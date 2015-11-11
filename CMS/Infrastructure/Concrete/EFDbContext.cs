@@ -11,11 +11,19 @@ namespace CMS.Infrastructure.Concrete
 {
         public class EFDbContext : DbContext
         {
-            public EFDbContext() : base("DefaultConnection") { }
-
-            public DbSet<Team> Teams { get; set; }
-            public DbSet<Match> Matches { get; set; }
+            public EFDbContext() : base("DefaultConnection") { }          
+           
             public DbSet<Event> Events { get; set; }
+            public DbSet<Lineup> Lineups { get; set; }
+            public DbSet<Match> Matches { get; set; }
+            public DbSet<Player> Players { get; set; }
+            public DbSet<PlayerStat> PlayerStats { get; set; }
+            public DbSet<Rival> Rivals { get; set; }
+            public DbSet<Stat> Stats { get; set; }
+            public DbSet<Sub> Subs { get; set; }
+            public DbSet<Substitution> Substitutions { get; set; }
+            public DbSet<Summary> Summaries { get; set; }
+            public DbSet<Team> Teams { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {

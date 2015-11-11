@@ -16,10 +16,12 @@ namespace CMS.Infrastructure.Entities
         public Guid Id { get; set; }
 
         public virtual ICollection<Match> Matches { get; set; }
+        public virtual ICollection<Rival> Rivals { get; set; }
 
         public Team()
         {
             Matches = new HashSet<Match>();
+            Rivals = new HashSet<Rival>();
         }
     }
 }
