@@ -24,12 +24,16 @@ namespace CMS.Infrastructure.Concrete
             public DbSet<Substitution> Substitutions { get; set; }
             public DbSet<Summary> Summaries { get; set; }
             public DbSet<Team> Teams { get; set; }
+            public DbSet<Goal> Goals { get; set; }
+            public DbSet<Card> Cards { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
                 modelBuilder.Configurations.Add(new TeamMap());
                 modelBuilder.Configurations.Add(new MatchMap());
                 modelBuilder.Configurations.Add(new EventMap());
+                modelBuilder.Configurations.Add(new GoalMap());
+                modelBuilder.Configurations.Add(new CardMap());
             }
         }
 
@@ -59,6 +63,11 @@ namespace CMS.Infrastructure.Concrete
             public MatchMap()
             {
                 HasMany(p => p.Events).WithRequired().HasForeignKey(ph => ph.MatchId);
+
+                Property(p => p.Stadium).HasMaxLength(100).IsUnicode(false);
+                Property(p => p.Attendance).HasMaxLength(10).IsUnicode(false);
+                Property(p => p.Time).HasMaxLength(20).IsUnicode(false);
+                Property(p => p.Referee).HasMaxLength(100).IsUnicode(false);
             }
         }
 
@@ -70,4 +79,19 @@ namespace CMS.Infrastructure.Concrete
             }
         }
 
+        public class GoalMap : EntityTypeConfiguration<Goal>
+        {
+            public GoalMap()
+            {
+                Property(p => p.PlayerName).HasMaxLength(250).IsUnicode(false);
+            }
+        }
+
+        public class CardMap : EntityTypeConfiguration<Card>
+        {
+            public CardMap()
+            {
+                Property(p => p.PlayerName).HasMaxLength(250).IsUnicode(false);
+            }
+        }
 }

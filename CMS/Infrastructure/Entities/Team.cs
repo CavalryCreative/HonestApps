@@ -17,11 +17,15 @@ namespace CMS.Infrastructure.Entities
 
         public virtual ICollection<Match> Matches { get; set; }
         public virtual ICollection<Rival> Rivals { get; set; }
+        public virtual ICollection<Lineup> Lineups { get; set; }
+        public virtual ICollection<Player> Players { get; set; }
 
         public Team()
         {
             Matches = new HashSet<Match>();
             Rivals = new HashSet<Rival>();
+            Lineups = new HashSet<Lineup>();
+            Players = new HashSet<Player>();
         }
     }
 }

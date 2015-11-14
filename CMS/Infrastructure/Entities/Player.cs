@@ -11,5 +11,14 @@ namespace CMS.Infrastructure.Entities
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+
+        public virtual ICollection<Team> Teams { get; set; }
+        public virtual ICollection<PlayerStat> PlayerStats { get; set; }
+
+        public Player()
+        {
+            Teams = new HashSet<Team>();
+            PlayerStats = new HashSet<PlayerStat>();
+        }
     }
 }

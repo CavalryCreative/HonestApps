@@ -210,6 +210,26 @@
     <Compile Include="EntitiesMigrations\201511112126209_UpdateSub1.Designer.cs">
       <DependentUpon>201511112126209_UpdateSub1.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201511141716041_UpdateEntities.cs" />
+    <Compile Include="EntitiesMigrations\201511141716041_UpdateEntities.Designer.cs">
+      <DependentUpon>201511141716041_UpdateEntities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511141722432_UpdatePlayer.cs" />
+    <Compile Include="EntitiesMigrations\201511141722432_UpdatePlayer.Designer.cs">
+      <DependentUpon>201511141722432_UpdatePlayer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511141724314_UpdatePlayer1.cs" />
+    <Compile Include="EntitiesMigrations\201511141724314_UpdatePlayer1.Designer.cs">
+      <DependentUpon>201511141724314_UpdatePlayer1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511142150291_AddGoalCardetc.cs" />
+    <Compile Include="EntitiesMigrations\201511142150291_AddGoalCardetc.Designer.cs">
+      <DependentUpon>201511142150291_AddGoalCardetc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511142156139_AddGoalCard2.cs" />
+    <Compile Include="EntitiesMigrations\201511142156139_AddGoalCard2.Designer.cs">
+      <DependentUpon>201511142156139_AddGoalCard2.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -217,19 +237,23 @@
     <Compile Include="Infrastructure\Abstract\ITeam.cs" />
     <Compile Include="Infrastructure\Concrete\EFDbContext.cs" />
     <Compile Include="Infrastructure\Concrete\EFTeam.cs" />
+    <Compile Include="Infrastructure\Entities\Card.cs" />
     <Compile Include="Infrastructure\Entities\CMSBase.cs" />
     <Compile Include="Infrastructure\Entities\Eleven.cs" />
     <Compile Include="Infrastructure\Entities\Event.cs" />
+    <Compile Include="Infrastructure\Entities\Goal.cs" />
     <Compile Include="Infrastructure\Entities\Lineup.cs" />
     <Compile Include="Infrastructure\Entities\Match.cs" />
     <Compile Include="Infrastructure\Entities\Player.cs" />
     <Compile Include="Infrastructure\Entities\PlayerStat.cs" />
+    <Compile Include="Infrastructure\Entities\RedCard.cs" />
     <Compile Include="Infrastructure\Entities\Rival.cs" />
     <Compile Include="Infrastructure\Entities\Stat.cs" />
     <Compile Include="Infrastructure\Entities\Sub.cs" />
     <Compile Include="Infrastructure\Entities\Substitution.cs" />
     <Compile Include="Infrastructure\Entities\Summary.cs" />
     <Compile Include="Infrastructure\Entities\Team.cs" />
+    <Compile Include="Infrastructure\Entities\YellowCard.cs" />
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
     <Compile Include="Infrastructure\NinjectResolver.cs" />
     <Compile Include="Infrastructure\NinjectScope.cs" />
@@ -323,6 +347,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201511112126209_UpdateSub1.resx">
       <DependentUpon>201511112126209_UpdateSub1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511141716041_UpdateEntities.resx">
+      <DependentUpon>201511141716041_UpdateEntities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511141722432_UpdatePlayer.resx">
+      <DependentUpon>201511141722432_UpdatePlayer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511141724314_UpdatePlayer1.resx">
+      <DependentUpon>201511141724314_UpdatePlayer1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511142150291_AddGoalCardetc.resx">
+      <DependentUpon>201511142150291_AddGoalCardetc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511142156139_AddGoalCard2.resx">
+      <DependentUpon>201511142156139_AddGoalCard2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

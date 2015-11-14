@@ -7,10 +7,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CMS.Infrastructure.Entities
 {
-    public class Substitution : CMSBase
+    public abstract class Card
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-        public Guid MatchId { get; set; }
+        public Guid SummaryId { get; set; }
+        public bool IsHomeTeam { get; set; }
+        public string PlayerName { get; set; }
+        public int APIPlayerId { get; set; }
+        public byte Minute { get; set; }
     }
 }
