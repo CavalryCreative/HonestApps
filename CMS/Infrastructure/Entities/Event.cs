@@ -14,5 +14,10 @@ namespace CMS.Infrastructure.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public Guid MatchId { get; set; }
+        public bool Important { get; set; }
+        public bool Goal { get; set; }
+        public byte Minute { get; set; }
+        public string Comment { get; set; }
+        public int APIId { get; set; }
     }
 }

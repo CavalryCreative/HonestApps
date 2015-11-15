@@ -11,6 +11,10 @@ namespace CMS.Infrastructure.Entities
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+        public byte SquadNumber { get; set; }
+        public string Name { get; set; }
+        public string Position { get; set; }
+        public int APIPlayerId { get; set; }
 
         public virtual ICollection<Team> Teams { get; set; }
         public virtual ICollection<PlayerStat> PlayerStats { get; set; }

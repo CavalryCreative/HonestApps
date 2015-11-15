@@ -11,6 +11,7 @@ namespace CMS.Infrastructure.Entities
     {
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+        public Guid MatchId { get; set; }
 
         public Lineup()
         {

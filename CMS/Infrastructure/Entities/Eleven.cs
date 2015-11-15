@@ -9,6 +9,13 @@ namespace CMS.Infrastructure.Entities
 {
     public class Eleven : Lineup
     {
-       
+        public virtual ICollection<Player> HomeTeam { get; set; }
+        public virtual ICollection<Player> AwayTeam { get; set; }
+
+        public Eleven()
+        {
+            HomeTeam = new HashSet<Player>();
+            AwayTeam = new HashSet<Player>();
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS", "CMS\CMS.csproj", "{4D70FB07-EBFB-4711-834A-18269C6776DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.Tests", "CMS.Tests\CMS.Tests.csproj", "{E0F10BFB-E412-45BB-A45B-D55288B2B0DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resources", "Resources\Resources.csproj", "{AEF97706-46C6-4B75-9AC2-134E83DA18AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E0F10BFB-E412-45BB-A45B-D55288B2B0DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0F10BFB-E412-45BB-A45B-D55288B2B0DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0F10BFB-E412-45BB-A45B-D55288B2B0DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -20,6 +20,7 @@ namespace CMS.Infrastructure.Entities
         public virtual ICollection<Lineup> Lineups { get; set; }
         public virtual ICollection<Summary> Summaries { get; set; }
         public virtual ICollection<Substitution> Substitutions { get; set; }
+        public virtual ICollection<PlayerStat> PlayerStats { get; set; }
 
         public string Stadium { get; set; }
         public string Attendance { get; set; }
@@ -34,6 +35,7 @@ namespace CMS.Infrastructure.Entities
             Lineups = new HashSet<Lineup>();
             Summaries = new HashSet<Summary>();
             Substitutions = new HashSet<Substitution>();
+            PlayerStats = new HashSet<PlayerStat>();
         }
     }
 }

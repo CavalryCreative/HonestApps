@@ -34,6 +34,8 @@ namespace CMS.Infrastructure.Concrete
                 modelBuilder.Configurations.Add(new EventMap());
                 modelBuilder.Configurations.Add(new GoalMap());
                 modelBuilder.Configurations.Add(new CardMap());
+                modelBuilder.Configurations.Add(new PlayerMap());
+                modelBuilder.Configurations.Add(new SubstitutionMap());
             }
         }
 
@@ -75,7 +77,7 @@ namespace CMS.Infrastructure.Concrete
         {
             public EventMap()
             {
-                
+                Property(p => p.Comment).HasMaxLength(1000).IsUnicode(false);
             }
         }
 
@@ -92,6 +94,24 @@ namespace CMS.Infrastructure.Concrete
             public CardMap()
             {
                 Property(p => p.PlayerName).HasMaxLength(250).IsUnicode(false);
+            }
+        }
+
+        public class PlayerMap : EntityTypeConfiguration<Player>
+        {
+            public PlayerMap()
+            {
+                Property(p => p.Name).HasMaxLength(250).IsUnicode(false);
+                Property(p => p.Position).HasMaxLength(100).IsUnicode(false);
+            }
+        }
+
+        public class SubstitutionMap : EntityTypeConfiguration<Substitution>
+        {
+            public SubstitutionMap()
+            {
+                Property(p => p.PlayerOn).HasMaxLength(250).IsUnicode(false);
+                Property(p => p.PlayerOff).HasMaxLength(250).IsUnicode(false);
             }
         }
 }

@@ -230,12 +230,37 @@
     <Compile Include="EntitiesMigrations\201511142156139_AddGoalCard2.Designer.cs">
       <DependentUpon>201511142156139_AddGoalCard2.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201511151016184_UpdatePlayers.cs" />
+    <Compile Include="EntitiesMigrations\201511151016184_UpdatePlayers.Designer.cs">
+      <DependentUpon>201511151016184_UpdatePlayers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511151245568_UpdateVarious.cs" />
+    <Compile Include="EntitiesMigrations\201511151245568_UpdateVarious.Designer.cs">
+      <DependentUpon>201511151245568_UpdateVarious.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511151430584_UpdateLineup1.cs" />
+    <Compile Include="EntitiesMigrations\201511151430584_UpdateLineup1.Designer.cs">
+      <DependentUpon>201511151430584_UpdateLineup1.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\Abstract\IEleven.cs" />
+    <Compile Include="Infrastructure\Abstract\IEvent.cs" />
+    <Compile Include="Infrastructure\Abstract\IGoal.cs" />
+    <Compile Include="Infrastructure\Abstract\IMatch.cs" />
+    <Compile Include="Infrastructure\Abstract\IPlayer.cs" />
+    <Compile Include="Infrastructure\Abstract\IPlayerStat.cs" />
+    <Compile Include="Infrastructure\Abstract\IRedCard.cs" />
+    <Compile Include="Infrastructure\Abstract\IRival.cs" />
+    <Compile Include="Infrastructure\Abstract\IStat.cs" />
+    <Compile Include="Infrastructure\Abstract\ISubstitution.cs" />
+    <Compile Include="Infrastructure\Abstract\ISummary.cs" />
     <Compile Include="Infrastructure\Abstract\ITeam.cs" />
+    <Compile Include="Infrastructure\Abstract\IYellowCard.cs" />
     <Compile Include="Infrastructure\Concrete\EFDbContext.cs" />
+    <Compile Include="Infrastructure\Concrete\EFEleven.cs" />
     <Compile Include="Infrastructure\Concrete\EFTeam.cs" />
     <Compile Include="Infrastructure\Entities\Card.cs" />
     <Compile Include="Infrastructure\Entities\CMSBase.cs" />
@@ -254,6 +279,7 @@
     <Compile Include="Infrastructure\Entities\Summary.cs" />
     <Compile Include="Infrastructure\Entities\Team.cs" />
     <Compile Include="Infrastructure\Entities\YellowCard.cs" />
+    <Compile Include="Infrastructure\Abstract\ISub.cs" />
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
     <Compile Include="Infrastructure\NinjectResolver.cs" />
     <Compile Include="Infrastructure\NinjectScope.cs" />
@@ -363,12 +389,27 @@
     <EmbeddedResource Include="EntitiesMigrations\201511142156139_AddGoalCard2.resx">
       <DependentUpon>201511142156139_AddGoalCard2.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511151016184_UpdatePlayers.resx">
+      <DependentUpon>201511151016184_UpdatePlayers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511151245568_UpdateVarious.resx">
+      <DependentUpon>201511151245568_UpdateVarious.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511151430584_UpdateLineup1.resx">
+      <DependentUpon>201511151430584_UpdateLineup1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201510111758212_AddInitial.resx">
       <DependentUpon>201510111758212_AddInitial.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Resources\Resources.csproj">
+      <Project>{aef97706-46c6-4b75-9ac2-134e83da18aa}</Project>
+      <Name>Resources</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
