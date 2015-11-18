@@ -9,5 +9,8 @@ namespace CMS.Infrastructure.Abstract
 {
     public interface IYellowCard
     {
+        IEnumerable<YellowCard> Get(Guid? summaryId, bool IsHomeTeam);
+        string Save(YellowCard updatedRecord);
+        string Delete(YellowCard updatedRecord);
     }
 }

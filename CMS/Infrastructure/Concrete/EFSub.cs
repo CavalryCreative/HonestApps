@@ -8,30 +8,30 @@ using Res = Resources;
 
 namespace CMS.Infrastructure.Concrete
 {
-    public class EFEleven : IEleven
+    public class EFSub : ISub
     {
         private EFDbContext context = new EFDbContext();
 
-        public IEnumerable<Eleven> Get(Guid? matchId, bool IsHomeTeam)
+        public IEnumerable<Sub> Get(Guid? matchId, bool IsHomeTeam)
         {
-            IList<Eleven> firstEleven = new List<Eleven>();
+            IList<Sub> subs = new List<Sub>();
 
             if (matchId.HasValue)
             {
-                firstEleven = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Eleven>().Where(x => (x.MatchId == matchId)).ToList();
+                subs = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Sub>().Where(x => (x.MatchId == matchId)).ToList();
             }
             else
             {
                 if (matchId != System.Guid.Empty)
                 {
-                    firstEleven = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Eleven>().ToList();
+                    subs = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Sub>().ToList();
                 }
             }
 
-            return firstEleven;
+            return subs;
         }
 
-        public string Save(Eleven updatedRecord)
+        public string Save(Sub updatedRecord)
         {
             bool isNewRecord = false;
             Guid Id;
@@ -62,6 +62,7 @@ namespace CMS.Infrastructure.Concrete
                     }
 
                     recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
                     recordToUpdate.Active = updatedRecord.Active;
 
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
@@ -86,7 +87,7 @@ namespace CMS.Infrastructure.Concrete
             }
         }
 
-        public string Delete(Eleven updatedRecord)
+        public string Delete(Sub updatedRecord)
         {
             throw new NotImplementedException();
         }

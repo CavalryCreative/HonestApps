@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CMS.Infrastructure.Entities
 {
-    public abstract class Card
+    public abstract class Card : CMSBase
     {
         public Guid Id { get; set; }
         public Guid SummaryId { get; set; }

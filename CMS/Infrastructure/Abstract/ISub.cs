@@ -9,5 +9,8 @@ namespace CMS.Infrastructure.Abstract
 {
     public interface ISub
     {
+        IEnumerable<Sub> Get(Guid? matchId, bool IsHomeTeam);
+        string Save(Sub updatedRecord);
+        string Delete(Sub updatedRecord);
     }
 }
