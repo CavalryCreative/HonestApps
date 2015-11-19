@@ -9,5 +9,8 @@ namespace CMS.Infrastructure.Abstract
 {
     public interface IGoal
     {
+        IEnumerable<Goal> Get(Guid? summaryId, bool IsHomeTeam);
+        string Save(Goal updatedRecord);
+        string Delete(Goal updatedRecord);
     }
 }

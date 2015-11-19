@@ -9,5 +9,8 @@ namespace CMS.Infrastructure.Abstract
 {
     public interface ISummary
     {
+        IEnumerable<Summary> Get(Guid? matchId);
+        string Save(Summary updatedRecord);
+        string Delete(Summary updatedRecord);
     }
 }

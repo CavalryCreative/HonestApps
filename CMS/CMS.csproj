@@ -265,8 +265,12 @@
     <Compile Include="Infrastructure\Abstract\IYellowCard.cs" />
     <Compile Include="Infrastructure\Concrete\EFDbContext.cs" />
     <Compile Include="Infrastructure\Concrete\EFEleven.cs" />
+    <Compile Include="Infrastructure\Concrete\EFEvent.cs" />
+    <Compile Include="Infrastructure\Concrete\EFGoal.cs" />
     <Compile Include="Infrastructure\Concrete\EFRedCard.cs" />
+    <Compile Include="Infrastructure\Concrete\EFStat.cs" />
     <Compile Include="Infrastructure\Concrete\EFSub.cs" />
+    <Compile Include="Infrastructure\Concrete\EFSummary.cs" />
     <Compile Include="Infrastructure\Concrete\EFTeam.cs" />
     <Compile Include="Infrastructure\Concrete\EFYellowCard.cs" />
     <Compile Include="Infrastructure\Entities\Card.cs" />

@@ -9,5 +9,8 @@ namespace CMS.Infrastructure.Abstract
 {
     public interface IStat
     {
+        IEnumerable<Stat> Get(Guid? matchId);
+        string Save(Stat updatedRecord);
+        string Delete(Stat updatedRecord);
     }
 }
