@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.Tests", "CMS.Tests\CMS.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resources", "Resources\Resources.csproj", "{AEF97706-46C6-4B75-9AC2-134E83DA18AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedData", "FeedData\FeedData.csproj", "{B265D013-565D-4A3B-BF3D-CFED8ADF9095}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEF97706-46C6-4B75-9AC2-134E83DA18AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B265D013-565D-4A3B-BF3D-CFED8ADF9095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B265D013-565D-4A3B-BF3D-CFED8ADF9095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B265D013-565D-4A3B-BF3D-CFED8ADF9095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B265D013-565D-4A3B-BF3D-CFED8ADF9095}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
