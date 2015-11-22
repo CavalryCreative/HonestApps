@@ -246,6 +246,10 @@
     <Compile Include="EntitiesMigrations\201511182049565_UpdateCards.Designer.cs">
       <DependentUpon>201511182049565_UpdateCards.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201511222012407_UpdateMatch.cs" />
+    <Compile Include="EntitiesMigrations\201511222012407_UpdateMatch.Designer.cs">
+      <DependentUpon>201511222012407_UpdateMatch.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -411,6 +415,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201511182049565_UpdateCards.resx">
       <DependentUpon>201511182049565_UpdateCards.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511222012407_UpdateMatch.resx">
+      <DependentUpon>201511222012407_UpdateMatch.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

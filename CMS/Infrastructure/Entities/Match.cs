@@ -22,6 +22,7 @@ namespace CMS.Infrastructure.Entities
         public virtual ICollection<Substitution> Substitutions { get; set; }
         public virtual ICollection<PlayerStat> PlayerStats { get; set; }
 
+        public int APIId { get; set; }
         public string Stadium { get; set; }
         public string Attendance { get; set; }
         public string Time { get; set; }

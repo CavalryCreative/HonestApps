@@ -17,7 +17,7 @@ namespace FeedData
         static void Main(string[] args)
         {
             //GetFixtures();
-            GetCommentaries();
+            GetCommentaries(2146623);
         }
 
         private static string GetFixtures()
@@ -53,13 +53,6 @@ namespace FeedData
                     string s = reader.ReadToEnd();
 
                     var arr = JsonConvert.DeserializeObject<JObject>(s);
-                    int i = 1;
-                    //string cat;
-                    //string film;
-                    //string instavid;
-                    //string bluray;
-                    //string dvd;
-                    //string imghtml;
 
                     foreach (KeyValuePair<string,JToken> obj in arr)
                     {
@@ -89,7 +82,7 @@ namespace FeedData
             return retMsg;
         }
 
-        private static string GetCommentaries()
+        private static string GetCommentaries(int matchId)
         {
             //const int POINT_OF_SATISFIED_CURIOSITY = 7;
             string retMsg = string.Empty;
@@ -110,7 +103,7 @@ namespace FeedData
 
             try
             {
-                string uri = "http://football-api.com/api/?Action=commentaries&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&match_id=2146622";  // <-- this returns formatted json
+                string uri = "http://football-api.com/api/?Action=commentaries&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&match_id=" + matchId.ToString();  // <-- this returns formatted json
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -121,20 +114,54 @@ namespace FeedData
                     var reader = new StreamReader(webResponse.GetResponseStream());
                     string s = reader.ReadToEnd();
 
-                    var arr = JsonConvert.DeserializeObject<JObject>(s);
+                    JToken token = JObject.Parse(s);
 
-                    foreach (KeyValuePair<string, JToken> obj in arr)
+                    string jPath = "commentaries.[0].comm_commentaries.comment";
+                    int lastUpdateId = 8961117;
+
+                    var events = token.SelectTokens(jPath);
+                      
+                    foreach (var childToken in events.Children())
                     {
-                        if (obj.Value.ToString() == "commentaries")
+                        var jeff = childToken.Children();
+
+                        foreach(var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                         {
+                            string id = evt["id"];
+                            int eventId = Convert.ToInt32(id);
+
+                            if (eventId <= lastUpdateId)
+                            {
+                                break;
+                            }
+
+                            Event commEvent = new Event();
+
+                            string important = evt["important"];
+                            string isgoal = evt["isgoal"];
+                            string minute = evt["minute"];
+
+                            if (minute.Contains('\''))
+                            {
+                                minute = minute.Remove(minute.Length - 1, 1);
+                            }
+
+                            string comment = evt["comment"];
+                          
+                            commEvent.Important = important == "True" ? true : false;
+                            commEvent.Goal = isgoal == "True" ? true : false;
+
+                            if (!string.IsNullOrWhiteSpace(minute))
+                                commEvent.Minute = Convert.ToByte(minute);
+
+                            commEvent.Comment = comment;
+                            commEvent.APIId = eventId;
+                            //commEvent.MatchId = matchId;
+
+                            EFEvent efEvent = new EFEvent();
+                            efEvent.Save(commEvent);
 
                         }
-                        //cat = (string)obj["category"];
-                        //film = (string)obj["film"];
-                        //instavid = (string)obj["instavid"];
-                        //bluray = (string)obj["bluray"];
-                        //dvd = (string)obj["dvd"];
-                        //imghtml = (string)obj["imghtml"];
                     }
                 }
                 else
