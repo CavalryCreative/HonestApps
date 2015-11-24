@@ -27,6 +27,7 @@ namespace CMS.Infrastructure.Entities
         public string Attendance { get; set; }
         public string Time { get; set; }
         public string Referee { get; set; }
+        public DateTime? Date { get; set; }
 
         public Match()
         {

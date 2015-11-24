@@ -250,6 +250,10 @@
     <Compile Include="EntitiesMigrations\201511222012407_UpdateMatch.Designer.cs">
       <DependentUpon>201511222012407_UpdateMatch.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201511242052269_UpdateMatch1.cs" />
+    <Compile Include="EntitiesMigrations\201511242052269_UpdateMatch1.Designer.cs">
+      <DependentUpon>201511242052269_UpdateMatch1.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -418,6 +422,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201511222012407_UpdateMatch.resx">
       <DependentUpon>201511222012407_UpdateMatch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511242052269_UpdateMatch1.resx">
+      <DependentUpon>201511242052269_UpdateMatch1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>
