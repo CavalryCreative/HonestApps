@@ -28,13 +28,22 @@ namespace FeedData
     {
         static void Main(string[] args)
         {
-            GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
-            //GetCommentaries(2146623);
+            IList<int> liveMatches = new List<int>();
+
+            liveMatches = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+
+          if (liveMatches.Count > 0)
+          {
+              foreach (var matchId in liveMatches)
+              {
+                  GetCommentaries(matchId);
+              }
+          }         
         }
 
-        private static string GetFixtures(DateTime startDate, DateTime endDate)
+        private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)
         {
-            //const int POINT_OF_SATISFIED_CURIOSITY = 7;
+            IList<int> liveMatches = new List<int>();
             string retMsg = string.Empty;
 
             string startDateStr = startDate.ToShortDateString();
@@ -59,54 +68,48 @@ namespace FeedData
                     var reader = new StreamReader(webResponse.GetResponseStream());
                     string s = reader.ReadToEnd();
 
-                    JToken token = JObject.Parse(s);
+                    JObject obj = JObject.Parse(s);
 
-                    string jPath = "matches";
-                    //int lastUpdateId = 8961117;
+                    var postTitles = from p in obj["matches"] 
+                                     select new
+                                         {
+                                             MatchDate = (string)p["match_formatted_date"],
+                                             APIId = (int)p["match_id"],
+                                             Time = (string)p["match_time"],
+                                             HomeTeamAPIId = (int)p["match_localteam_id"],
+                                             HomeTeam = (string)p["match_localteam_name"],
+                                             AwayTeamAPIId = (int)p["match_visitorteam_id"],
+                                             AwayTeam = (string)p["match_visitorteam_name"]
+                                         };
+ 
+                     foreach (var item in postTitles)
+                     {
+                         Match match = new Match();
 
-                    var matches = token.SelectTokens(jPath);
+                         match.APIId = item.APIId;
+                         match.Time = item.Time;
+                         match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), match.Time));
+                         match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
 
-                    foreach (var childToken in matches.Children())
-                    {
-                        //var jeff = childToken.ToObject<Dictionary<string, string>();
+                         DateTime matchEnd = match.Date.Value.AddHours(2);
+                         match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= matchEnd ? true : false;
 
-                        //foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
-                        //{
-                            //string id = evt["id"];
-                            //int eventId = Convert.ToInt32(id);
+                         if (match.IsLive)
+                             liveMatches.Add(match.APIId);
 
-                            //if (eventId <= lastUpdateId)
-                            //{
-                            //    break;
-                            //}
+                         Team homeTeam = new Team();
+                         homeTeam.APIId = item.HomeTeamAPIId;
 
-                            //Event commEvent = new Event();
+                         Team awayTeam = new Team();
+                         awayTeam.APIId = item.AwayTeamAPIId;
 
-                        //string important = childToken["match_localteam_id"];
-                            //string isgoal = evt["isgoal"];
-                            //string minute = evt["minute"];
+                         match.HomeTeamAPIId = item.HomeTeamAPIId;
+                         match.AwayTeamAPIId = item.AwayTeamAPIId;
 
-                            //if (minute.Contains('\''))
-                            //{
-                            //    minute = minute.Remove(minute.Length - 1, 1);
-                            //}
+                         EFMatch efMatch = new EFMatch();
 
-                            //string comment = evt["comment"];
-
-                            //commEvent.Important = important == "True" ? true : false;
-                            //commEvent.Goal = isgoal == "True" ? true : false;
-
-                            //if (!string.IsNullOrWhiteSpace(minute))
-                            //    commEvent.Minute = Convert.ToByte(minute);
-
-                            //commEvent.Comment = comment;
-                            //commEvent.APIId = eventId;
-                            ////commEvent.MatchId = matchId;
-
-                            //EFEvent efEvent = new EFEvent();
-                            //efEvent.Save(commEvent);
-                        //}
-                    }
+                         //efMatch.Save(match);
+                     }
                 }
                 else
                 {
@@ -119,7 +122,7 @@ namespace FeedData
                 retMsg = "Error: " + ex.Message;
             }
 
-            return retMsg;
+            return liveMatches;
         }
 
         private static string GetCommentaries(int matchId)

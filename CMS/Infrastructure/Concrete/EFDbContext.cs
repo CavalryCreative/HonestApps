@@ -43,11 +43,11 @@ namespace CMS.Infrastructure.Concrete
         {
             public TeamMap()
             {
-                HasMany(p => p.Matches).WithMany(c => c.Teams).Map(m =>
-                {
-                    m.MapLeftKey("MatchId");
-                    m.MapRightKey("TeamId");
-                });
+                //HasMany(p => p.Matches).WithMany(c => c.Teams).Map(m =>
+                //{
+                //    m.MapLeftKey("MatchId");
+                //    m.MapRightKey("TeamId");
+                //});
 
                 //Property(p => p.URL).HasMaxLength(500).IsUnicode(false);
                 //Property(p => p.JobRef).HasMaxLength(50).IsUnicode(false);

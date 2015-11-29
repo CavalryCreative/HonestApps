@@ -9,5 +9,9 @@ namespace CMS.Infrastructure.Abstract
 {
     public interface IMatch
     {
+        IEnumerable<Match> Get(Guid? matchId);
+        IEnumerable<Match> GetByAPIId(int id);
+        string Save(Match updatedRecord);
+        string SaveTeam(Match updatedRecord, int teamAPIId);
     }
 }

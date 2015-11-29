@@ -254,6 +254,70 @@
     <Compile Include="EntitiesMigrations\201511242052269_UpdateMatch1.Designer.cs">
       <DependentUpon>201511242052269_UpdateMatch1.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201511262214560_UpdateTeam.cs" />
+    <Compile Include="EntitiesMigrations\201511262214560_UpdateTeam.Designer.cs">
+      <DependentUpon>201511262214560_UpdateTeam.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511262217420_UpdateTeam2.cs" />
+    <Compile Include="EntitiesMigrations\201511262217420_UpdateTeam2.Designer.cs">
+      <DependentUpon>201511262217420_UpdateTeam2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511262243063_UpdateTeam3.cs" />
+    <Compile Include="EntitiesMigrations\201511262243063_UpdateTeam3.Designer.cs">
+      <DependentUpon>201511262243063_UpdateTeam3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511262244031_UpdateTeam4.cs" />
+    <Compile Include="EntitiesMigrations\201511262244031_UpdateTeam4.Designer.cs">
+      <DependentUpon>201511262244031_UpdateTeam4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511281555337_UpdateMatch2.cs" />
+    <Compile Include="EntitiesMigrations\201511281555337_UpdateMatch2.Designer.cs">
+      <DependentUpon>201511281555337_UpdateMatch2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291142305_UpdateMatch3.cs" />
+    <Compile Include="EntitiesMigrations\201511291142305_UpdateMatch3.Designer.cs">
+      <DependentUpon>201511291142305_UpdateMatch3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291148035_UpdateMatch21.cs" />
+    <Compile Include="EntitiesMigrations\201511291148035_UpdateMatch21.Designer.cs">
+      <DependentUpon>201511291148035_UpdateMatch21.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291533279_UpdateMatch31.cs" />
+    <Compile Include="EntitiesMigrations\201511291533279_UpdateMatch31.Designer.cs">
+      <DependentUpon>201511291533279_UpdateMatch31.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291537278_UpdateMatch4.cs" />
+    <Compile Include="EntitiesMigrations\201511291537278_UpdateMatch4.Designer.cs">
+      <DependentUpon>201511291537278_UpdateMatch4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291538253_UpdateMatch5.cs" />
+    <Compile Include="EntitiesMigrations\201511291538253_UpdateMatch5.Designer.cs">
+      <DependentUpon>201511291538253_UpdateMatch5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291551300_UpdateTeam1.cs" />
+    <Compile Include="EntitiesMigrations\201511291551300_UpdateTeam1.Designer.cs">
+      <DependentUpon>201511291551300_UpdateTeam1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291553464_UpdateTeam21.cs" />
+    <Compile Include="EntitiesMigrations\201511291553464_UpdateTeam21.Designer.cs">
+      <DependentUpon>201511291553464_UpdateTeam21.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291603450_UpdateTeam41.cs" />
+    <Compile Include="EntitiesMigrations\201511291603450_UpdateTeam41.Designer.cs">
+      <DependentUpon>201511291603450_UpdateTeam41.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291620560_UpdateTeam5.cs" />
+    <Compile Include="EntitiesMigrations\201511291620560_UpdateTeam5.Designer.cs">
+      <DependentUpon>201511291620560_UpdateTeam5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291629439_UpdateMatch6.cs" />
+    <Compile Include="EntitiesMigrations\201511291629439_UpdateMatch6.Designer.cs">
+      <DependentUpon>201511291629439_UpdateMatch6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201511291717234_UpdateMatch22.cs" />
+    <Compile Include="EntitiesMigrations\201511291717234_UpdateMatch22.Designer.cs">
+      <DependentUpon>201511291717234_UpdateMatch22.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -275,6 +339,7 @@
     <Compile Include="Infrastructure\Concrete\EFEleven.cs" />
     <Compile Include="Infrastructure\Concrete\EFEvent.cs" />
     <Compile Include="Infrastructure\Concrete\EFGoal.cs" />
+    <Compile Include="Infrastructure\Concrete\EFMatch.cs" />
     <Compile Include="Infrastructure\Concrete\EFRedCard.cs" />
     <Compile Include="Infrastructure\Concrete\EFStat.cs" />
     <Compile Include="Infrastructure\Concrete\EFSub.cs" />
@@ -425,6 +490,54 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201511242052269_UpdateMatch1.resx">
       <DependentUpon>201511242052269_UpdateMatch1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511262214560_UpdateTeam.resx">
+      <DependentUpon>201511262214560_UpdateTeam.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511262217420_UpdateTeam2.resx">
+      <DependentUpon>201511262217420_UpdateTeam2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511262243063_UpdateTeam3.resx">
+      <DependentUpon>201511262243063_UpdateTeam3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511262244031_UpdateTeam4.resx">
+      <DependentUpon>201511262244031_UpdateTeam4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511281555337_UpdateMatch2.resx">
+      <DependentUpon>201511281555337_UpdateMatch2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291142305_UpdateMatch3.resx">
+      <DependentUpon>201511291142305_UpdateMatch3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291148035_UpdateMatch21.resx">
+      <DependentUpon>201511291148035_UpdateMatch21.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291533279_UpdateMatch31.resx">
+      <DependentUpon>201511291533279_UpdateMatch31.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291537278_UpdateMatch4.resx">
+      <DependentUpon>201511291537278_UpdateMatch4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291538253_UpdateMatch5.resx">
+      <DependentUpon>201511291538253_UpdateMatch5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291551300_UpdateTeam1.resx">
+      <DependentUpon>201511291551300_UpdateTeam1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291553464_UpdateTeam21.resx">
+      <DependentUpon>201511291553464_UpdateTeam21.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291603450_UpdateTeam41.resx">
+      <DependentUpon>201511291603450_UpdateTeam41.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291620560_UpdateTeam5.resx">
+      <DependentUpon>201511291620560_UpdateTeam5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291629439_UpdateMatch6.resx">
+      <DependentUpon>201511291629439_UpdateMatch6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201511291717234_UpdateMatch22.resx">
+      <DependentUpon>201511291717234_UpdateMatch22.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

@@ -14,7 +14,7 @@ namespace CMS.Infrastructure.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        public virtual ICollection<Team> Teams { get; set; }
+        //public virtual ICollection<Team> Teams { get; set; }
         public virtual ICollection<Event> Events { get; set; }
         public virtual ICollection<Stat> Stats { get; set; }
         public virtual ICollection<Lineup> Lineups { get; set; }
@@ -28,10 +28,15 @@ namespace CMS.Infrastructure.Entities
         public string Time { get; set; }
         public string Referee { get; set; }
         public DateTime? Date { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int HomeTeamAPIId { get; set; }
+        public int AwayTeamAPIId { get; set; }
+        public bool IsToday { get; set; }
+        public bool IsLive { get; set; }
 
         public Match()
         {
-            Teams = new HashSet<Team>();
+            //Teams = new HashSet<Team>();
             Events = new HashSet<Event>();
             Stats = new HashSet<Stat>();
             Lineups = new HashSet<Lineup>();

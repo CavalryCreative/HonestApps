@@ -14,15 +14,19 @@ namespace CMS.Infrastructure.Entities
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+        public int APIId { get; set; }
+        public string Name { get; set; }
 
-        public virtual ICollection<Match> Matches { get; set; }
+        public virtual ICollection<Match> HomeMatches { get; set; }
+        public virtual ICollection<Match> AwayMatches { get; set; }
         public virtual ICollection<Rival> Rivals { get; set; }
         public virtual ICollection<Lineup> Lineups { get; set; }
         public virtual ICollection<Player> Players { get; set; }
 
         public Team()
         {
-            Matches = new HashSet<Match>();
+            HomeMatches = new HashSet<Match>();
+            AwayMatches = new HashSet<Match>();
             Rivals = new HashSet<Rival>();
             Lineups = new HashSet<Lineup>();
             Players = new HashSet<Player>();
