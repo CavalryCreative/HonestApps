@@ -16,6 +16,7 @@ namespace CMS.Infrastructure.Entities
         public Guid Id { get; set; }
         public int APIId { get; set; }
         public string Name { get; set; }
+        public string Stadium { get; set; }
 
         public virtual ICollection<Match> HomeMatches { get; set; }
         public virtual ICollection<Match> AwayMatches { get; set; }

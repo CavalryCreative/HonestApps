@@ -7,8 +7,7 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using CMS.Infrastructure.Entities;
-using CMS.Infrastructure.Concrete;
+using Res = Resources;
 
 namespace FeedData
 {
@@ -81,34 +80,40 @@ namespace FeedData
                                              AwayTeamAPIId = (int)p["match_visitorteam_id"],
                                              AwayTeam = (string)p["match_visitorteam_name"]
                                          };
- 
+
+                    Entities context = new Entities();
+
                      foreach (var item in postTitles)
                      {
                          Match match = new Match();
 
                          match.APIId = item.APIId;
-                         match.Time = item.Time;
                          match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), match.Time));
+                         match.EndDate = match.Date.Value.AddHours(2);      
+                         match.Active = DateTime.Now <= match.EndDate ? true : false;                                                                        
                          match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-
-                         DateTime matchEnd = match.Date.Value.AddHours(2);
-                         match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= matchEnd ? true : false;
+                         match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
+                         match.Time = item.Time;
 
                          if (match.IsLive)
                              liveMatches.Add(match.APIId);
 
-                         Team homeTeam = new Team();
-                         homeTeam.APIId = item.HomeTeamAPIId;
+                         var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
+                         var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
 
-                         Team awayTeam = new Team();
-                         awayTeam.APIId = item.AwayTeamAPIId;
+                         if (homeTeam != null)
+                         {
+                             match.HomeTeamId = homeTeam.Id;
+                             match.Stadium = homeTeam.Stadium;
+                         }
+                            
+                         if (awayTeam != null)
+                             match.AwayTeamId = awayTeam.Id;
 
                          match.HomeTeamAPIId = item.HomeTeamAPIId;
                          match.AwayTeamAPIId = item.AwayTeamAPIId;
 
-                         EFMatch efMatch = new EFMatch();
-
-                         //efMatch.Save(match);
+                         SaveMatch(match);
                      }
                 }
                 else
@@ -201,8 +206,7 @@ namespace FeedData
                             commEvent.APIId = eventId;
                             //commEvent.MatchId = matchId;
 
-                            EFEvent efEvent = new EFEvent();
-                            efEvent.Save(commEvent);
+                            SaveEvent(commEvent);
                         }
                     }
                 }
@@ -218,6 +222,107 @@ namespace FeedData
             }
 
             return retMsg;
+        }
+
+        private static string SaveMatch(Match updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord == null)
+            {
+                return Res.Resources.NotFound;
+            }
+          
+                //Update record
+                var recordToUpdate = context.Matches.Where(x => x.APIId == updatedRecord.APIId).FirstOrDefault();
+
+                if (recordToUpdate == null)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.Matches.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+                else
+                {
+                    recordToUpdate.Active = updatedRecord.Active;
+                    recordToUpdate.APIId = updatedRecord.APIId;
+                    recordToUpdate.Attendance = updatedRecord.Attendance;
+                    recordToUpdate.AwayTeamAPIId = updatedRecord.AwayTeamAPIId;
+                    recordToUpdate.AwayTeamId = updatedRecord.AwayTeamId;
+                    recordToUpdate.Date = updatedRecord.Date;
+                    recordToUpdate.EndDate = updatedRecord.EndDate;
+                    recordToUpdate.HomeTeamAPIId = updatedRecord.HomeTeamAPIId;
+                    recordToUpdate.HomeTeamId = updatedRecord.HomeTeamId;
+                    recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.IsLive = updatedRecord.IsLive;
+                    recordToUpdate.IsToday = updatedRecord.IsToday;
+                    recordToUpdate.Referee = updatedRecord.Referee;
+                    recordToUpdate.Stadium = updatedRecord.Stadium;
+                    recordToUpdate.Time = updatedRecord.Time;
+
+                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                    Id = updatedRecord.Id;
+                }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string SaveEvent(Event updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord != null)
+            {
+                if (updatedRecord.Id == System.Guid.Empty)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.Events.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static Team GetTeamByAPIId(int id)
+        {
+            Entities context = new Entities();
+
+            return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
         }
     }
 }
