@@ -37,7 +37,9 @@ namespace FeedData
               {
                   GetCommentaries(matchId);
               }
-          }         
+          }
+
+          GetCommentaries(2148519);
         }
 
         private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)
@@ -164,8 +166,108 @@ namespace FeedData
 
                     JToken token = JObject.Parse(s);
 
-                    string jPath = "commentaries.[0].comm_commentaries.comment";
-                    int lastUpdateId = 8961117;//TODO - save/retrieve lastupdateId
+                    //JObject obj = JObject.Parse(s);
+
+                    #region Lineups
+
+                    //Home
+                    string jPath = "commentaries.[0].comm_match_teams.localteam.player";
+
+                    var y = token.SelectTokens(jPath);
+
+                    foreach (var childToken in y.Children())
+                    {
+                         var jeff = childToken.Children();
+
+                         foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                         {
+                             byte squadNumber = Convert.ToByte(evt["number"]);
+                             string name = evt["name"];
+                             string position = evt["pos"];
+                             int playerAPIId = Convert.ToInt32(evt["id"]);
+                         }
+                    }
+
+                    //Home subs
+
+                    //Away
+                    jPath = "commentaries.[0].comm_match_teams.visitorteam.player";
+
+                    y = token.SelectTokens(jPath);
+
+                    foreach (var childToken in y.Children())
+                    {
+                        var jeff = childToken.Children();
+
+                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            byte squadNumber = Convert.ToByte(evt["number"]);
+                            string name = evt["name"];
+                            string position = evt["pos"];
+                            int playerAPIId = Convert.ToInt32(evt["id"]);
+                        }
+                    }
+
+                    //Away subs
+
+                    //var homeLineup = from p in obj["commentaries"][0]["comm_match_teams"]["localteam"]["player"]["1"]
+                    //                 select new
+                    //                 {
+                    //                     SquadNumber = (byte)p["number"],
+                    //                     Name = (int)p["name"],
+                    //                     Position = (string)p["pos"],
+                    //                     PlayerAPIId = (int)p["id"]
+                    //                 };
+
+                    //Entities context = new Entities();
+
+                    //foreach (var item in homeLineup)
+                    //{
+                    //    Player player = new Player();
+
+                    //    //player.Active = true;
+                    //    //player.IsToday = DateTime.Now.ToShortDateString() == player.Date.Value.ToShortDateString() ? true : false;
+                    //    //player.IsLive = DateTime.Now >= player.Date && DateTime.Now <= player.EndDate ? true : false;
+                    //    //player.Time = item.Time;
+
+                    //    //if (player.IsLive)
+                    //    //    liveMatches.Add(player.APIId);
+
+                    //    //var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
+                    //    //var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
+
+                    //    //if (homeTeam != null)
+                    //    //{
+                    //    //    player.HomeTeamId = homeTeam.Id;
+                    //    //    player.Stadium = homeTeam.Stadium;
+                    //    //}
+
+                    //    //if (awayTeam != null)
+                    //    //    player.AwayTeamId = awayTeam.Id;
+
+                    //    //player.HomeTeamAPIId = item.HomeTeamAPIId;
+                    //    //player.AwayTeamAPIId = item.AwayTeamAPIId;
+
+                    //    //SaveMatch(player);
+                    //}
+                    #endregion
+
+                    #region Match Stats
+
+                    #endregion
+
+                    #region Player Stats
+
+                    #endregion
+
+                    #region Events
+
+                    jPath = "commentaries.[0].comm_commentaries.comment";
+
+                    //Retrieve lastupdateId
+                    var matchGuid = GetMatchIdByAPIId(matchId);
+
+                    int lastUpdateId = GetLatestEventId(matchGuid);
 
                     var events = token.SelectTokens(jPath);
                       
@@ -204,11 +306,12 @@ namespace FeedData
 
                             commEvent.Comment = comment;
                             commEvent.APIId = eventId;
-                            //commEvent.MatchId = matchId;
+                            commEvent.MatchId = matchGuid;
 
                             SaveEvent(commEvent);
                         }
                     }
+                    #endregion
                 }
                 else
                 {
@@ -318,11 +421,66 @@ namespace FeedData
             }
         }
 
+        private static string SavePlayer(Player updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord != null)
+            {
+                if (updatedRecord.Id == System.Guid.Empty)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.Players.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
         private static Team GetTeamByAPIId(int id)
         {
             Entities context = new Entities();
 
             return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
+        }
+
+        private static Guid GetMatchIdByAPIId(int id)
+        {
+            Entities context = new Entities();
+
+            return context.Matches.Where(x => (x.APIId == id)).FirstOrDefault().Id;
+        }
+
+        private static int GetLatestEventId(Guid id)
+        {
+            Entities context = new Entities();
+
+            int retInt = 0;
+
+            var evt = context.Events.Where(x => (x.Id == id)).OrderByDescending(x => x.DateAdded).FirstOrDefault();
+
+            if (evt != null)
+                retInt = evt.APIId;
+
+            return retInt;
         }
     }
 }
