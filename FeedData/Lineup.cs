@@ -33,6 +33,11 @@ namespace FeedData
         public string Discriminator { get; set; }
         public System.Guid MatchId { get; set; }
         public Nullable<System.Guid> Team_Id { get; set; }
+        public Nullable<System.Guid> Match_Id { get; set; }
+        public int MatchAPIId { get; set; }
+        public bool IsHomePlayer { get; set; }
+        public bool IsSub { get; set; }
+        public Nullable<System.Guid> Player_Id { get; set; }
     
         public virtual Match Match { get; set; }
         public virtual Team Team { get; set; }
@@ -44,5 +49,7 @@ namespace FeedData
         public virtual ICollection<Player> Players2 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Player> Players3 { get; set; }
+        public virtual Match Match1 { get; set; }
+        public virtual Player Player { get; set; }
     }
 }

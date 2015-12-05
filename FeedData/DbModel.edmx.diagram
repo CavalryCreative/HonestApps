@@ -44,6 +44,9 @@
         <AssociationConnector Association="Data.FK_dbo_Rivals_dbo_Teams_TeamId" ManuallyRouted="false" />
         <AssociationConnector Association="Data.AspNetUserRoles" ManuallyRouted="false" />
         <AssociationConnector Association="Data.TeamPlayers" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="Data.UpdateHistory" Width="1.5" PointX="3.375" PointY="6.75" />
+        <AssociationConnector Association="Data.FK_dbo_Lineups_dbo_Matches_Match_Id" />
+        <AssociationConnector Association="Data.FK_dbo_Lineups_dbo_Players_Player_Id" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

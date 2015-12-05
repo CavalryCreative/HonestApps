@@ -117,9 +117,12 @@
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="Discriminator" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Match_Id" Type="uniqueidentifier" />
           <Property Name="Team_Id" Type="uniqueidentifier" />
+          <Property Name="MatchAPIId" Type="int" Nullable="false" />
+          <Property Name="IsHomePlayer" Type="bit" Nullable="false" />
+          <Property Name="IsSub" Type="bit" Nullable="false" />
+          <Property Name="Player_Id" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="Matches">
           <Key>
@@ -161,10 +164,6 @@
           <Property Name="Name" Type="varchar" MaxLength="250" />
           <Property Name="Position" Type="varchar" MaxLength="100" />
           <Property Name="APIPlayerId" Type="int" Nullable="false" />
-          <Property Name="Eleven_Id" Type="uniqueidentifier" />
-          <Property Name="Eleven_Id1" Type="uniqueidentifier" />
-          <Property Name="Sub_Id" Type="uniqueidentifier" />
-          <Property Name="Sub_Id1" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="PlayerStats">
           <Key>
@@ -308,6 +307,21 @@
           <Property Name="APIId" Type="int" Nullable="false" />
           <Property Name="Stadium" Type="nvarchar(max)" />
         </EntityType>
+        <EntityType Name="UpdateHistories">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MatchAPIId" Type="int" Nullable="false" />
+          <Property Name="MatchDetails" Type="bit" Nullable="false" />
+          <Property Name="Lineups" Type="bit" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateAdded" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="Deleted" Type="bit" />
+          <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateUpdated" Type="datetime" />
+        </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -416,17 +430,27 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_Lineups_dbo_Matches_MatchId">
-          <End Role="Matches" Type="Self.Matches" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+        <Association Name="FK_dbo_Lineups_dbo_Matches_Match_Id">
+          <End Role="Matches" Type="Self.Matches" Multiplicity="0..1" />
           <End Role="Lineups" Type="Self.Lineups" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Matches">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Lineups">
-              <PropertyRef Name="MatchId" />
+              <PropertyRef Name="Match_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Lineups_dbo_Players_Player_Id">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Lineups" Type="Self.Lineups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Lineups">
+              <PropertyRef Name="Player_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -463,54 +487,6 @@
             </Principal>
             <Dependent Role="Matches">
               <PropertyRef Name="HomeTeamId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Eleven_Id">
-          <End Role="Lineups" Type="Self.Lineups" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Players" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Eleven_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Eleven_Id1">
-          <End Role="Lineups" Type="Self.Lineups" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Players" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Eleven_Id1" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Sub_Id">
-          <End Role="Lineups" Type="Self.Lineups" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Players" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Sub_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Sub_Id1">
-          <End Role="Lineups" Type="Self.Lineups" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Players" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Sub_Id1" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -646,6 +622,7 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TeamPlayers" EntityType="Self.TeamPlayers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Teams" EntityType="Self.Teams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UpdateHistories" EntityType="Self.UpdateHistories" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -678,8 +655,12 @@
             <End Role="Summaries" EntitySet="Summaries" />
             <End Role="Goals" EntitySet="Goals" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_MatchId" Association="Self.FK_dbo_Lineups_dbo_Matches_MatchId">
+          <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_Match_Id" Association="Self.FK_dbo_Lineups_dbo_Matches_Match_Id">
             <End Role="Matches" EntitySet="Matches" />
+            <End Role="Lineups" EntitySet="Lineups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Lineups_dbo_Players_Player_Id" Association="Self.FK_dbo_Lineups_dbo_Players_Player_Id">
+            <End Role="Players" EntitySet="Players" />
             <End Role="Lineups" EntitySet="Lineups" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Lineups_dbo_Teams_Team_Id" Association="Self.FK_dbo_Lineups_dbo_Teams_Team_Id">
@@ -693,22 +674,6 @@
           <AssociationSet Name="FK_dbo_Matches_dbo_Teams_HomeTeamId" Association="Self.FK_dbo_Matches_dbo_Teams_HomeTeamId">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Matches" EntitySet="Matches" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Eleven_Id" Association="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Eleven_Id1" Association="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id1">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Sub_Id" Association="Self.FK_dbo_Players_dbo_Lineups_Sub_Id">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Sub_Id1" Association="Self.FK_dbo_Players_dbo_Lineups_Sub_Id1">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_PlayerStats_dbo_Matches_MatchId" Association="Self.FK_dbo_PlayerStats_dbo_Matches_MatchId">
             <End Role="Matches" EntitySet="Matches" />
@@ -870,6 +835,13 @@
           <NavigationProperty Name="Players1" Relationship="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id1" FromRole="Lineups" ToRole="Players" />
           <NavigationProperty Name="Players2" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id" FromRole="Lineups" ToRole="Players" />
           <NavigationProperty Name="Players3" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id1" FromRole="Lineups" ToRole="Players" />
+          <Property Name="Match_Id" Type="Guid" />
+          <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
+          <Property Name="IsHomePlayer" Type="Boolean" Nullable="false" />
+          <Property Name="IsSub" Type="Boolean" Nullable="false" />
+          <Property Name="Player_Id" Type="Guid" />
+          <NavigationProperty Name="Match1" Relationship="Data.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Lineup" ToRole="Match" />
+          <NavigationProperty Name="Player" Relationship="Data.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Lineup" ToRole="Player" />
         </EntityType>
         <EntityType Name="Match">
           <Key>
@@ -903,6 +875,7 @@
           <NavigationProperty Name="Stats" Relationship="Self.FK_dbo_Stats_dbo_Matches_MatchId" FromRole="Matches" ToRole="Stats" />
           <NavigationProperty Name="Substitutions" Relationship="Self.FK_dbo_Substitutions_dbo_Matches_MatchId" FromRole="Matches" ToRole="Substitutions" />
           <NavigationProperty Name="Summaries" Relationship="Self.FK_dbo_Summaries_dbo_Matches_MatchId" FromRole="Matches" ToRole="Summaries" />
+          <NavigationProperty Name="Lineups1" Relationship="Data.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Match" ToRole="Lineup" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -929,6 +902,7 @@
           <NavigationProperty Name="Lineup3" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id1" FromRole="Players" ToRole="Lineups" />
           <NavigationProperty Name="PlayerStats" Relationship="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId" FromRole="Players" ToRole="PlayerStats" />
           <NavigationProperty Name="Teams" Relationship="Self.TeamPlayers" FromRole="Players" ToRole="Teams" />
+          <NavigationProperty Name="Lineups" Relationship="Data.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Player" ToRole="Lineup" />
         </EntityType>
         <EntityType Name="PlayerStat">
           <Key>
@@ -1454,7 +1428,55 @@
             <End Role="Players" EntitySet="Players" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
+          <EntitySet Name="UpdateHistories" EntityType="Data.UpdateHistory" />
+          <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_Match_Id" Association="Data.FK_dbo_Lineups_dbo_Matches_Match_Id">
+            <End Role="Match" EntitySet="Matches" />
+            <End Role="Lineup" EntitySet="Lineups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Lineups_dbo_Players_Player_Id" Association="Data.FK_dbo_Lineups_dbo_Players_Player_Id">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="Lineup" EntitySet="Lineups" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="UpdateHistory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
+          <Property Name="MatchDetails" Type="Boolean" Nullable="false" />
+          <Property Name="Lineups" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+        </EntityType>
+        <Association Name="FK_dbo_Lineups_dbo_Matches_Match_Id">
+          <End Type="Data.Match" Role="Match" Multiplicity="0..1" />
+          <End Type="Data.Lineup" Role="Lineup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Match">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Lineup">
+              <PropertyRef Name="Match_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Lineups_dbo_Players_Player_Id">
+          <End Type="Data.Player" Role="Player" Multiplicity="0..1" />
+          <End Type="Data.Lineup" Role="Lineup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Lineup">
+              <PropertyRef Name="Player_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1562,6 +1584,11 @@
           <EntitySetMapping Name="Lineups">
             <EntityTypeMapping TypeName="Data.Lineup">
               <MappingFragment StoreEntitySet="Lineups">
+                <ScalarProperty Name="Player_Id" ColumnName="Player_Id" />
+                <ScalarProperty Name="IsSub" ColumnName="IsSub" />
+                <ScalarProperty Name="IsHomePlayer" ColumnName="IsHomePlayer" />
+                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
+                <ScalarProperty Name="Match_Id" ColumnName="Match_Id" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
@@ -1569,8 +1596,6 @@
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="Discriminator" ColumnName="Discriminator" />
-                <ScalarProperty Name="MatchId" ColumnName="MatchId" />
                 <ScalarProperty Name="Team_Id" ColumnName="Team_Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1615,11 +1640,7 @@
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Position" ColumnName="Position" />
                 <ScalarProperty Name="APIPlayerId" ColumnName="APIPlayerId" />
-                <ScalarProperty Name="Eleven_Id" ColumnName="Eleven_Id" />
-                <ScalarProperty Name="Eleven_Id1" ColumnName="Eleven_Id1" />
-                <ScalarProperty Name="Sub_Id" ColumnName="Sub_Id" />
-                <ScalarProperty Name="Sub_Id1" ColumnName="Sub_Id1" />
-              </MappingFragment>
+                </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PlayerStats">
@@ -1779,6 +1800,22 @@
               <ScalarProperty Name="Id" ColumnName="Team_Id" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="UpdateHistories">
+            <EntityTypeMapping TypeName="Data.UpdateHistory">
+              <MappingFragment StoreEntitySet="UpdateHistories">
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="Lineups" ColumnName="Lineups" />
+                <ScalarProperty Name="MatchDetails" ColumnName="MatchDetails" />
+                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

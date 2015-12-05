@@ -20,12 +20,12 @@ namespace CMS.Infrastructure.Concrete
             public DbSet<PlayerStat> PlayerStats { get; set; }
             public DbSet<Rival> Rivals { get; set; }
             public DbSet<Stat> Stats { get; set; }
-            public DbSet<Sub> Subs { get; set; }
             public DbSet<Substitution> Substitutions { get; set; }
             public DbSet<Summary> Summaries { get; set; }
             public DbSet<Team> Teams { get; set; }
             public DbSet<Goal> Goals { get; set; }
             public DbSet<Card> Cards { get; set; }
+            public DbSet<UpdateHistory> UpdateHistory { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {

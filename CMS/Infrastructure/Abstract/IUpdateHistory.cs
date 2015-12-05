@@ -7,10 +7,9 @@ using CMS.Infrastructure.Entities;
 
 namespace CMS.Infrastructure.Abstract
 {
-    public interface IEleven
+    public interface IUpdateHistory
     {
-        IEnumerable<Eleven> Get(Guid? matchId, bool IsHomeTeam);
-        string Save(Eleven updatedRecord);
-        string Delete(Eleven updatedRecord);
+        IEnumerable<UpdateHistory> Get(int matchId);
+        string Save(UpdateHistory updatedRecord);
     }
 }

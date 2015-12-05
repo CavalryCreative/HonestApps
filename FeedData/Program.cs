@@ -166,8 +166,6 @@ namespace FeedData
 
                     JToken token = JObject.Parse(s);
 
-                    //JObject obj = JObject.Parse(s);
-
                     #region Lineups
 
                     //Home
@@ -188,7 +186,27 @@ namespace FeedData
                          }
                     }
 
+                    //TODO - add to Lineups
+                    //Add to Players if not already added
+                    //Add to Team, Team Players
+
                     //Home subs
+                    jPath = "commentaries.[0].comm_match_subs.localteam.player";
+
+                    y = token.SelectTokens(jPath);
+
+                    foreach (var childToken in y.Children())
+                    {
+                        var jeff = childToken.Children();
+
+                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            byte squadNumber = Convert.ToByte(evt["number"]);
+                            string name = evt["name"];
+                            string position = evt["pos"];
+                            int playerAPIId = Convert.ToInt32(evt["id"]);
+                        }
+                    }
 
                     //Away
                     jPath = "commentaries.[0].comm_match_teams.visitorteam.player";
@@ -209,6 +227,22 @@ namespace FeedData
                     }
 
                     //Away subs
+                    jPath = "commentaries.[0].comm_match_teams.visitorteam.player";
+
+                    y = token.SelectTokens(jPath);
+
+                    foreach (var childToken in y.Children())
+                    {
+                        var jeff = childToken.Children();
+
+                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            byte squadNumber = Convert.ToByte(evt["number"]);
+                            string name = evt["name"];
+                            string position = evt["pos"];
+                            int playerAPIId = Convert.ToInt32(evt["id"]);
+                        }
+                    }
 
                     //var homeLineup = from p in obj["commentaries"][0]["comm_match_teams"]["localteam"]["player"]["1"]
                     //                 select new
@@ -475,7 +509,7 @@ namespace FeedData
 
             int retInt = 0;
 
-            var evt = context.Events.Where(x => (x.Id == id)).OrderByDescending(x => x.DateAdded).FirstOrDefault();
+            var evt = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.DateAdded).FirstOrDefault();
 
             if (evt != null)
                 retInt = evt.APIId;

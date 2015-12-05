@@ -7,13 +7,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CMS.Infrastructure.Entities
 {
-    public class Lineup : CMSBase
+    public class UpdateHistory : CMSBase
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public int MatchAPIId { get; set; }
-        public Player Player { get; set; }
-        public bool IsHomePlayer { get; set; }
-        public bool IsSub { get; set; }
+        public bool MatchDetails { get; set; }
+        public bool Lineups { get; set; }
     }
 }

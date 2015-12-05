@@ -7,10 +7,10 @@ using CMS.Infrastructure.Entities;
 
 namespace CMS.Infrastructure.Abstract
 {
-    public interface ISub
+    public interface ILineup
     {
-        IEnumerable<Sub> Get(Guid? matchId, bool IsHomeTeam);
-        string Save(Sub updatedRecord);
-        string Delete(Sub updatedRecord);
+        IEnumerable<Lineup> Get(int matchId, bool isHomePlayer, bool isSub);
+        string Save(Lineup updatedRecord);
+        string Delete(Lineup updatedRecord);
     }
 }

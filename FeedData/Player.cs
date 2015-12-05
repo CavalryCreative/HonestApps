@@ -19,6 +19,7 @@ namespace FeedData
         {
             this.PlayerStats = new HashSet<PlayerStat>();
             this.Teams = new HashSet<Team>();
+            this.Lineups = new HashSet<Lineup>();
         }
     
         public System.Guid Id { get; set; }
@@ -45,5 +46,7 @@ namespace FeedData
         public virtual ICollection<PlayerStat> PlayerStats { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Team> Teams { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Lineup> Lineups { get; set; }
     }
 }

@@ -8,30 +8,16 @@ using Res = Resources;
 
 namespace CMS.Infrastructure.Concrete
 {
-    public class EFEleven : IEleven
+    public class EFUpdateHistory : IUpdateHistory
     {
         private EFDbContext context = new EFDbContext();
 
-        public IEnumerable<Eleven> Get(Guid? matchId, bool IsHomeTeam)
+        public IEnumerable<UpdateHistory> Get(int matchId)
         {
-            IList<Eleven> firstEleven = new List<Eleven>();
-
-            if (matchId.HasValue)
-            {
-                firstEleven = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Eleven>().Where(x => (x.MatchId == matchId)).ToList();
-            }
-            else
-            {
-                if (matchId != System.Guid.Empty)
-                {
-                    firstEleven = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Eleven>().ToList();
-                }
-            }
-
-            return firstEleven;
+            return context.UpdateHistory.Where(x => x.MatchAPIId == matchId).ToList();
         }
 
-        public string Save(Eleven updatedRecord)
+        public string Save(UpdateHistory updatedRecord)
         {
             bool isNewRecord = false;
             Guid Id;
@@ -40,13 +26,13 @@ namespace CMS.Infrastructure.Concrete
             {
                 if (updatedRecord.Id == System.Guid.Empty)
                 {
-                    //Create record
+                    //Create record  
                     updatedRecord.Id = Guid.NewGuid();
                     updatedRecord.Deleted = false;
                     updatedRecord.DateAdded = DateTime.Now;
                     updatedRecord.DateUpdated = DateTime.Now;
 
-                    context.Lineups.Add(updatedRecord);
+                    context.UpdateHistory.Add(updatedRecord);
                     Id = updatedRecord.Id;
 
                     isNewRecord = true;
@@ -54,14 +40,16 @@ namespace CMS.Infrastructure.Concrete
                 else
                 {
                     //Update record
-                    var recordToUpdate = context.Lineups.Find(updatedRecord.Id);
+                    var recordToUpdate = context.UpdateHistory.Find(updatedRecord.Id);
 
                     if (recordToUpdate == null)
                     {
                         return Res.Resources.NotFound;
                     }
 
+                    recordToUpdate.Deleted = updatedRecord.Deleted;
                     recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
                     recordToUpdate.Active = updatedRecord.Active;
 
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
@@ -84,11 +72,6 @@ namespace CMS.Infrastructure.Concrete
             {
                 return string.Format("Error: {0}", e.InnerException.ToString());
             }
-        }
-
-        public string Delete(Eleven updatedRecord)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -23,6 +23,7 @@ namespace FeedData
             this.Stats = new HashSet<Stat>();
             this.Substitutions = new HashSet<Substitution>();
             this.Summaries = new HashSet<Summary>();
+            this.Lineups1 = new HashSet<Lineup>();
         }
     
         public System.Guid Id { get; set; }
@@ -60,5 +61,7 @@ namespace FeedData
         public virtual ICollection<Substitution> Substitutions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Summary> Summaries { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Lineup> Lineups1 { get; set; }
     }
 }

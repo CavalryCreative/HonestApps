@@ -8,33 +8,19 @@ using Res = Resources;
 
 namespace CMS.Infrastructure.Concrete
 {
-    public class EFSub : ISub
+    public class EFLineup : ILineup
     {
         private EFDbContext context = new EFDbContext();
 
-        public IEnumerable<Sub> Get(Guid? matchId, bool IsHomeTeam)
+        public IEnumerable<Lineup> Get(int matchId, bool isHomePlayer, bool isSub)
         {
-            IList<Sub> subs = new List<Sub>();
-
-            if (matchId.HasValue)
-            {
-                subs = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Sub>().Where(x => (x.MatchId == matchId)).ToList();
-            }
-            else
-            {
-                if (matchId != System.Guid.Empty)
-                {
-                    subs = context.Lineups.Include("HomeTeam").Include("AwayTeam").OfType<Sub>().ToList();
-                }
-            }
-
-            return subs;
+            return context.Lineups.Where(x => (x.MatchAPIId == matchId) && (x.IsHomePlayer == isHomePlayer) && (x.IsSub == isSub)).ToList();
         }
 
-        public string Save(Sub updatedRecord)
+        public string Save(Lineup updatedRecord)
         {
             bool isNewRecord = false;
-            Guid Id;
+            Guid Id = System.Guid.Empty;
 
             if (updatedRecord != null)
             {
@@ -50,23 +36,6 @@ namespace CMS.Infrastructure.Concrete
                     Id = updatedRecord.Id;
 
                     isNewRecord = true;
-                }
-                else
-                {
-                    //Update record
-                    var recordToUpdate = context.Lineups.Find(updatedRecord.Id);
-
-                    if (recordToUpdate == null)
-                    {
-                        return Res.Resources.NotFound;
-                    }
-
-                    recordToUpdate.DateUpdated = DateTime.Now;
-                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
-                    recordToUpdate.Active = updatedRecord.Active;
-
-                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
-                    Id = updatedRecord.Id;
                 }
             }
             else
@@ -87,7 +56,7 @@ namespace CMS.Infrastructure.Concrete
             }
         }
 
-        public string Delete(Sub updatedRecord)
+        public string Delete(Lineup updatedRecord)
         {
             throw new NotImplementedException();
         }
