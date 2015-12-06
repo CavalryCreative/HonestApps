@@ -8,16 +8,16 @@ using Res = Resources;
 
 namespace CMS.Infrastructure.Concrete
 {
-    public class EFUpdateHistory : IUpdateHistory
+    public class EFPlayer : IPlayer
     {
         private EFDbContext context = new EFDbContext();
 
-        public IEnumerable<UpdateHistory> Get(int matchId)
+        public IEnumerable<Player> Get(int Id)
         {
-            return context.UpdateHistory.Where(x => x.MatchAPIId == matchId).ToList();
+            return context.Players.Include("Teams").Include("PlayerStats").Where(x => x.APIPlayerId == Id).ToList();
         }
 
-        public string Save(UpdateHistory updatedRecord)
+        public string Save(Player updatedRecord, Guid teamId)
         {
             bool isNewRecord = false;
             Guid Id;
@@ -32,7 +32,7 @@ namespace CMS.Infrastructure.Concrete
                     updatedRecord.DateAdded = DateTime.Now;
                     updatedRecord.DateUpdated = DateTime.Now;
 
-                    context.UpdateHistory.Add(updatedRecord);
+                    context.Players.Add(updatedRecord);
                     Id = updatedRecord.Id;
 
                     isNewRecord = true;
@@ -40,18 +40,17 @@ namespace CMS.Infrastructure.Concrete
                 else
                 {
                     //Update record
-                    var recordToUpdate = context.UpdateHistory.Find(updatedRecord.Id);
+                    var recordToUpdate = context.Players.Find(updatedRecord.Id);
 
                     if (recordToUpdate == null)
                     {
                         return Res.Resources.NotFound;
                     }
 
-                    recordToUpdate.Active = updatedRecord.Active;
-                    recordToUpdate.Lineups = updatedRecord.Lineups;
-                    recordToUpdate.MatchAPIId = updatedRecord.MatchAPIId;
-                    recordToUpdate.MatchDetails = updatedRecord.MatchDetails;
-                    recordToUpdate.MatchStats = updatedRecord.MatchStats;
+                    recordToUpdate.APIPlayerId = updatedRecord.APIPlayerId;
+                    recordToUpdate.Name = updatedRecord.Name;
+                    recordToUpdate.Position = updatedRecord.Position;
+                    recordToUpdate.SquadNumber = updatedRecord.SquadNumber;
                     recordToUpdate.Deleted = updatedRecord.Deleted;
                     recordToUpdate.DateUpdated = DateTime.Now;
                     recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;

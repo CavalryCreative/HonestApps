@@ -14,5 +14,6 @@ namespace CMS.Infrastructure.Entities
         public int MatchAPIId { get; set; }
         public bool MatchDetails { get; set; }
         public bool Lineups { get; set; }
+        public bool MatchStats { get; set; }
     }
 }

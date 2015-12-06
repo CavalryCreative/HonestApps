@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CMS.Infrastructure.Entities;
 
 namespace CMS.Infrastructure.Abstract
 {
-    interface IPlayer
+    public interface IPlayer
     {
+        IEnumerable<Player> Get(int Id);
+        string Save(Player updatedRecord, Guid teamId);
     }
 }

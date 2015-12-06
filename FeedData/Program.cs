@@ -39,7 +39,7 @@ namespace FeedData
               }
           }
 
-          GetCommentaries(2148519);
+          //GetCommentaries(2148519);
         }
 
         private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)
@@ -87,35 +87,57 @@ namespace FeedData
 
                      foreach (var item in postTitles)
                      {
-                         Match match = new Match();
+                         //Check if Update History Match details is true/false
+                         var updateHistory = GetUpdateHistoryByMatchAPIId(item.APIId);
+                         bool matchDetailsAdded = false;
 
-                         match.APIId = item.APIId;
-                         match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), match.Time));
-                         match.EndDate = match.Date.Value.AddHours(2);      
-                         match.Active = DateTime.Now <= match.EndDate ? true : false;                                                                        
-                         match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-                         match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
-                         match.Time = item.Time;
-
-                         if (match.IsLive)
-                             liveMatches.Add(match.APIId);
-
-                         var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
-                         var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
-
-                         if (homeTeam != null)
+                         if (updateHistory != null)
                          {
-                             match.HomeTeamId = homeTeam.Id;
-                             match.Stadium = homeTeam.Stadium;
+                             matchDetailsAdded = updateHistory.MatchDetails;
                          }
-                            
-                         if (awayTeam != null)
-                             match.AwayTeamId = awayTeam.Id;
 
-                         match.HomeTeamAPIId = item.HomeTeamAPIId;
-                         match.AwayTeamAPIId = item.AwayTeamAPIId;
+                         if (matchDetailsAdded == false)
+                         {
+                             Match match = new Match();
 
-                         SaveMatch(match);
+                             match.APIId = item.APIId;
+                             match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
+                             match.EndDate = match.Date.Value.AddHours(2);
+                             match.Active = DateTime.Now <= match.EndDate ? true : false;
+                             match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
+                             //change this when live
+                             //match.IsLive = true;
+                             match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
+                             match.Time = item.Time;
+
+                             if (match.IsLive)
+                                 liveMatches.Add(match.APIId);
+
+                             var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
+                             var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
+
+                             if (homeTeam != null)
+                             {
+                                 match.HomeTeamId = homeTeam.Id;
+                                 match.Stadium = homeTeam.Stadium;
+                             }
+
+                             if (awayTeam != null)
+                                 match.AwayTeamId = awayTeam.Id;
+
+                             match.HomeTeamAPIId = item.HomeTeamAPIId;
+                             match.AwayTeamAPIId = item.AwayTeamAPIId;
+
+                             SaveMatch(match);
+
+                             UpdateHistory history = new UpdateHistory();
+
+                             history.MatchAPIId = match.APIId;
+                             history.MatchDetails = true;
+                             history.Id = System.Guid.Empty;
+
+                             SaveUpdateHistory(history);
+                         }
                      }
                 }
                 else
@@ -134,11 +156,8 @@ namespace FeedData
 
         private static string GetCommentaries(int matchId)
         {
-            //const int POINT_OF_SATISFIED_CURIOSITY = 7;
             string retMsg = string.Empty;
-            
-            //System.Diagnostics.Debugger.Break();
-
+           
             //Fixtures
             //http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date=17.10.2015&to_date=27.10.2015
 
@@ -166,127 +185,296 @@ namespace FeedData
 
                     JToken token = JObject.Parse(s);
 
+                    var match = GetMatchByAPIId(matchId);
+
+                    var homeTeam = GetTeamByAPIId(match.HomeTeamAPIId);
+                    var awayTeam = GetTeamByAPIId(match.AwayTeamAPIId);
+
+                    string jPath = string.Empty;
+
+                    //Check if Update History Lineups is true/false
+                    var updateHistory = GetUpdateHistoryByMatchAPIId(matchId);
+                    bool lineupsAdded = false;
+
+                    if (updateHistory != null)
+                    {
+                        lineupsAdded = updateHistory.Lineups;
+                    }
+
                     #region Lineups
 
-                    //Home
-                    string jPath = "commentaries.[0].comm_match_teams.localteam.player";
-
-                    var y = token.SelectTokens(jPath);
-
-                    foreach (var childToken in y.Children())
+                    //TODO - create Player stats record for each player
+                    if (lineupsAdded == false)
                     {
-                         var jeff = childToken.Children();
+                        #region Home Team
 
-                         foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
-                         {
-                             byte squadNumber = Convert.ToByte(evt["number"]);
-                             string name = evt["name"];
-                             string position = evt["pos"];
-                             int playerAPIId = Convert.ToInt32(evt["id"]);
-                         }
-                    }
+                        jPath = "commentaries.[0].comm_match_teams.localteam.player";
 
-                    //TODO - add to Lineups
-                    //Add to Players if not already added
-                    //Add to Team, Team Players
+                        var y = token.SelectTokens(jPath);
 
-                    //Home subs
-                    jPath = "commentaries.[0].comm_match_subs.localteam.player";
+                        string Id;
+                        string actionMessage;
 
-                    y = token.SelectTokens(jPath);
-
-                    foreach (var childToken in y.Children())
-                    {
-                        var jeff = childToken.Children();
-
-                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        foreach (var childToken in y.Children())
                         {
-                            byte squadNumber = Convert.ToByte(evt["number"]);
-                            string name = evt["name"];
-                            string position = evt["pos"];
-                            int playerAPIId = Convert.ToInt32(evt["id"]);
+                            var jeff = childToken.Children();
+
+                            foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                            {
+                                int playerAPIId = Convert.ToInt32(evt["id"]);
+
+                                //Check if player exists
+                                var player = GetPlayerByAPIId(playerAPIId);
+                                Guid playerId = Guid.Empty;
+
+                                //Add to Players if not already added
+                                if (player == null)
+                                {
+                                    Player newPlayer = new Player();
+
+                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
+                                    newPlayer.Name = evt["name"];
+                                    newPlayer.Position = evt["pos"];
+                                    newPlayer.Id = System.Guid.Empty;
+                                    newPlayer.APIPlayerId = playerAPIId;
+
+                                    retMsg = SavePlayer(newPlayer, homeTeam.Id);
+
+                                    ReturnId(retMsg, out actionMessage, out Id);
+
+                                    if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                    {
+                                        newPlayer.Id = new Guid(Id);
+                                    }
+
+                                    player = newPlayer;
+                                }
+                                else
+                                {
+                                    playerId = player.Id;
+                                }
+
+                                //add to Lineups
+                                Lineup lineup = new Lineup();
+
+                                lineup.IsHomePlayer = true;
+                                lineup.IsSub = false;
+                                //lineup.Match = match;
+                                lineup.Match_Id = match.Id;
+                                lineup.MatchAPIId = matchId;
+                                //lineup.Player = player;
+                                lineup.Player_Id = player.Id;
+                                //lineup.Team = homeTeam;
+                                lineup.Team_Id = homeTeam.Id;
+
+                                SavePlayerToMatchLineup(lineup);
+                            }
                         }
-                    }
+                        #endregion
 
-                    //Away
-                    jPath = "commentaries.[0].comm_match_teams.visitorteam.player";
+                        #region Home subs
 
-                    y = token.SelectTokens(jPath);
+                        jPath = "commentaries.[0].comm_match_subs.localteam.player";
 
-                    foreach (var childToken in y.Children())
-                    {
-                        var jeff = childToken.Children();
+                        y = token.SelectTokens(jPath);
 
-                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        foreach (var childToken in y.Children())
                         {
-                            byte squadNumber = Convert.ToByte(evt["number"]);
-                            string name = evt["name"];
-                            string position = evt["pos"];
-                            int playerAPIId = Convert.ToInt32(evt["id"]);
+                            var jeff = childToken.Children();
+
+                            foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                            {
+                                int playerAPIId = Convert.ToInt32(evt["id"]);
+
+                                //Check if player exists
+                                var player = GetPlayerByAPIId(playerAPIId);
+                                Guid playerId = Guid.Empty;
+
+                                //Add to Players if not already added
+                                if (player == null)
+                                {
+                                    Player newPlayer = new Player();
+
+                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
+                                    newPlayer.Name = evt["name"];
+                                    newPlayer.Position = evt["pos"];
+                                    newPlayer.Id = System.Guid.Empty;
+                                    newPlayer.APIPlayerId = playerAPIId;
+
+                                    retMsg = SavePlayer(newPlayer, homeTeam.Id);
+
+                                    ReturnId(retMsg, out actionMessage, out Id);
+
+                                    if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                    {
+                                        newPlayer.Id = new Guid(Id);
+                                    }
+
+                                    player = newPlayer;
+                                }
+                                else
+                                {
+                                    playerId = player.Id;
+                                }
+
+                                //add to Lineups
+                                Lineup lineup = new Lineup();
+
+                                lineup.IsHomePlayer = true;
+                                lineup.IsSub = true;
+                                //lineup.Match = match;
+                                lineup.Match_Id = match.Id;
+                                lineup.MatchAPIId = matchId;
+                                //lineup.Player = player;
+                                lineup.Player_Id = player.Id;
+                                //lineup.Team = homeTeam;
+                                lineup.Team_Id = homeTeam.Id;
+
+                                SavePlayerToMatchLineup(lineup);
+                            }
                         }
-                    }
+                        #endregion
 
-                    //Away subs
-                    jPath = "commentaries.[0].comm_match_teams.visitorteam.player";
+                        #region Away Team
 
-                    y = token.SelectTokens(jPath);
+                        jPath = "commentaries.[0].comm_match_teams.visitorteam.player";
 
-                    foreach (var childToken in y.Children())
-                    {
-                        var jeff = childToken.Children();
+                        y = token.SelectTokens(jPath);
 
-                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        foreach (var childToken in y.Children())
                         {
-                            byte squadNumber = Convert.ToByte(evt["number"]);
-                            string name = evt["name"];
-                            string position = evt["pos"];
-                            int playerAPIId = Convert.ToInt32(evt["id"]);
+                            var jeff = childToken.Children();
+
+                            foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                            {
+                                int playerAPIId = Convert.ToInt32(evt["id"]);
+
+                                //Check if player exists
+                                var player = GetPlayerByAPIId(playerAPIId);
+                                Guid playerId = Guid.Empty;
+
+                                //Add to Players if not already added
+                                if (player == null)
+                                {
+                                    Player newPlayer = new Player();
+
+                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
+                                    newPlayer.Name = evt["name"];
+                                    newPlayer.Position = evt["pos"];
+                                    newPlayer.Id = System.Guid.Empty;
+                                    newPlayer.APIPlayerId = playerAPIId;
+
+                                    retMsg = SavePlayer(newPlayer, awayTeam.Id);
+
+                                    ReturnId(retMsg, out actionMessage, out Id);
+
+                                    if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                    {
+                                        newPlayer.Id = new Guid(Id);
+                                    }
+
+                                    player = newPlayer;
+                                }
+                                else
+                                {
+                                    playerId = player.Id;
+                                }
+
+                                //add to Lineups
+                                Lineup lineup = new Lineup();
+
+                                lineup.IsHomePlayer = false;
+                                lineup.IsSub = false;
+                                //lineup.Match = match;
+                                lineup.Match_Id = match.Id;
+                                lineup.MatchAPIId = matchId;
+                                //lineup.Player = player;
+                                lineup.Player_Id = player.Id;
+                                //lineup.Team = homeTeam;
+                                lineup.Team_Id = awayTeam.Id;
+
+                                SavePlayerToMatchLineup(lineup);
+                            }
                         }
-                    }
 
-                    //var homeLineup = from p in obj["commentaries"][0]["comm_match_teams"]["localteam"]["player"]["1"]
-                    //                 select new
-                    //                 {
-                    //                     SquadNumber = (byte)p["number"],
-                    //                     Name = (int)p["name"],
-                    //                     Position = (string)p["pos"],
-                    //                     PlayerAPIId = (int)p["id"]
-                    //                 };
+                        #endregion
 
-                    //Entities context = new Entities();
+                        #region Away subs
 
-                    //foreach (var item in homeLineup)
-                    //{
-                    //    Player player = new Player();
+                        jPath = "commentaries.[0].comm_match_subs.visitorteam.player";
 
-                    //    //player.Active = true;
-                    //    //player.IsToday = DateTime.Now.ToShortDateString() == player.Date.Value.ToShortDateString() ? true : false;
-                    //    //player.IsLive = DateTime.Now >= player.Date && DateTime.Now <= player.EndDate ? true : false;
-                    //    //player.Time = item.Time;
+                        y = token.SelectTokens(jPath);
 
-                    //    //if (player.IsLive)
-                    //    //    liveMatches.Add(player.APIId);
+                        foreach (var childToken in y.Children())
+                        {
+                            var jeff = childToken.Children();
 
-                    //    //var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
-                    //    //var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
+                            foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                            {
+                                int playerAPIId = Convert.ToInt32(evt["id"]);
 
-                    //    //if (homeTeam != null)
-                    //    //{
-                    //    //    player.HomeTeamId = homeTeam.Id;
-                    //    //    player.Stadium = homeTeam.Stadium;
-                    //    //}
+                                //Check if player exists
+                                var player = GetPlayerByAPIId(playerAPIId);
+                                Guid playerId = Guid.Empty;
 
-                    //    //if (awayTeam != null)
-                    //    //    player.AwayTeamId = awayTeam.Id;
+                                //Add to Players if not already added
+                                if (player == null)
+                                {
+                                    Player newPlayer = new Player();
 
-                    //    //player.HomeTeamAPIId = item.HomeTeamAPIId;
-                    //    //player.AwayTeamAPIId = item.AwayTeamAPIId;
+                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
+                                    newPlayer.Name = evt["name"];
+                                    newPlayer.Position = evt["pos"];
+                                    newPlayer.Id = System.Guid.Empty;
+                                    newPlayer.APIPlayerId = playerAPIId;
 
-                    //    //SaveMatch(player);
-                    //}
+                                    retMsg = SavePlayer(newPlayer, awayTeam.Id);
+
+                                    ReturnId(retMsg, out actionMessage, out Id);
+
+                                    if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                    {
+                                        newPlayer.Id = new Guid(Id);
+                                    }
+
+                                    player = newPlayer;
+                                }
+                                else
+                                {
+                                    playerId = player.Id;
+                                }
+
+                                //add to Lineups
+                                Lineup lineup = new Lineup();
+
+                                lineup.IsHomePlayer = false;
+                                lineup.IsSub = true;
+                                //lineup.Match = match;
+                                lineup.Match_Id = match.Id;
+                                lineup.MatchAPIId = matchId;
+                                //lineup.Player = player;
+                                lineup.Player_Id = player.Id;
+                                //lineup.Team = homeTeam;
+                                lineup.Team_Id = awayTeam.Id;
+
+                                SavePlayerToMatchLineup(lineup);
+                            }
+                        }
+                        #endregion
+
+                        UpdateHistory history = new UpdateHistory();
+                   
+                        history.MatchAPIId = matchId;
+                        history.Lineups = true;
+                        history.Id = System.Guid.Empty;
+                     
+                        SaveUpdateHistory(history);
+                    }                  
+
                     #endregion
 
                     #region Match Stats
+                    //TODO - create record (one for match) - updatehistory
 
                     #endregion
 
@@ -299,9 +487,7 @@ namespace FeedData
                     jPath = "commentaries.[0].comm_commentaries.comment";
 
                     //Retrieve lastupdateId
-                    var matchGuid = GetMatchIdByAPIId(matchId);
-
-                    int lastUpdateId = GetLatestEventId(matchGuid);
+                    int lastUpdateId = GetLatestEventId(match.Id);
 
                     var events = token.SelectTokens(jPath);
                       
@@ -340,7 +526,7 @@ namespace FeedData
 
                             commEvent.Comment = comment;
                             commEvent.APIId = eventId;
-                            commEvent.MatchId = matchGuid;
+                            commEvent.MatchId = match.Id;
 
                             SaveEvent(commEvent);
                         }
@@ -361,6 +547,7 @@ namespace FeedData
             return retMsg;
         }
 
+        #region Save
         private static string SaveMatch(Match updatedRecord)
         {
             Guid Id = Guid.Empty;
@@ -455,7 +642,7 @@ namespace FeedData
             }
         }
 
-        private static string SavePlayer(Player updatedRecord)
+        private static string SavePlayer(Player updatedRecord, Guid teamId)
         {
             Guid Id = Guid.Empty;
 
@@ -463,6 +650,14 @@ namespace FeedData
 
             if (updatedRecord != null)
             {
+                //Update record
+                var recordToUpdate = context.Teams.Find(teamId);
+
+                if (recordToUpdate == null)
+                {
+                    return Res.Resources.NotFound;
+                }
+
                 if (updatedRecord.Id == System.Guid.Empty)
                 {
                     //Create record
@@ -472,7 +667,7 @@ namespace FeedData
                     updatedRecord.DateAdded = DateTime.Now;
                     updatedRecord.DateUpdated = DateTime.Now;
 
-                    context.Players.Add(updatedRecord);
+                    recordToUpdate.Players.Add(updatedRecord);
                     Id = updatedRecord.Id;
                 }
             }
@@ -489,6 +684,121 @@ namespace FeedData
             }
         }
 
+        private static string SavePlayerToMatchLineup(Lineup updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord != null)
+            {
+                if (updatedRecord.Id == System.Guid.Empty)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.Lineups.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string SaveUpdateHistory(UpdateHistory updatedRecord)
+        {
+            bool isNewRecord = false;
+            Guid Id;
+
+            Entities context = new Entities();
+
+            if (updatedRecord != null)
+            {
+                if (updatedRecord.Id == System.Guid.Empty)
+                {
+                    //Create record  
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.UpdateHistories.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+
+                    isNewRecord = true;
+                }
+                else
+                {
+                    //Update record
+                    var recordToUpdate = context.UpdateHistories.Find(updatedRecord.Id);
+
+                    if (recordToUpdate == null)
+                    {
+                        return Res.Resources.NotFound;
+                    }
+
+                    recordToUpdate.Active = updatedRecord.Active;
+                    recordToUpdate.Lineups = updatedRecord.Lineups;
+                    recordToUpdate.MatchAPIId = updatedRecord.MatchAPIId;
+                    recordToUpdate.MatchDetails = updatedRecord.MatchDetails;
+                    recordToUpdate.Deleted = updatedRecord.Deleted;
+                    recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+                    recordToUpdate.Active = updatedRecord.Active;
+
+                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                    Id = updatedRecord.Id;
+                }
+            }
+            else
+            {
+                return Res.Resources.NotFound;
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return isNewRecord ? string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString())
+                    : string.Format("{0}:{1}", Res.Resources.RecordUpdated, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+        #endregion
+
+        #region Get
+
+        private static UpdateHistory GetUpdateHistoryByMatchAPIId(int id)
+        {
+            Entities context = new Entities();
+
+            return context.UpdateHistories.Where(x => (x.MatchAPIId == id)).FirstOrDefault();
+        }
+
+        private static Player GetPlayerByAPIId(int id)
+        {
+            Entities context = new Entities();
+
+            return context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
+        }
+
         private static Team GetTeamByAPIId(int id)
         {
             Entities context = new Entities();
@@ -496,11 +806,11 @@ namespace FeedData
             return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
         }
 
-        private static Guid GetMatchIdByAPIId(int id)
+        private static Match GetMatchByAPIId(int id)
         {
             Entities context = new Entities();
 
-            return context.Matches.Where(x => (x.APIId == id)).FirstOrDefault().Id;
+            return context.Matches.Where(x => (x.APIId == id)).FirstOrDefault();
         }
 
         private static int GetLatestEventId(Guid id)
@@ -515,6 +825,26 @@ namespace FeedData
                 retInt = evt.APIId;
 
             return retInt;
+        }
+
+        #endregion
+
+        private static void ReturnId(string retMessage, out string recordMessage, out string Id)
+        {
+            string[] message = retMessage.Split(':');
+
+            recordMessage = string.Empty;
+            Id = string.Empty;
+
+            if (message.Count() == 2)
+            {
+                recordMessage = message[0];
+                Id = message[1];
+            }
+            else
+            {
+                recordMessage = message[0];
+            }
         }
     }
 }

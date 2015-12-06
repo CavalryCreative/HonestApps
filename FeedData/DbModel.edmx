@@ -4,51 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Data.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="AspNetRoles">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AspNetUserClaims">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ClaimType" Type="nvarchar(max)" />
-          <Property Name="ClaimValue" Type="nvarchar(max)" />
-          <Property Name="User_Id" Type="nvarchar" MaxLength="128" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AspNetUserLogins">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="LoginProvider" />
-            <PropertyRef Name="ProviderKey" />
-          </Key>
-          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="LoginProvider" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="ProviderKey" Type="nvarchar" MaxLength="128" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AspNetUserRoles">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="RoleId" Type="nvarchar" MaxLength="128" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AspNetUsers">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="UserName" Type="nvarchar(max)" />
-          <Property Name="PasswordHash" Type="nvarchar(max)" />
-          <Property Name="SecurityStamp" Type="nvarchar(max)" />
-          <Property Name="Discriminator" Type="nvarchar" MaxLength="128" Nullable="false" />
-        </EntityType>
+      <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cards">
           <Key>
             <PropertyRef Name="Id" />
@@ -322,62 +278,6 @@
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
         </EntityType>
-        <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserClaims" Type="Self.AspNetUserClaims" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserClaims">
-              <PropertyRef Name="User_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserLogins" Type="Self.AspNetUserLogins" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserLogins">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
-          <End Role="AspNetRoles" Type="Self.AspNetRoles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetRoles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserRoles">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserRoles">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_dbo_Cards_dbo_Summaries_Summary_Id">
           <End Role="Summaries" Type="Self.Summaries" Multiplicity="0..1" />
           <End Role="Cards" Type="Self.Cards" Multiplicity="*" />
@@ -602,12 +502,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="DataStoreContainer">
-          <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+        <EntityContainer Name="ModelStoreContainer">
           <EntitySet Name="Cards" EntityType="Self.Cards" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Events" EntityType="Self.Events" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Goals" EntityType="Self.Goals" Schema="dbo" store:Type="Tables" />
@@ -623,22 +518,6 @@
           <EntitySet Name="TeamPlayers" EntityType="Self.TeamPlayers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Teams" EntityType="Self.Teams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UpdateHistories" EntityType="Self.UpdateHistories" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="AspNetUserLogins" EntitySet="AspNetUserLogins" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
-            <End Role="AspNetRoles" EntitySet="AspNetRoles" />
-            <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
-          </AssociationSet>
           <AssociationSet Name="FK_dbo_Cards_dbo_Summaries_Summary_Id" Association="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id">
             <End Role="Summaries" EntitySet="Summaries" />
             <End Role="Cards" EntitySet="Cards" />
@@ -708,52 +587,11 @@
             <End Role="Summaries" EntitySet="Summaries" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="Data" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="AspNetRole">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="AspNetUsers" Relationship="Self.AspNetUserRoles" FromRole="AspNetRoles" ToRole="AspNetUsers" />
-        </EntityType>
-        <EntityType Name="AspNetUserClaim">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ClaimType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ClaimValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="User_Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="AspNetUser" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id" FromRole="AspNetUserClaims" ToRole="AspNetUsers" />
-        </EntityType>
-        <EntityType Name="AspNetUserLogin">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="LoginProvider" />
-            <PropertyRef Name="ProviderKey" />
-          </Key>
-          <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="LoginProvider" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="ProviderKey" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="AspNetUser" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUserLogins" ToRole="AspNetUsers" />
-        </EntityType>
-        <EntityType Name="AspNetUser">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="UserName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Discriminator" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="AspNetUserClaims" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id" FromRole="AspNetUsers" ToRole="AspNetUserClaims" />
-          <NavigationProperty Name="AspNetUserLogins" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserLogins" />
-          <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
-        </EntityType>
+      <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Card">
           <Key>
             <PropertyRef Name="Id" />
@@ -826,22 +664,15 @@
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="Discriminator" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="MatchId" Type="Guid" Nullable="false" />
-          <Property Name="Team_Id" Type="Guid" />
-          <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Lineups_dbo_Matches_MatchId" FromRole="Lineups" ToRole="Matches" />
-          <NavigationProperty Name="Team" Relationship="Self.FK_dbo_Lineups_dbo_Teams_Team_Id" FromRole="Lineups" ToRole="Teams" />
-          <NavigationProperty Name="Players" Relationship="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id" FromRole="Lineups" ToRole="Players" />
-          <NavigationProperty Name="Players1" Relationship="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id1" FromRole="Lineups" ToRole="Players" />
-          <NavigationProperty Name="Players2" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id" FromRole="Lineups" ToRole="Players" />
-          <NavigationProperty Name="Players3" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id1" FromRole="Lineups" ToRole="Players" />
           <Property Name="Match_Id" Type="Guid" />
+          <Property Name="Team_Id" Type="Guid" />
           <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
           <Property Name="IsHomePlayer" Type="Boolean" Nullable="false" />
           <Property Name="IsSub" Type="Boolean" Nullable="false" />
           <Property Name="Player_Id" Type="Guid" />
-          <NavigationProperty Name="Match1" Relationship="Data.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Lineup" ToRole="Match" />
-          <NavigationProperty Name="Player" Relationship="Data.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Lineup" ToRole="Player" />
+          <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Lineups" ToRole="Matches" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Lineups" ToRole="Players" />
+          <NavigationProperty Name="Team" Relationship="Self.FK_dbo_Lineups_dbo_Teams_Team_Id" FromRole="Lineups" ToRole="Teams" />
         </EntityType>
         <EntityType Name="Match">
           <Key>
@@ -868,14 +699,13 @@
           <Property Name="IsLive" Type="Boolean" Nullable="false" />
           <Property Name="EndDate" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Events" Relationship="Self.FK_dbo_Events_dbo_Matches_MatchId" FromRole="Matches" ToRole="Events" />
-          <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Matches_MatchId" FromRole="Matches" ToRole="Lineups" />
+          <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Matches" ToRole="Lineups" />
           <NavigationProperty Name="Team" Relationship="Self.FK_dbo_Matches_dbo_Teams_AwayTeamId" FromRole="Matches" ToRole="Teams" />
           <NavigationProperty Name="Team1" Relationship="Self.FK_dbo_Matches_dbo_Teams_HomeTeamId" FromRole="Matches" ToRole="Teams" />
           <NavigationProperty Name="PlayerStats" Relationship="Self.FK_dbo_PlayerStats_dbo_Matches_MatchId" FromRole="Matches" ToRole="PlayerStats" />
           <NavigationProperty Name="Stats" Relationship="Self.FK_dbo_Stats_dbo_Matches_MatchId" FromRole="Matches" ToRole="Stats" />
           <NavigationProperty Name="Substitutions" Relationship="Self.FK_dbo_Substitutions_dbo_Matches_MatchId" FromRole="Matches" ToRole="Substitutions" />
           <NavigationProperty Name="Summaries" Relationship="Self.FK_dbo_Summaries_dbo_Matches_MatchId" FromRole="Matches" ToRole="Summaries" />
-          <NavigationProperty Name="Lineups1" Relationship="Data.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Match" ToRole="Lineup" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -892,17 +722,9 @@
           <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Position" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="APIPlayerId" Type="Int32" Nullable="false" />
-          <Property Name="Eleven_Id" Type="Guid" />
-          <Property Name="Eleven_Id1" Type="Guid" />
-          <Property Name="Sub_Id" Type="Guid" />
-          <Property Name="Sub_Id1" Type="Guid" />
-          <NavigationProperty Name="Lineup" Relationship="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id" FromRole="Players" ToRole="Lineups" />
-          <NavigationProperty Name="Lineup1" Relationship="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id1" FromRole="Players" ToRole="Lineups" />
-          <NavigationProperty Name="Lineup2" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id" FromRole="Players" ToRole="Lineups" />
-          <NavigationProperty Name="Lineup3" Relationship="Self.FK_dbo_Players_dbo_Lineups_Sub_Id1" FromRole="Players" ToRole="Lineups" />
+          <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Players" ToRole="Lineups" />
           <NavigationProperty Name="PlayerStats" Relationship="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId" FromRole="Players" ToRole="PlayerStats" />
           <NavigationProperty Name="Teams" Relationship="Self.TeamPlayers" FromRole="Players" ToRole="Teams" />
-          <NavigationProperty Name="Lineups" Relationship="Data.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Player" ToRole="Lineup" />
         </EntityType>
         <EntityType Name="PlayerStat">
           <Key>
@@ -1045,41 +867,28 @@
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="Stadium" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Teams_Team_Id" FromRole="Teams" ToRole="Lineups" />
           <NavigationProperty Name="Matches" Relationship="Self.FK_dbo_Matches_dbo_Teams_AwayTeamId" FromRole="Teams" ToRole="Matches" />
           <NavigationProperty Name="Matches1" Relationship="Self.FK_dbo_Matches_dbo_Teams_HomeTeamId" FromRole="Teams" ToRole="Matches" />
           <NavigationProperty Name="Rivals" Relationship="Self.FK_dbo_Rivals_dbo_Teams_TeamId" FromRole="Teams" ToRole="Rivals" />
           <NavigationProperty Name="Players" Relationship="Self.TeamPlayers" FromRole="Teams" ToRole="Players" />
-          <Property Name="Stadium" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
-        <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id">
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserClaims" Type="Self.AspNetUserClaim" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserClaims">
-              <PropertyRef Name="User_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserLogins" Type="Self.AspNetUserLogin" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserLogins">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
+        <EntityType Name="UpdateHistory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
+          <Property Name="MatchDetails" Type="Boolean" Nullable="false" />
+          <Property Name="Lineups" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+        </EntityType>
         <Association Name="FK_dbo_Cards_dbo_Summaries_Summary_Id">
           <End Role="Summaries" Type="Self.Summary" Multiplicity="0..1" />
           <End Role="Cards" Type="Self.Card" Multiplicity="*" />
@@ -1132,17 +941,27 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_Lineups_dbo_Matches_MatchId">
-          <End Role="Matches" Type="Self.Match" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
+        <Association Name="FK_dbo_Lineups_dbo_Matches_Match_Id">
+          <End Role="Matches" Type="Self.Match" Multiplicity="0..1" />
           <End Role="Lineups" Type="Self.Lineup" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Matches">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Lineups">
-              <PropertyRef Name="MatchId" />
+              <PropertyRef Name="Match_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Lineups_dbo_Players_Player_Id">
+          <End Role="Players" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Lineups" Type="Self.Lineup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Lineups">
+              <PropertyRef Name="Player_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1155,54 +974,6 @@
             </Principal>
             <Dependent Role="Lineups">
               <PropertyRef Name="Team_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Eleven_Id">
-          <End Role="Lineups" Type="Self.Lineup" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Player" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Eleven_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Eleven_Id1">
-          <End Role="Lineups" Type="Self.Lineup" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Player" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Eleven_Id1" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Sub_Id">
-          <End Role="Lineups" Type="Self.Lineup" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Player" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Sub_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Players_dbo_Lineups_Sub_Id1">
-          <End Role="Lineups" Type="Self.Lineup" Multiplicity="0..1" />
-          <End Role="Players" Type="Self.Player" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Lineups">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Players">
-              <PropertyRef Name="Sub_Id1" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1314,19 +1085,11 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="AspNetUserRoles">
-          <End Role="AspNetRoles" Type="Self.AspNetRole" Multiplicity="*" />
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
-        </Association>
         <Association Name="TeamPlayers">
           <End Role="Players" Type="Self.Player" Multiplicity="*" />
           <End Role="Teams" Type="Self.Team" Multiplicity="*" />
         </Association>
         <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRole" />
-          <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaim" />
-          <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogin" />
-          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUser" />
           <EntitySet Name="Cards" EntityType="Self.Card" />
           <EntitySet Name="Events" EntityType="Self.Event" />
           <EntitySet Name="Goals" EntityType="Self.Goal" />
@@ -1340,14 +1103,7 @@
           <EntitySet Name="Summaries" EntityType="Self.Summary" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="Teams" EntityType="Self.Team" />
-          <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_User_Id">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="AspNetUserLogins" EntitySet="AspNetUserLogins" />
-          </AssociationSet>
+          <EntitySet Name="UpdateHistories" EntityType="Self.UpdateHistory" />
           <AssociationSet Name="FK_dbo_Cards_dbo_Summaries_Summary_Id" Association="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id">
             <End Role="Summaries" EntitySet="Summaries" />
             <End Role="Cards" EntitySet="Cards" />
@@ -1364,29 +1120,17 @@
             <End Role="Summaries" EntitySet="Summaries" />
             <End Role="Goals" EntitySet="Goals" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_MatchId" Association="Self.FK_dbo_Lineups_dbo_Matches_MatchId">
+          <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_Match_Id" Association="Self.FK_dbo_Lineups_dbo_Matches_Match_Id">
             <End Role="Matches" EntitySet="Matches" />
+            <End Role="Lineups" EntitySet="Lineups" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Lineups_dbo_Players_Player_Id" Association="Self.FK_dbo_Lineups_dbo_Players_Player_Id">
+            <End Role="Players" EntitySet="Players" />
             <End Role="Lineups" EntitySet="Lineups" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Lineups_dbo_Teams_Team_Id" Association="Self.FK_dbo_Lineups_dbo_Teams_Team_Id">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Lineups" EntitySet="Lineups" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Eleven_Id" Association="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Eleven_Id1" Association="Self.FK_dbo_Players_dbo_Lineups_Eleven_Id1">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Sub_Id" Association="Self.FK_dbo_Players_dbo_Lineups_Sub_Id">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Players_dbo_Lineups_Sub_Id1" Association="Self.FK_dbo_Players_dbo_Lineups_Sub_Id1">
-            <End Role="Lineups" EntitySet="Lineups" />
-            <End Role="Players" EntitySet="Players" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Matches_dbo_Teams_AwayTeamId" Association="Self.FK_dbo_Matches_dbo_Teams_AwayTeamId">
             <End Role="Teams" EntitySet="Teams" />
@@ -1420,109 +1164,19 @@
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Rivals" EntitySet="Rivals" />
           </AssociationSet>
-          <AssociationSet Name="AspNetUserRoles" Association="Self.AspNetUserRoles">
-            <End Role="AspNetRoles" EntitySet="AspNetRoles" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-          </AssociationSet>
           <AssociationSet Name="TeamPlayers" Association="Self.TeamPlayers">
             <End Role="Players" EntitySet="Players" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
-          <EntitySet Name="UpdateHistories" EntityType="Data.UpdateHistory" />
-          <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_Match_Id" Association="Data.FK_dbo_Lineups_dbo_Matches_Match_Id">
-            <End Role="Match" EntitySet="Matches" />
-            <End Role="Lineup" EntitySet="Lineups" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Lineups_dbo_Players_Player_Id" Association="Data.FK_dbo_Lineups_dbo_Players_Player_Id">
-            <End Role="Player" EntitySet="Players" />
-            <End Role="Lineup" EntitySet="Lineups" />
-          </AssociationSet>
         </EntityContainer>
-        <EntityType Name="UpdateHistory">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
-          <Property Name="MatchDetails" Type="Boolean" Nullable="false" />
-          <Property Name="Lineups" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedByUserId" Type="Guid" />
-          <Property Name="DateAdded" Type="DateTime" Precision="3" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Deleted" Type="Boolean" />
-          <Property Name="UpdatedByUserId" Type="Guid" />
-          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-        </EntityType>
-        <Association Name="FK_dbo_Lineups_dbo_Matches_Match_Id">
-          <End Type="Data.Match" Role="Match" Multiplicity="0..1" />
-          <End Type="Data.Lineup" Role="Lineup" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Match">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Lineup">
-              <PropertyRef Name="Match_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Lineups_dbo_Players_Player_Id">
-          <End Type="Data.Player" Role="Player" Multiplicity="0..1" />
-          <End Type="Data.Lineup" Role="Lineup" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Player">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Lineup">
-              <PropertyRef Name="Player_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="DataStoreContainer" CdmEntityContainer="Entities">
-          <EntitySetMapping Name="AspNetRoles">
-            <EntityTypeMapping TypeName="Data.AspNetRole">
-              <MappingFragment StoreEntitySet="AspNetRoles">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AspNetUserClaims">
-            <EntityTypeMapping TypeName="Data.AspNetUserClaim">
-              <MappingFragment StoreEntitySet="AspNetUserClaims">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ClaimType" ColumnName="ClaimType" />
-                <ScalarProperty Name="ClaimValue" ColumnName="ClaimValue" />
-                <ScalarProperty Name="User_Id" ColumnName="User_Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AspNetUserLogins">
-            <EntityTypeMapping TypeName="Data.AspNetUserLogin">
-              <MappingFragment StoreEntitySet="AspNetUserLogins">
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="LoginProvider" ColumnName="LoginProvider" />
-                <ScalarProperty Name="ProviderKey" ColumnName="ProviderKey" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="AspNetUsers">
-            <EntityTypeMapping TypeName="Data.AspNetUser">
-              <MappingFragment StoreEntitySet="AspNetUsers">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserName" ColumnName="UserName" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
-                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
-                <ScalarProperty Name="Discriminator" ColumnName="Discriminator" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="Entities">
           <EntitySetMapping Name="Cards">
-            <EntityTypeMapping TypeName="Data.Card">
+            <EntityTypeMapping TypeName="Model.Card">
               <MappingFragment StoreEntitySet="Cards">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1543,7 +1197,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Events">
-            <EntityTypeMapping TypeName="Data.Event">
+            <EntityTypeMapping TypeName="Model.Event">
               <MappingFragment StoreEntitySet="Events">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1562,7 +1216,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Goals">
-            <EntityTypeMapping TypeName="Data.Goal">
+            <EntityTypeMapping TypeName="Model.Goal">
               <MappingFragment StoreEntitySet="Goals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1582,13 +1236,8 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Lineups">
-            <EntityTypeMapping TypeName="Data.Lineup">
+            <EntityTypeMapping TypeName="Model.Lineup">
               <MappingFragment StoreEntitySet="Lineups">
-                <ScalarProperty Name="Player_Id" ColumnName="Player_Id" />
-                <ScalarProperty Name="IsSub" ColumnName="IsSub" />
-                <ScalarProperty Name="IsHomePlayer" ColumnName="IsHomePlayer" />
-                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
-                <ScalarProperty Name="Match_Id" ColumnName="Match_Id" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
@@ -1596,12 +1245,17 @@
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="Match_Id" ColumnName="Match_Id" />
                 <ScalarProperty Name="Team_Id" ColumnName="Team_Id" />
+                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
+                <ScalarProperty Name="IsHomePlayer" ColumnName="IsHomePlayer" />
+                <ScalarProperty Name="IsSub" ColumnName="IsSub" />
+                <ScalarProperty Name="Player_Id" ColumnName="Player_Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Matches">
-            <EntityTypeMapping TypeName="Data.Match">
+            <EntityTypeMapping TypeName="Model.Match">
               <MappingFragment StoreEntitySet="Matches">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
@@ -1627,7 +1281,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Players">
-            <EntityTypeMapping TypeName="Data.Player">
+            <EntityTypeMapping TypeName="Model.Player">
               <MappingFragment StoreEntitySet="Players">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
@@ -1640,11 +1294,11 @@
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Position" ColumnName="Position" />
                 <ScalarProperty Name="APIPlayerId" ColumnName="APIPlayerId" />
-                </MappingFragment>
+              </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PlayerStats">
-            <EntityTypeMapping TypeName="Data.PlayerStat">
+            <EntityTypeMapping TypeName="Model.PlayerStat">
               <MappingFragment StoreEntitySet="PlayerStats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
@@ -1674,7 +1328,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Rivals">
-            <EntityTypeMapping TypeName="Data.Rival">
+            <EntityTypeMapping TypeName="Model.Rival">
               <MappingFragment StoreEntitySet="Rivals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="TeamId" ColumnName="TeamId" />
@@ -1688,7 +1342,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Stats">
-            <EntityTypeMapping TypeName="Data.Stat">
+            <EntityTypeMapping TypeName="Model.Stat">
               <MappingFragment StoreEntitySet="Stats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1720,7 +1374,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Substitutions">
-            <EntityTypeMapping TypeName="Data.Substitution">
+            <EntityTypeMapping TypeName="Model.Substitution">
               <MappingFragment StoreEntitySet="Substitutions">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
@@ -1742,7 +1396,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Summaries">
-            <EntityTypeMapping TypeName="Data.Summary">
+            <EntityTypeMapping TypeName="Model.Summary">
               <MappingFragment StoreEntitySet="Summaries">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
@@ -1758,7 +1412,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="Data.sysdiagram">
+            <EntityTypeMapping TypeName="Model.sysdiagram">
               <MappingFragment StoreEntitySet="sysdiagrams">
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="principal_id" ColumnName="principal_id" />
@@ -1769,9 +1423,8 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Teams">
-            <EntityTypeMapping TypeName="Data.Team">
+            <EntityTypeMapping TypeName="Model.Team">
               <MappingFragment StoreEntitySet="Teams">
-                <ScalarProperty Name="Stadium" ColumnName="Stadium" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
@@ -1781,18 +1434,27 @@
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
+                <ScalarProperty Name="Stadium" ColumnName="Stadium" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="AspNetUserRoles" TypeName="Data.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
-            <EndProperty Name="AspNetRoles">
-              <ScalarProperty Name="Id" ColumnName="RoleId" />
-            </EndProperty>
-            <EndProperty Name="AspNetUsers">
-              <ScalarProperty Name="Id" ColumnName="UserId" />
-            </EndProperty>
-          </AssociationSetMapping>
-          <AssociationSetMapping Name="TeamPlayers" TypeName="Data.TeamPlayers" StoreEntitySet="TeamPlayers">
+          <EntitySetMapping Name="UpdateHistories">
+            <EntityTypeMapping TypeName="Model.UpdateHistory">
+              <MappingFragment StoreEntitySet="UpdateHistories">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
+                <ScalarProperty Name="MatchDetails" ColumnName="MatchDetails" />
+                <ScalarProperty Name="Lineups" ColumnName="Lineups" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="TeamPlayers" TypeName="Model.TeamPlayers" StoreEntitySet="TeamPlayers">
             <EndProperty Name="Players">
               <ScalarProperty Name="Id" ColumnName="Player_Id" />
             </EndProperty>
@@ -1800,22 +1462,6 @@
               <ScalarProperty Name="Id" ColumnName="Team_Id" />
             </EndProperty>
           </AssociationSetMapping>
-          <EntitySetMapping Name="UpdateHistories">
-            <EntityTypeMapping TypeName="Data.UpdateHistory">
-              <MappingFragment StoreEntitySet="UpdateHistories">
-                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
-                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
-                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
-                <ScalarProperty Name="Lineups" ColumnName="Lineups" />
-                <ScalarProperty Name="MatchDetails" ColumnName="MatchDetails" />
-                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

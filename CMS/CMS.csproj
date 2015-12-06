@@ -334,6 +334,10 @@
     <Compile Include="EntitiesMigrations\201512051739312_AddUpdateHistory2.Designer.cs">
       <DependentUpon>201512051739312_AddUpdateHistory2.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201512061930374_UpdateUpdateHistory.cs" />
+    <Compile Include="EntitiesMigrations\201512061930374_UpdateUpdateHistory.Designer.cs">
+      <DependentUpon>201512061930374_UpdateUpdateHistory.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -357,6 +361,7 @@
     <Compile Include="Infrastructure\Concrete\EFEvent.cs" />
     <Compile Include="Infrastructure\Concrete\EFGoal.cs" />
     <Compile Include="Infrastructure\Concrete\EFMatch.cs" />
+    <Compile Include="Infrastructure\Concrete\EFPlayer.cs" />
     <Compile Include="Infrastructure\Concrete\EFRedCard.cs" />
     <Compile Include="Infrastructure\Concrete\EFStat.cs" />
     <Compile Include="Infrastructure\Concrete\EFSummary.cs" />
@@ -565,6 +570,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201512051739312_AddUpdateHistory2.resx">
       <DependentUpon>201512051739312_AddUpdateHistory2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201512061930374_UpdateUpdateHistory.resx">
+      <DependentUpon>201512061930374_UpdateUpdateHistory.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>
