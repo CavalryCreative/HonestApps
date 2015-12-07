@@ -13,7 +13,7 @@
         <EntityTypeShape EntityType="Model.Player" Width="1.5" PointX="0.75" PointY="21.25" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.PlayerStat" Width="1.5" PointX="10.5" PointY="20.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Rival" Width="1.5" PointX="5.25" PointY="46.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Stat" Width="1.5" PointX="7.5" PointY="24.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Stat" Width="2.25" PointX="7.5" PointY="24.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Substitution" Width="1.5" PointX="7.5" PointY="31.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Summary" Width="1.5" PointX="7.5" PointY="39.375" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />

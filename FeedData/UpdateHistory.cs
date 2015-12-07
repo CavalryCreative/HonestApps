@@ -24,5 +24,6 @@ namespace FeedData
         public Nullable<bool> Deleted { get; set; }
         public Nullable<System.Guid> UpdatedByUserId { get; set; }
         public Nullable<System.DateTime> DateUpdated { get; set; }
+        public bool MatchStats { get; set; }
     }
 }

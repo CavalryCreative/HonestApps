@@ -27,7 +27,7 @@ namespace FeedData
         public Nullable<byte> HomeTeamFouls { get; set; }
         public Nullable<byte> HomeTeamCorners { get; set; }
         public Nullable<byte> HomeTeamOffsides { get; set; }
-        public Nullable<byte> HomeTeamPossessionTime { get; set; }
+        public string HomeTeamPossessionTime { get; set; }
         public Nullable<byte> HomeTeamYellowCards { get; set; }
         public Nullable<byte> HomeTeamRedCards { get; set; }
         public Nullable<byte> HomeTeamSaves { get; set; }
@@ -36,7 +36,7 @@ namespace FeedData
         public Nullable<byte> AwayTeamFouls { get; set; }
         public Nullable<byte> AwayTeamCorners { get; set; }
         public Nullable<byte> AwayTeamOffsides { get; set; }
-        public Nullable<byte> AwayTeamPossessionTime { get; set; }
+        public string AwayTeamPossessionTime { get; set; }
         public Nullable<byte> AwayTeamYellowCards { get; set; }
         public Nullable<byte> AwayTeamRedCards { get; set; }
         public Nullable<byte> AwayTeamSaves { get; set; }

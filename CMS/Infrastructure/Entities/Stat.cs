@@ -17,7 +17,7 @@ namespace CMS.Infrastructure.Entities
         public byte? HomeTeamFouls { get; set; }
         public byte? HomeTeamCorners { get; set; }
         public byte? HomeTeamOffsides { get; set; }
-        public byte? HomeTeamPossessionTime { get; set; }
+        public string HomeTeamPossessionTime { get; set; }
         public byte? HomeTeamYellowCards { get; set; }
         public byte? HomeTeamRedCards { get; set; }
         public byte? HomeTeamSaves { get; set; }
@@ -26,7 +26,7 @@ namespace CMS.Infrastructure.Entities
         public byte? AwayTeamFouls { get; set; }
         public byte? AwayTeamCorners { get; set; }
         public byte? AwayTeamOffsides { get; set; }
-        public byte? AwayTeamPossessionTime { get; set; }
+        public string AwayTeamPossessionTime { get; set; }
         public byte? AwayTeamYellowCards { get; set; }
         public byte? AwayTeamRedCards { get; set; }
         public byte? AwayTeamSaves { get; set; }

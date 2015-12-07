@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cards">
           <Key>
             <PropertyRef Name="Id" />
@@ -180,7 +180,7 @@
           <Property Name="HomeTeamFouls" Type="tinyint" />
           <Property Name="HomeTeamCorners" Type="tinyint" />
           <Property Name="HomeTeamOffsides" Type="tinyint" />
-          <Property Name="HomeTeamPossessionTime" Type="tinyint" />
+          <Property Name="HomeTeamPossessionTime" Type="nvarchar(max)" />
           <Property Name="HomeTeamYellowCards" Type="tinyint" />
           <Property Name="HomeTeamRedCards" Type="tinyint" />
           <Property Name="HomeTeamSaves" Type="tinyint" />
@@ -189,7 +189,7 @@
           <Property Name="AwayTeamFouls" Type="tinyint" />
           <Property Name="AwayTeamCorners" Type="tinyint" />
           <Property Name="AwayTeamOffsides" Type="tinyint" />
-          <Property Name="AwayTeamPossessionTime" Type="tinyint" />
+          <Property Name="AwayTeamPossessionTime" Type="nvarchar(max)" />
           <Property Name="AwayTeamYellowCards" Type="tinyint" />
           <Property Name="AwayTeamRedCards" Type="tinyint" />
           <Property Name="AwayTeamSaves" Type="tinyint" />
@@ -277,6 +277,7 @@
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+          <Property Name="MatchStats" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_dbo_Cards_dbo_Summaries_Summary_Id">
           <End Role="Summaries" Type="Self.Summaries" Multiplicity="0..1" />
@@ -587,8 +588,7 @@
             <End Role="Summaries" EntitySet="Summaries" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -788,7 +788,7 @@
           <Property Name="HomeTeamFouls" Type="Byte" />
           <Property Name="HomeTeamCorners" Type="Byte" />
           <Property Name="HomeTeamOffsides" Type="Byte" />
-          <Property Name="HomeTeamPossessionTime" Type="Byte" />
+          <Property Name="HomeTeamPossessionTime" Type="String" />
           <Property Name="HomeTeamYellowCards" Type="Byte" />
           <Property Name="HomeTeamRedCards" Type="Byte" />
           <Property Name="HomeTeamSaves" Type="Byte" />
@@ -797,7 +797,7 @@
           <Property Name="AwayTeamFouls" Type="Byte" />
           <Property Name="AwayTeamCorners" Type="Byte" />
           <Property Name="AwayTeamOffsides" Type="Byte" />
-          <Property Name="AwayTeamPossessionTime" Type="Byte" />
+          <Property Name="AwayTeamPossessionTime" Type="String" />
           <Property Name="AwayTeamYellowCards" Type="Byte" />
           <Property Name="AwayTeamRedCards" Type="Byte" />
           <Property Name="AwayTeamSaves" Type="Byte" />
@@ -888,6 +888,7 @@
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+          <Property Name="MatchStats" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="FK_dbo_Cards_dbo_Summaries_Summary_Id">
           <End Role="Summaries" Type="Self.Summary" Multiplicity="0..1" />
@@ -1441,6 +1442,7 @@
           <EntitySetMapping Name="UpdateHistories">
             <EntityTypeMapping TypeName="Model.UpdateHistory">
               <MappingFragment StoreEntitySet="UpdateHistories">
+                <ScalarProperty Name="MatchStats" ColumnName="MatchStats" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
                 <ScalarProperty Name="MatchDetails" ColumnName="MatchDetails" />

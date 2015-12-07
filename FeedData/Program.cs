@@ -38,6 +38,9 @@ namespace FeedData
                   GetCommentaries(matchId);
               }
           }
+            //TODO - set live matches to false when ended
+            //Only hit Get Fixtures once per day
+            //Create live games table?
 
           //GetCommentaries(2148519);
         }
@@ -82,8 +85,6 @@ namespace FeedData
                                              AwayTeamAPIId = (int)p["match_visitorteam_id"],
                                              AwayTeam = (string)p["match_visitorteam_name"]
                                          };
-
-                    Entities context = new Entities();
 
                      foreach (var item in postTitles)
                      {
@@ -137,6 +138,13 @@ namespace FeedData
                              history.Id = System.Guid.Empty;
 
                              SaveUpdateHistory(history);
+                         }
+                         else
+                         {
+                             var retMatch = GetMatchByAPIId(item.APIId);
+
+                             if(retMatch.IsLive == true)
+                                 liveMatches.Add(item.APIId);
                          }
                      }
                 }
@@ -474,7 +482,37 @@ namespace FeedData
                     #endregion
 
                     #region Match Stats
-                    //TODO - create record (one for match) - updatehistory
+                  
+                    Stat stat = new Stat();
+                    stat.MatchId = match.Id;
+
+                    var matchStats = GetMatchStatsByAPIId(match.Id);
+
+                    if (matchStats != null)
+                        stat.Id = matchStats.Id;
+                        
+                    JObject obj = JObject.Parse(s);
+                    stat.HomeTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.corners.total").ToString());
+                    stat.HomeTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString());
+                    stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString();
+                    stat.HomeTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.saves.total").ToString());
+                    stat.HomeTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.ongoal").ToString());
+                    stat.HomeTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.total").ToString());
+                    stat.HomeTeamFouls = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.fouls.total").ToString());
+                    stat.HomeTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.redcards.total").ToString());
+                    stat.HomeTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.yellowcards.total").ToString());
+
+                    stat.AwayTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.corners.total").ToString());
+                    stat.AwayTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString());
+                    stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString();
+                    stat.AwayTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.saves.total").ToString());
+                    stat.AwayTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.ongoal").ToString());
+                    stat.AwayTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.total").ToString());
+                    stat.AwayTeamFouls = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.fouls.total").ToString());
+                    stat.AwayTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.redcards.total").ToString());
+                    stat.AwayTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.yellowcards.total").ToString());
+
+                    SaveMatchStats(stat);
 
                     #endregion
 
@@ -595,6 +633,75 @@ namespace FeedData
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                     Id = updatedRecord.Id;
                 }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string SaveMatchStats(Stat updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord == null)
+            {
+                return Res.Resources.NotFound;
+            }
+
+            //Update record
+            var recordToUpdate = context.Stats.Where(x => x.Id == updatedRecord.Id).FirstOrDefault();
+
+            if (recordToUpdate == null)
+            {
+                //Create record
+                updatedRecord.Id = Guid.NewGuid();
+                updatedRecord.Active = true;
+                updatedRecord.Deleted = false;
+                updatedRecord.DateAdded = DateTime.Now;
+                updatedRecord.DateUpdated = DateTime.Now;
+
+                context.Stats.Add(updatedRecord);
+                Id = updatedRecord.Id;
+            }
+            else
+            {
+                recordToUpdate.Active = updatedRecord.Active;
+                recordToUpdate.AwayTeamCorners = updatedRecord.AwayTeamCorners;
+                recordToUpdate.AwayTeamFouls = updatedRecord.AwayTeamFouls;
+                recordToUpdate.AwayTeamOffsides = updatedRecord.AwayTeamOffsides;
+                recordToUpdate.AwayTeamOnGoalShots = updatedRecord.AwayTeamOnGoalShots;
+                recordToUpdate.AwayTeamPossessionTime = updatedRecord.AwayTeamPossessionTime;
+                recordToUpdate.AwayTeamRedCards = updatedRecord.AwayTeamRedCards;
+                recordToUpdate.AwayTeamSaves = updatedRecord.AwayTeamSaves;
+                recordToUpdate.AwayTeamTotalShots = updatedRecord.AwayTeamTotalShots;
+                recordToUpdate.AwayTeamYellowCards = updatedRecord.AwayTeamYellowCards;
+                recordToUpdate.DateUpdated = DateTime.Now;
+                recordToUpdate.Deleted = false;
+                recordToUpdate.HomeTeamCorners = updatedRecord.HomeTeamCorners;
+                recordToUpdate.HomeTeamFouls = updatedRecord.HomeTeamFouls;
+                recordToUpdate.HomeTeamOffsides = updatedRecord.HomeTeamOffsides;
+                recordToUpdate.HomeTeamOnGoalShots = updatedRecord.HomeTeamOnGoalShots;
+                recordToUpdate.HomeTeamPossessionTime = updatedRecord.HomeTeamPossessionTime;
+                recordToUpdate.HomeTeamRedCards = updatedRecord.HomeTeamRedCards;
+                recordToUpdate.HomeTeamSaves = updatedRecord.HomeTeamSaves;
+                recordToUpdate.HomeTeamTotalShots = updatedRecord.HomeTeamTotalShots;
+                recordToUpdate.HomeTeamYellowCards = updatedRecord.HomeTeamYellowCards;
+                recordToUpdate.Match = updatedRecord.Match;
+                recordToUpdate.MatchId = updatedRecord.MatchId;
+                recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+
+                context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                Id = updatedRecord.Id;
+            }
 
             try
             {
@@ -784,6 +891,13 @@ namespace FeedData
         #endregion
 
         #region Get
+
+        private static Stat GetMatchStatsByAPIId(Guid matchGuid)
+        {
+            Entities context = new Entities();
+
+            return context.Stats.Where(x => (x.MatchId == matchGuid)).FirstOrDefault();
+        }
 
         private static UpdateHistory GetUpdateHistoryByMatchAPIId(int id)
         {
