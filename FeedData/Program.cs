@@ -518,6 +518,83 @@ namespace FeedData
 
                     #region Player Stats
 
+                    //Home players
+                    jPath = "commentaries.[0].comm_match_player_stats.localteam.player";
+
+                    var playerStats = token.SelectTokens(jPath);
+
+                    foreach (var statToken in playerStats.Children())
+                    {
+                        var fred = statToken.Children();
+
+                        foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            PlayerStat playerStat = new PlayerStat();
+
+                            playerStat.APIId = Convert.ToInt32(evt["id"]);
+
+                            Player player = new Player();
+                            GetPlayerByAPIId(playerStat.APIId);
+
+                            playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
+                            playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
+                            playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
+                            playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
+                            playerStat.MatchId = match.Id;
+                            playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
+                            playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
+                            playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
+                            playerStat.PlayerId = player.Id;
+                            playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
+                            playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
+                            playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
+                            playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
+                            playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
+                            playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
+                            playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+
+                            SavePlayerStats(playerStat);
+                        }
+                    }
+
+                    //Away players
+                    jPath = "commentaries.[0].comm_match_player_stats.visitorteam.player";
+
+                    playerStats = token.SelectTokens(jPath);
+
+                    foreach (var statToken in playerStats.Children())
+                    {
+                        var fred = statToken.Children();
+
+                        foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            PlayerStat playerStat = new PlayerStat();
+
+                            playerStat.APIId = Convert.ToInt32(evt["id"]);
+
+                            Player player = new Player();
+                            GetPlayerByAPIId(playerStat.APIId);
+
+                            playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
+                            playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
+                            playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
+                            playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
+                            playerStat.MatchId = match.Id;
+                            playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
+                            playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
+                            playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
+                            playerStat.PlayerId = player.Id;
+                            playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
+                            playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
+                            playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
+                            playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
+                            playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
+                            playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
+                            playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+
+                            SavePlayerStats(playerStat);
+                        }
+                    }
                     #endregion
 
                     #region Events
@@ -695,6 +772,73 @@ namespace FeedData
                 recordToUpdate.HomeTeamSaves = updatedRecord.HomeTeamSaves;
                 recordToUpdate.HomeTeamTotalShots = updatedRecord.HomeTeamTotalShots;
                 recordToUpdate.HomeTeamYellowCards = updatedRecord.HomeTeamYellowCards;
+                recordToUpdate.Match = updatedRecord.Match;
+                recordToUpdate.MatchId = updatedRecord.MatchId;
+                recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+
+                context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                Id = updatedRecord.Id;
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string SavePlayerStats(PlayerStat updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord == null)
+            {
+                return Res.Resources.NotFound;
+            }
+
+            //Update record
+            var recordToUpdate = context.PlayerStats.Where(x => x.PlayerId == updatedRecord.PlayerId && x.MatchId == updatedRecord.MatchId).FirstOrDefault();
+
+            if (recordToUpdate == null)
+            {
+                //Create record
+                updatedRecord.Id = Guid.NewGuid();
+                updatedRecord.Active = true;
+                updatedRecord.Deleted = false;
+                updatedRecord.DateAdded = DateTime.Now;
+                updatedRecord.DateUpdated = DateTime.Now;
+
+                context.PlayerStats.Add(updatedRecord);
+                Id = updatedRecord.Id;
+            }
+            else
+            {
+                recordToUpdate.Assists = updatedRecord.Assists;
+                recordToUpdate.FoulsCommitted = updatedRecord.FoulsCommitted;
+                recordToUpdate.FoulsDrawn = updatedRecord.FoulsDrawn;
+                recordToUpdate.Goals = updatedRecord.Goals;
+                recordToUpdate.Offsides = updatedRecord.Offsides;
+                recordToUpdate.PenaltiesMissed = updatedRecord.PenaltiesMissed;
+                recordToUpdate.PenaltiesScored = updatedRecord.PenaltiesScored;
+                recordToUpdate.Player = updatedRecord.Player;
+                recordToUpdate.PlayerId = updatedRecord.PlayerId;
+                recordToUpdate.PositionX = updatedRecord.PositionX;
+                recordToUpdate.PositionY = updatedRecord.PositionY;
+                recordToUpdate.RedCards = updatedRecord.RedCards;
+                recordToUpdate.Saves = updatedRecord.Saves;
+                recordToUpdate.ShotsOnGoal = updatedRecord.ShotsOnGoal;
+                recordToUpdate.TotalShots = updatedRecord.TotalShots;
+                recordToUpdate.YellowCards = updatedRecord.YellowCards;
+                recordToUpdate.Active = updatedRecord.Active;
+                recordToUpdate.DateUpdated = DateTime.Now;
+                recordToUpdate.Deleted = false;
                 recordToUpdate.Match = updatedRecord.Match;
                 recordToUpdate.MatchId = updatedRecord.MatchId;
                 recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
