@@ -8,6 +8,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Res = Resources;
+using System.Timers;
 
 namespace FeedData
 {
@@ -534,7 +535,7 @@ namespace FeedData
                             playerStat.APIId = Convert.ToInt32(evt["id"]);
 
                             Player player = new Player();
-                            GetPlayerByAPIId(playerStat.APIId);
+                            player = GetPlayerByAPIId(playerStat.APIId);
 
                             playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
                             playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
@@ -573,7 +574,7 @@ namespace FeedData
                             playerStat.APIId = Convert.ToInt32(evt["id"]);
 
                             Player player = new Player();
-                            GetPlayerByAPIId(playerStat.APIId);
+                            player = GetPlayerByAPIId(playerStat.APIId);
 
                             playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
                             playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
