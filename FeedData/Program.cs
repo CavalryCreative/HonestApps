@@ -144,8 +144,11 @@ namespace FeedData
                          {
                              var retMatch = GetMatchByAPIId(item.APIId);
 
-                             if(retMatch.IsLive == true)
-                                 liveMatches.Add(item.APIId);
+                             if (retMatch != null)
+                             {
+                                 if (retMatch.IsLive == true)
+                                     liveMatches.Add(item.APIId);
+                             }                    
                          }
                      }
                 }
