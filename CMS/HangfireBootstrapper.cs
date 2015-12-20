@@ -31,7 +31,7 @@ namespace CMS
                 HostingEnvironment.RegisterObject(this);
 
                 GlobalConfiguration.Configuration
-                    .UseSqlServerStorage("connection string");
+                    .UseSqlServerStorage("DefaultConnection");
                 // Specify other options here
 
                 _backgroundJobServer = new BackgroundJobServer();
