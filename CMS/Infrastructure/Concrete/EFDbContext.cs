@@ -55,8 +55,8 @@ namespace CMS.Infrastructure.Concrete
                 //Property(p => p.Description).IsUnicode(false);
                 //Property(p => p.Summary).HasMaxLength(5000).IsUnicode(false);
                 //Property(p => p.Keywords).HasMaxLength(5000).IsUnicode(false);
-                //Property(p => p.MetaDescription).HasMaxLength(5000).IsUnicode(false);
-                //Property(p => p.Location).HasMaxLength(1000).IsUnicode(false);
+                Property(p => p.Name).HasMaxLength(500).IsUnicode(false);
+                Property(p => p.Stadium).HasMaxLength(500).IsUnicode(false);
             }
         }
 

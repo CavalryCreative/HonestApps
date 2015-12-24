@@ -10,6 +10,7 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Hangfire;
 
 namespace CMS.Controllers
 {
@@ -43,15 +44,17 @@ namespace CMS.Controllers
 
         public void GetCommentaries()
         {
-            var liveMatches = GetLiveMatches();
+            //var liveMatches = GetLiveMatches();
 
-            if (liveMatches.Count > 0)
-            {
-                foreach (var match in liveMatches)
-                {
-                    GetCommentaries(match.APIId);
-                }
-            }
+            //if (liveMatches.Count > 0)
+            //{
+            //    foreach (var match in liveMatches)
+            //    {
+            //        GetCommentaries(match.APIId);
+            //    }
+            //}
+            
+            GetCommentaries(2153970);
         }
 
         private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)

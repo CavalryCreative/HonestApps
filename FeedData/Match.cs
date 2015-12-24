@@ -38,20 +38,18 @@ namespace FeedData
         public string Referee { get; set; }
         public int APIId { get; set; }
         public Nullable<System.DateTime> Date { get; set; }
-        public Nullable<System.Guid> HomeTeamId { get; set; }
-        public Nullable<System.Guid> AwayTeamId { get; set; }
         public int HomeTeamAPIId { get; set; }
         public int AwayTeamAPIId { get; set; }
         public bool IsToday { get; set; }
         public bool IsLive { get; set; }
         public Nullable<System.DateTime> EndDate { get; set; }
+        public System.Guid HomeTeamId { get; set; }
+        public System.Guid AwayTeamId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Event> Events { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Lineup> Lineups { get; set; }
-        public virtual Team Team { get; set; }
-        public virtual Team Team1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PlayerStat> PlayerStats { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

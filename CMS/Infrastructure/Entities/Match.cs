@@ -29,6 +29,8 @@ namespace CMS.Infrastructure.Entities
         public string Referee { get; set; }
         public DateTime? Date { get; set; }
         public DateTime? EndDate { get; set; }
+        public Guid HomeTeamId { get; set; }
+        public Guid AwayTeamId { get; set; }
         public int HomeTeamAPIId { get; set; }
         public int AwayTeamAPIId { get; set; }
         public bool IsToday { get; set; }

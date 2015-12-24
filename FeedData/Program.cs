@@ -8,7 +8,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Res = Resources;
-using System.Timers;
+using Hangfire;
 
 namespace FeedData
 {
@@ -28,22 +28,40 @@ namespace FeedData
     {
         static void Main(string[] args)
         {
-            IList<int> liveMatches = new List<int>();
+            GlobalConfiguration.Configuration.UseSqlServerStorage("Entities");
 
-            liveMatches = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+            RecurringJob.AddOrUpdate(() => Fixtures(), Cron.Daily(9));
 
-          if (liveMatches.Count > 0)
-          {
-              foreach (var matchId in liveMatches)
-              {
-                  GetCommentaries(matchId);
-              }
-          }
+            //GetCommentaries
+            //RecurringJob.AddOrUpdate(() => GetCommentaries(), Cron.Daily(9));
+
+            using (var server = new BackgroundJobServer())
+            {
+                Console.WriteLine("Hangfire Server started. Press any key to exit...");
+                Console.ReadKey();
+            }
+
+           
             //TODO - set live matches to false when ended
             //Only hit Get Fixtures once per day
             //Create live games table?
 
           //GetCommentaries(2148519);
+        }
+
+        private static void Fixtures()
+        {
+            IList<int> liveMatches = new List<int>();
+
+            liveMatches = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+
+            if (liveMatches.Count > 0)
+            {
+                foreach (var matchId in liveMatches)
+                {
+                    GetCommentaries(matchId);
+                }
+            }
         }
 
         private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)

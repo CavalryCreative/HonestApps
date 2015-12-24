@@ -3,6 +3,7 @@ using Hangfire.Dashboard;
 using Microsoft.Owin;
 using Owin;
 using System.Collections.Generic;
+using CMS.Controllers;
 
 [assembly: OwinStartupAttribute(typeof(CMS.Startup))]
 namespace CMS
@@ -17,6 +18,11 @@ namespace CMS
             {
                 AuthorizationFilters = new[] { new MyRestrictiveAuthorizationFilter() }
             });
+
+            HomeController home = new HomeController();
+            //RecurringJob.AddOrUpdate(() => home.GetFixtures(), Cron.Daily(9));
+            //GetCommentaries
+            RecurringJob.AddOrUpdate(() => home.GetCommentaries(), Cron.Daily(9));
         }
     }
 

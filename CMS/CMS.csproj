@@ -355,6 +355,14 @@
     <Compile Include="EntitiesMigrations\201512072135175_UpdateStat.Designer.cs">
       <DependentUpon>201512072135175_UpdateStat.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201512231757585_UpdateJim.cs" />
+    <Compile Include="EntitiesMigrations\201512231757585_UpdateJim.Designer.cs">
+      <DependentUpon>201512231757585_UpdateJim.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201512231812318_UpdateJim1.cs" />
+    <Compile Include="EntitiesMigrations\201512231812318_UpdateJim1.Designer.cs">
+      <DependentUpon>201512231812318_UpdateJim1.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -594,6 +602,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201512072135175_UpdateStat.resx">
       <DependentUpon>201512072135175_UpdateStat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201512231757585_UpdateJim.resx">
+      <DependentUpon>201512231757585_UpdateJim.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201512231812318_UpdateJim1.resx">
+      <DependentUpon>201512231812318_UpdateJim1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

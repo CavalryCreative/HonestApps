@@ -4,20 +4,20 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="327b1aa625214f67882c34624867ee61" Name="Diagram1">
-        <EntityTypeShape EntityType="Model.Card" Width="1.5" PointX="9.75" PointY="36.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Event" Width="1.5" PointX="7.5" PointY="20.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Goal" Width="1.5" PointX="9.75" PointY="41.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Lineup" Width="1.5" PointX="10.5" PointY="27.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Match" Width="1.5" PointX="5.25" PointY="29.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Player" Width="1.5" PointX="0.75" PointY="21.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.PlayerStat" Width="1.5" PointX="10.5" PointY="20.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Rival" Width="1.5" PointX="5.25" PointY="46.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Stat" Width="2.25" PointX="7.5" PointY="24.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Substitution" Width="1.5" PointX="7.5" PointY="31.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Summary" Width="1.5" PointX="7.5" PointY="39.375" IsExpanded="true" />
+      <Diagram DiagramId="25bc6bc664c942f7b76036cc7aebd8d7" Name="Diagram1">
+        <EntityTypeShape EntityType="Model.Card" Width="1.5" PointX="5.25" PointY="36.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Event" Width="1.5" PointX="3" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Goal" Width="1.5" PointX="5.25" PointY="41.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Lineup" Width="1.5" PointX="3" PointY="19.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Match" Width="1.5" PointX="0.75" PointY="18.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Player" Width="1.5" PointX="0.75" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.PlayerStat" Width="1.5" PointX="6" PointY="18.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Rival" Width="1.5" PointX="3" PointY="15" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Stat" Width="1.5" PointX="3" PointY="24.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Substitution" Width="1.5" PointX="3" PointY="31.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Summary" Width="1.5" PointX="3" PointY="39.125" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.Team" Width="1.5" PointX="3" PointY="32.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.Team" Width="1.5" PointX="0.75" PointY="25.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.UpdateHistory" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <AssociationConnector Association="Model.FK_dbo_Cards_dbo_Summaries_Summary_Id" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_Cards_dbo_Summaries_Summary_Id1" ManuallyRouted="false" />
@@ -26,8 +26,6 @@
         <AssociationConnector Association="Model.FK_dbo_Lineups_dbo_Matches_Match_Id" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_Lineups_dbo_Players_Player_Id" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_Lineups_dbo_Teams_Team_Id" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.FK_dbo_Matches_dbo_Teams_AwayTeamId" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.FK_dbo_Matches_dbo_Teams_HomeTeamId" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_PlayerStats_dbo_Matches_MatchId" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_Stats_dbo_Matches_MatchId" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_Substitutions_dbo_Matches_MatchId" ManuallyRouted="false" />
