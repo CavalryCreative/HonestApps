@@ -10,6 +10,10 @@ namespace CMS.Infrastructure.Entities
    [NotMapped]
     public class Feed
     {
-
+        public string EventComment { get; set; }
+        public string Comment { get; set; }
+        public string Score { get; set; }
+        public byte Minute { get; set; }
+        public int TeamAPIId { get; set; }
     }
 }
