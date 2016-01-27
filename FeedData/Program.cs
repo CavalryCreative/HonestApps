@@ -28,18 +28,18 @@ namespace FeedData
     {
         static void Main(string[] args)
         {
-            GlobalConfiguration.Configuration.UseSqlServerStorage("Entities");
+            //GlobalConfiguration.Configuration.UseSqlServerStorage("Entities");
 
-            RecurringJob.AddOrUpdate(() => Fixtures(), Cron.Daily(9));
+            //RecurringJob.AddOrUpdate(() => Fixtures(), Cron.Daily(9));
 
-            //GetCommentaries
-            //RecurringJob.AddOrUpdate(() => GetCommentaries(), Cron.Daily(9));
+            ////GetCommentaries
+            ////RecurringJob.AddOrUpdate(() => GetCommentaries(), Cron.Daily(9));
 
-            using (var server = new BackgroundJobServer())
-            {
-                Console.WriteLine("Hangfire Server started. Press any key to exit...");
-                Console.ReadKey();
-            }
+            //using (var server = new BackgroundJobServer())
+            //{
+            //    Console.WriteLine("Hangfire Server started. Press any key to exit...");
+            //    Console.ReadKey();
+            //}
 
            
             //TODO - set live matches to false when ended
@@ -47,6 +47,7 @@ namespace FeedData
             //Create live games table?
 
           //GetCommentaries(2148519);
+            Fixtures();
         }
 
         private static void Fixtures()
@@ -516,7 +517,7 @@ namespace FeedData
                     JObject obj = JObject.Parse(s);
                     stat.HomeTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.corners.total").ToString());
                     stat.HomeTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString());
-                    stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString();
+                    stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.possestiontime.total").ToString();
                     stat.HomeTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.saves.total").ToString());
                     stat.HomeTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.ongoal").ToString());
                     stat.HomeTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.total").ToString());
@@ -526,7 +527,7 @@ namespace FeedData
 
                     stat.AwayTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.corners.total").ToString());
                     stat.AwayTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString());
-                    stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString();
+                    stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.possestiontime.total").ToString();
                     stat.AwayTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.saves.total").ToString());
                     stat.AwayTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.ongoal").ToString());
                     stat.AwayTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.total").ToString());
