@@ -15,5 +15,6 @@ namespace CMS.Infrastructure.Entities
         public string Score { get; set; }
         public byte Minute { get; set; }
         public int TeamAPIId { get; set; }
+        public int EventAPIId { get; set; }
     }
 }
