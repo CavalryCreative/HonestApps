@@ -18,10 +18,14 @@ namespace CMS.Infrastructure.Entities
 
         }
 
-        public void Send(string message)
+        public FeedHub(FeedUpdate feedUpdate)
         {
-            // Call the addMessage method on all clients            
-            Clients.All.showMessage(message);
+            _feedUpdate = feedUpdate;
         }
+
+        //public void SendFeed()
+        //{
+        //    _feedUpdate.BroadcastFeed();      
+        //}
     }
 }

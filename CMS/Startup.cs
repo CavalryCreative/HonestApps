@@ -19,15 +19,15 @@ namespace CMS
             ConfigureSignalR(app);
             ConfigureAuth(app);          
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
-            {
-                AuthorizationFilters = new[] { new MyRestrictiveAuthorizationFilter() }
-            });
+            //app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            //{
+            //    AuthorizationFilters = new[] { new MyRestrictiveAuthorizationFilter() }
+            //});
 
-            HomeController home = new HomeController();
-            //RecurringJob.AddOrUpdate(() => home.GetFixtures(), Cron.Daily(9));
-            //GetCommentaries
-            RecurringJob.AddOrUpdate(() => home.GetCommentaries(), Cron.Daily(9));
+            //HomeController home = new HomeController();
+            ////RecurringJob.AddOrUpdate(() => home.GetFixtures(), Cron.Daily(9));
+            ////GetCommentaries
+            //RecurringJob.AddOrUpdate(() => home.GetCommentaries(), Cron.Daily(9));
         }
 
         public static void ConfigureSignalR(IAppBuilder app)
