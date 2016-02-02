@@ -17,7 +17,10 @@ namespace CMS.Infrastructure.Entities
         public bool Important { get; set; }
         public bool Goal { get; set; }
         public byte Minute { get; set; }
+        public string Score { get; set; }
         public string Comment { get; set; }
         public int APIId { get; set; }
+        public byte HomeTeamMatchRating { get; set; }
+        public byte AwayTeamMatchRating { get; set; }
     }
 }

@@ -35,6 +35,13 @@ namespace CMS.Controllers
             return View();
         }
 
+        public ActionResult Test()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
         public void GetFixtures()
         {
             IList<int> liveMatches = new List<int>();

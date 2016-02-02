@@ -26,6 +26,7 @@ namespace CMS.Infrastructure.Concrete
             public DbSet<Goal> Goals { get; set; }
             public DbSet<Card> Cards { get; set; }
             public DbSet<UpdateHistory> UpdateHistory { get; set; }
+            public DbSet<MatchesToday> MatchesToday { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
@@ -36,6 +37,7 @@ namespace CMS.Infrastructure.Concrete
                 modelBuilder.Configurations.Add(new CardMap());
                 modelBuilder.Configurations.Add(new PlayerMap());
                 modelBuilder.Configurations.Add(new SubstitutionMap());
+                modelBuilder.Configurations.Add(new MatchesTodayMap());
             }
         }
 
@@ -112,6 +114,14 @@ namespace CMS.Infrastructure.Concrete
             {
                 Property(p => p.PlayerOn).HasMaxLength(250).IsUnicode(false);
                 Property(p => p.PlayerOff).HasMaxLength(250).IsUnicode(false);
+            }
+        }
+
+        public class MatchesTodayMap : EntityTypeConfiguration<MatchesToday>
+        {
+            public MatchesTodayMap()
+            {
+                Property(p => p.KickOffTime).HasMaxLength(10).IsUnicode(false);
             }
         }
 }

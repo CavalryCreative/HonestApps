@@ -30,8 +30,8 @@ namespace CMS.Infrastructure.Entities
             HostingEnvironment.RegisterObject(this);
 
             Clients = clients;
-            matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120)); 
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));         
+            matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));         
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -58,34 +58,38 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
-            string feed = DateTime.Now.ToString();
+            GetAllCommentaries();
 
-            //_stocks.Clear();
-
-            //var stocks = new List<Stock>
-            //{
-            //    new Stock { Symbol = "MSFT", Price = 41.68m },
-            //    new Stock { Symbol = "AAPL", Price = 92.08m },
-            //    new Stock { Symbol = "GOOG", Price = 543.01m }
-            //};
-
-            //stocks.ForEach(stock => _stocks.TryAdd(stock.Symbol, stock));
+            string feed = string.Empty;
+            feed = GetFeed();
 
             Clients.All.showMessage(feed);
         }
 
         public void GetFixtures(object sender)
         {
-            IList<int> liveMatches = new List<int>();
+            //Clear today matches table
+            DeleteMatchesToday();
 
-            liveMatches = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
+
+            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+
+            foreach (var kvp in matchesToday)
+            {
+                MatchesToday match = new MatchesToday();
+                match.APIId = kvp.Key;
+                match.KickOffTime = kvp.Value;
+
+                SaveMatchToday(match);
+            }
         }
 
         #region Private Methods
 
-        private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)
+        private static IDictionary<int, string> GetFixtures(DateTime startDate, DateTime endDate)
         {
-            IList<int> liveMatches = new List<int>();
+            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
             string retMsg = string.Empty;
 
             string startDateStr = startDate.ToShortDateString();
@@ -150,7 +154,7 @@ namespace CMS.Infrastructure.Entities
                             match.Time = item.Time;
 
                             if (match.IsLive)
-                                liveMatches.Add(match.APIId);
+                                matchesToday.Add(match.APIId, match.Time);
 
                             var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
                             var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
@@ -183,8 +187,8 @@ namespace CMS.Infrastructure.Entities
 
                             if (retMatch != null)
                             {
-                                if (retMatch.IsLive == true)
-                                    liveMatches.Add(item.APIId);
+                                if (DateTime.Now.ToShortDateString() == retMatch.Date.Value.ToShortDateString())
+                                    matchesToday.Add(retMatch.APIId, retMatch.Time);
                             }
                         }
                     }
@@ -200,7 +204,7 @@ namespace CMS.Infrastructure.Entities
                 retMsg = "Error: " + ex.Message;
             }
 
-            return liveMatches;
+            return matchesToday;
         }
 
         private void GetAllCommentaries()
@@ -698,6 +702,9 @@ namespace CMS.Infrastructure.Entities
                             commEvent.Comment = comment;
                             commEvent.APIId = eventId;
                             commEvent.MatchId = match.Id;
+                            commEvent.Score = "";
+
+                            //Todo - set match rating for both teams
 
                             SaveEvent(commEvent);
                         }
@@ -716,6 +723,44 @@ namespace CMS.Infrastructure.Entities
             }
 
             return retMsg;
+        }
+
+        private static string GetFeed()
+        {
+            var jsonObject = new JObject();
+
+            jsonObject.Add("Updated", DateTime.Now);
+
+            dynamic feed = jsonObject;
+            feed.Events = new JArray() as dynamic;
+           
+            var todaysMatches = GetTodayMatches();
+
+            foreach (var match in todaysMatches)
+            {
+                var matchDetails = GetMatchByAPIId(match.APIId);
+                var latestEvents = GetLatestEvents(match.APIId);
+
+                foreach (var evt in latestEvents)
+                {
+                    dynamic feedEvent = new JObject();
+
+                    //TODO - generate home/away comment based on match rating
+                    feedEvent.EventComment = evt.Comment;
+                    feedEvent.Score = "";//TODO - return score from event
+                    feedEvent.Minute = evt.Minute;
+                    feedEvent.EventAPIId = evt.APIId;
+                    feedEvent.MatchAPIId = matchDetails.APIId;
+                    feedEvent.HomeComment = "";
+                    feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
+                    feedEvent.AwayComment = "";
+                    feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
+
+                    feed.Events.Add(feedEvent);
+                }               
+            }
+            
+            return feed.ToString();
         }
 
         #region Save
@@ -1088,6 +1133,62 @@ namespace CMS.Infrastructure.Entities
                 return string.Format("Error: {0}", e.InnerException.ToString());
             }
         }
+
+        private static string SaveMatchToday(MatchesToday updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            EFDbContext context = new EFDbContext();
+
+            if (updatedRecord != null)
+            {              
+                    //Create record
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.MatchesToday.Add(updatedRecord);
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}", Res.Resources.RecordAdded);
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string DeleteMatchesToday()
+        {
+            EFDbContext context = new EFDbContext();
+
+            var allRecords = context.MatchesToday;
+ 
+            if (allRecords != null)
+            {
+                foreach (var record in allRecords)
+                {
+                    context.MatchesToday.Remove(record);
+                }     
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}", Res.Resources.RecordUpdated);
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
         #endregion
 
         #region Get
@@ -1146,6 +1247,20 @@ namespace CMS.Infrastructure.Entities
                 retInt = evt.APIId;
 
             return retInt;
+        }
+
+        private static IList<Event> GetLatestEvents(int id)
+        {
+            EFDbContext context = new EFDbContext();
+
+            return context.Events.Where(x => (x.APIId == id)).OrderByDescending(x => x.DateAdded).Take(5).ToList();
+        }
+
+        private static IList<MatchesToday> GetTodayMatches()
+        {
+            EFDbContext context = new EFDbContext();
+
+            return context.MatchesToday.ToList();
         }
 
         #endregion
