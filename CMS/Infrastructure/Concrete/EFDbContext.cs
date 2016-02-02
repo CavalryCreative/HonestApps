@@ -80,6 +80,7 @@ namespace CMS.Infrastructure.Concrete
             public EventMap()
             {
                 Property(p => p.Comment).HasMaxLength(1000).IsUnicode(false);
+                Property(p => p.Score).HasMaxLength(250).IsUnicode(false);
             }
         }
 

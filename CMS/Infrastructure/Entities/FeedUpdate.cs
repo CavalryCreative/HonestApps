@@ -747,13 +747,13 @@ namespace CMS.Infrastructure.Entities
 
                     //TODO - generate home/away comment based on match rating
                     feedEvent.EventComment = evt.Comment;
-                    feedEvent.Score = "";//TODO - return score from event
+                    feedEvent.Score = "1-0";//TODO - return score from event
                     feedEvent.Minute = evt.Minute;
                     feedEvent.EventAPIId = evt.APIId;
                     feedEvent.MatchAPIId = matchDetails.APIId;
-                    feedEvent.HomeComment = "";
+                    feedEvent.HomeComment = "Test";
                     feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
-                    feedEvent.AwayComment = "";
+                    feedEvent.AwayComment = "Test";
                     feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
                     feed.Events.Add(feedEvent);
