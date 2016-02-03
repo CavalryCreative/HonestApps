@@ -74,3 +74,15 @@ Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSoc
 Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
 Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
 Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.

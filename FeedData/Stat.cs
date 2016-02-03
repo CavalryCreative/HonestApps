@@ -16,12 +16,6 @@ namespace FeedData
     {
         public System.Guid Id { get; set; }
         public System.Guid MatchId { get; set; }
-        public Nullable<System.Guid> CreatedByUserId { get; set; }
-        public Nullable<System.DateTime> DateAdded { get; set; }
-        public Nullable<bool> Active { get; set; }
-        public Nullable<bool> Deleted { get; set; }
-        public Nullable<System.Guid> UpdatedByUserId { get; set; }
-        public Nullable<System.DateTime> DateUpdated { get; set; }
         public Nullable<byte> HomeTeamTotalShots { get; set; }
         public Nullable<byte> HomeTeamOnGoalShots { get; set; }
         public Nullable<byte> HomeTeamFouls { get; set; }
@@ -40,6 +34,12 @@ namespace FeedData
         public Nullable<byte> AwayTeamYellowCards { get; set; }
         public Nullable<byte> AwayTeamRedCards { get; set; }
         public Nullable<byte> AwayTeamSaves { get; set; }
+        public Nullable<System.Guid> CreatedByUserId { get; set; }
+        public Nullable<System.DateTime> DateAdded { get; set; }
+        public Nullable<bool> Active { get; set; }
+        public Nullable<bool> Deleted { get; set; }
+        public Nullable<System.Guid> UpdatedByUserId { get; set; }
+        public Nullable<System.DateTime> DateUpdated { get; set; }
     
         public virtual Match Match { get; set; }
     }

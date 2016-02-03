@@ -13,10 +13,10 @@ namespace FeedData
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class Entities : DbContext
+    public partial class HonestAppsEntities : DbContext
     {
-        public Entities()
-            : base("name=Entities")
+        public HonestAppsEntities()
+            : base("name=HonestAppsEntities")
         {
         }
     
@@ -30,6 +30,7 @@ namespace FeedData
         public virtual DbSet<Goal> Goals { get; set; }
         public virtual DbSet<Lineup> Lineups { get; set; }
         public virtual DbSet<Match> Matches { get; set; }
+        public virtual DbSet<MatchesToday> MatchesTodays { get; set; }
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<PlayerStat> PlayerStats { get; set; }
         public virtual DbSet<Rival> Rivals { get; set; }
@@ -38,6 +39,5 @@ namespace FeedData
         public virtual DbSet<Summary> Summaries { get; set; }
         public virtual DbSet<Team> Teams { get; set; }
         public virtual DbSet<UpdateHistory> UpdateHistories { get; set; }
-        public virtual DbSet<MatchesToday> MatchesTodays { get; set; }
     }
 }

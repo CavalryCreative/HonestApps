@@ -28,7 +28,7 @@ namespace FeedData
     {
         static void Main(string[] args)
         {
-            //GlobalConfiguration.Configuration.UseSqlServerStorage("Entities");
+            //GlobalConfiguration.Configuration.UseSqlServerStorage("HonestAppsEntities");
 
             //RecurringJob.AddOrUpdate(() => Fixtures(), Cron.Daily(9));
 
@@ -693,7 +693,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord == null)
             {
@@ -753,7 +753,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord == null)
             {
@@ -822,7 +822,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord == null)
             {
@@ -889,7 +889,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord != null)
             {
@@ -923,7 +923,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord != null)
             {
@@ -965,7 +965,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord != null)
             {
@@ -1000,7 +1000,7 @@ namespace FeedData
             bool isNewRecord = false;
             Guid Id;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord != null)
             {
@@ -1063,7 +1063,7 @@ namespace FeedData
         {
             Guid Id = Guid.Empty;
 
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             if (updatedRecord != null)
             {
@@ -1091,7 +1091,7 @@ namespace FeedData
 
         private static string DeleteMatchesToday()
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             var allRecords = context.MatchesTodays;
 
@@ -1120,42 +1120,42 @@ namespace FeedData
 
         private static Stat GetMatchStatsByAPIId(Guid matchGuid)
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             return context.Stats.Where(x => (x.MatchId == matchGuid)).FirstOrDefault();
         }
 
         private static UpdateHistory GetUpdateHistoryByMatchAPIId(int id)
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             return context.UpdateHistories.Where(x => (x.MatchAPIId == id)).FirstOrDefault();
         }
 
         private static Player GetPlayerByAPIId(int id)
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             return context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
         }
 
         private static Team GetTeamByAPIId(int id)
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
         }
 
         private static Match GetMatchByAPIId(int id)
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             return context.Matches.Where(x => (x.APIId == id)).FirstOrDefault();
         }
 
         private static int GetLatestEventId(Guid id)
         {
-            Entities context = new Entities();
+            HonestAppsEntities context = new HonestAppsEntities();
 
             int retInt = 0;
 

@@ -15,12 +15,6 @@ namespace FeedData
     public partial class Substitution
     {
         public System.Guid Id { get; set; }
-        public Nullable<System.Guid> CreatedByUserId { get; set; }
-        public Nullable<System.DateTime> DateAdded { get; set; }
-        public Nullable<bool> Active { get; set; }
-        public Nullable<bool> Deleted { get; set; }
-        public Nullable<System.Guid> UpdatedByUserId { get; set; }
-        public Nullable<System.DateTime> DateUpdated { get; set; }
         public System.Guid MatchId { get; set; }
         public string PlayerOff { get; set; }
         public System.Guid PlayerOffId { get; set; }
@@ -30,6 +24,12 @@ namespace FeedData
         public int APIPlayerOnId { get; set; }
         public byte Minute { get; set; }
         public bool IsHomeTeam { get; set; }
+        public Nullable<System.Guid> CreatedByUserId { get; set; }
+        public Nullable<System.DateTime> DateAdded { get; set; }
+        public Nullable<bool> Active { get; set; }
+        public Nullable<bool> Deleted { get; set; }
+        public Nullable<System.Guid> UpdatedByUserId { get; set; }
+        public Nullable<System.DateTime> DateUpdated { get; set; }
     
         public virtual Match Match { get; set; }
     }

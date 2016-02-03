@@ -35,6 +35,7 @@ namespace CMS.Infrastructure.Entities
         public int AwayTeamAPIId { get; set; }
         public bool IsToday { get; set; }
         public bool IsLive { get; set; }
+       
 
         public Match()
         {

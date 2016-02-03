@@ -23,15 +23,15 @@ namespace FeedData
         }
     
         public System.Guid Id { get; set; }
+        public System.Guid MatchId { get; set; }
+        public System.Guid HomeTeam { get; set; }
+        public System.Guid AwayTeam { get; set; }
         public Nullable<System.Guid> CreatedByUserId { get; set; }
         public Nullable<System.DateTime> DateAdded { get; set; }
         public Nullable<bool> Active { get; set; }
         public Nullable<bool> Deleted { get; set; }
         public Nullable<System.Guid> UpdatedByUserId { get; set; }
         public Nullable<System.DateTime> DateUpdated { get; set; }
-        public System.Guid MatchId { get; set; }
-        public System.Guid HomeTeam { get; set; }
-        public System.Guid AwayTeam { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Card> Cards { get; set; }

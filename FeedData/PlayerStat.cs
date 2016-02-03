@@ -15,12 +15,6 @@ namespace FeedData
     public partial class PlayerStat
     {
         public System.Guid Id { get; set; }
-        public Nullable<System.Guid> CreatedByUserId { get; set; }
-        public Nullable<System.DateTime> DateAdded { get; set; }
-        public Nullable<bool> Active { get; set; }
-        public Nullable<bool> Deleted { get; set; }
-        public Nullable<System.Guid> UpdatedByUserId { get; set; }
-        public Nullable<System.DateTime> DateUpdated { get; set; }
         public System.Guid PlayerId { get; set; }
         public System.Guid MatchId { get; set; }
         public byte PositionX { get; set; }
@@ -38,6 +32,12 @@ namespace FeedData
         public Nullable<byte> PenaltiesScored { get; set; }
         public Nullable<byte> PenaltiesMissed { get; set; }
         public int APIId { get; set; }
+        public Nullable<System.Guid> CreatedByUserId { get; set; }
+        public Nullable<System.DateTime> DateAdded { get; set; }
+        public Nullable<bool> Active { get; set; }
+        public Nullable<bool> Deleted { get; set; }
+        public Nullable<System.Guid> UpdatedByUserId { get; set; }
+        public Nullable<System.DateTime> DateUpdated { get; set; }
     
         public virtual Match Match { get; set; }
         public virtual Player Player { get; set; }

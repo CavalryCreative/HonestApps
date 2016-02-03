@@ -20,15 +20,15 @@ namespace FeedData
         public string PlayerName { get; set; }
         public int APIPlayerId { get; set; }
         public byte Minute { get; set; }
-        public string Discriminator { get; set; }
-        public Nullable<System.Guid> Summary_Id { get; set; }
-        public Nullable<System.Guid> Summary_Id1 { get; set; }
         public Nullable<System.Guid> CreatedByUserId { get; set; }
         public Nullable<System.DateTime> DateAdded { get; set; }
         public Nullable<bool> Active { get; set; }
         public Nullable<bool> Deleted { get; set; }
         public Nullable<System.Guid> UpdatedByUserId { get; set; }
         public Nullable<System.DateTime> DateUpdated { get; set; }
+        public string Discriminator { get; set; }
+        public Nullable<System.Guid> Summary_Id { get; set; }
+        public Nullable<System.Guid> Summary_Id1 { get; set; }
     
         public virtual Summary Summary { get; set; }
         public virtual Summary Summary1 { get; set; }

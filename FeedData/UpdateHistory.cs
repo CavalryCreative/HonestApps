@@ -18,12 +18,12 @@ namespace FeedData
         public int MatchAPIId { get; set; }
         public bool MatchDetails { get; set; }
         public bool Lineups { get; set; }
+        public bool MatchStats { get; set; }
         public Nullable<System.Guid> CreatedByUserId { get; set; }
         public Nullable<System.DateTime> DateAdded { get; set; }
         public Nullable<bool> Active { get; set; }
         public Nullable<bool> Deleted { get; set; }
         public Nullable<System.Guid> UpdatedByUserId { get; set; }
         public Nullable<System.DateTime> DateUpdated { get; set; }
-        public bool MatchStats { get; set; }
     }
 }

@@ -62,6 +62,7 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
+            GetAllCommentaries();
             BroadcastFeed();
         }
 

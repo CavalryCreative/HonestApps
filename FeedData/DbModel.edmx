@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="HonestAppsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cards">
           <Key>
             <PropertyRef Name="Id" />
@@ -15,15 +15,15 @@
           <Property Name="PlayerName" Type="varchar" MaxLength="250" />
           <Property Name="APIPlayerId" Type="int" Nullable="false" />
           <Property Name="Minute" Type="tinyint" Nullable="false" />
-          <Property Name="Discriminator" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="Summary_Id" Type="uniqueidentifier" />
-          <Property Name="Summary_Id1" Type="uniqueidentifier" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+          <Property Name="Discriminator" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Summary_Id" Type="uniqueidentifier" />
+          <Property Name="Summary_Id1" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="Events">
           <Key>
@@ -31,20 +31,20 @@
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Important" Type="bit" Nullable="false" />
+          <Property Name="Goal" Type="bit" Nullable="false" />
+          <Property Name="Minute" Type="tinyint" Nullable="false" />
+          <Property Name="Score" Type="varchar" MaxLength="250" />
+          <Property Name="Comment" Type="varchar" MaxLength="1000" />
+          <Property Name="APIId" Type="int" Nullable="false" />
+          <Property Name="HomeTeamMatchRating" Type="tinyint" Nullable="false" />
+          <Property Name="AwayTeamMatchRating" Type="tinyint" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="Important" Type="bit" Nullable="false" />
-          <Property Name="Goal" Type="bit" Nullable="false" />
-          <Property Name="Minute" Type="tinyint" Nullable="false" />
-          <Property Name="Comment" Type="varchar" MaxLength="1000" />
-          <Property Name="APIId" Type="int" Nullable="false" />
-          <Property Name="Score" Type="varchar" MaxLength="250" />
-          <Property Name="HomeTeamMatchRating" Type="tinyint" Nullable="false" />
-          <Property Name="AwayTeamMatchRating" Type="tinyint" Nullable="false" />
         </EntityType>
         <EntityType Name="Goals">
           <Key>
@@ -70,6 +70,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MatchAPIId" Type="int" Nullable="false" />
+          <Property Name="IsHomePlayer" Type="bit" Nullable="false" />
+          <Property Name="IsSub" Type="bit" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
@@ -78,9 +81,6 @@
           <Property Name="DateUpdated" Type="datetime" />
           <Property Name="Match_Id" Type="uniqueidentifier" />
           <Property Name="Team_Id" Type="uniqueidentifier" />
-          <Property Name="MatchAPIId" Type="int" Nullable="false" />
-          <Property Name="IsHomePlayer" Type="bit" Nullable="false" />
-          <Property Name="IsSub" Type="bit" Nullable="false" />
           <Property Name="Player_Id" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="Matches">
@@ -88,25 +88,27 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="APIId" Type="int" Nullable="false" />
+          <Property Name="Stadium" Type="varchar" MaxLength="100" />
+          <Property Name="Attendance" Type="varchar" MaxLength="10" />
+          <Property Name="Time" Type="varchar" MaxLength="20" />
+          <Property Name="Referee" Type="varchar" MaxLength="100" />
+          <Property Name="Date" Type="datetime" />
+          <Property Name="EndDate" Type="datetime" />
+          <Property Name="HomeTeamId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AwayTeamId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="HomeTeamAPIId" Type="int" Nullable="false" />
+          <Property Name="AwayTeamAPIId" Type="int" Nullable="false" />
+          <Property Name="IsToday" Type="bit" Nullable="false" />
+          <Property Name="IsLive" Type="bit" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="Stadium" Type="varchar" MaxLength="100" />
-          <Property Name="Attendance" Type="varchar" MaxLength="10" />
-          <Property Name="Time" Type="varchar" MaxLength="20" />
-          <Property Name="Referee" Type="varchar" MaxLength="100" />
-          <Property Name="APIId" Type="int" Nullable="false" />
-          <Property Name="Date" Type="datetime" />
-          <Property Name="HomeTeamId" Type="uniqueidentifier" />
-          <Property Name="AwayTeamId" Type="uniqueidentifier" />
-          <Property Name="HomeTeamAPIId" Type="int" Nullable="false" />
-          <Property Name="AwayTeamAPIId" Type="int" Nullable="false" />
-          <Property Name="IsToday" Type="bit" Nullable="false" />
-          <Property Name="IsLive" Type="bit" Nullable="false" />
-          <Property Name="EndDate" Type="datetime" />
+          <Property Name="Team_Id" Type="uniqueidentifier" />
+          <Property Name="Team_Id1" Type="uniqueidentifier" />
         </EntityType>
         <EntityType Name="MatchesTodays">
           <Key>
@@ -127,28 +129,22 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SquadNumber" Type="tinyint" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="250" />
+          <Property Name="Position" Type="varchar" MaxLength="100" />
+          <Property Name="APIPlayerId" Type="int" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="SquadNumber" Type="tinyint" Nullable="false" />
-          <Property Name="Name" Type="varchar" MaxLength="250" />
-          <Property Name="Position" Type="varchar" MaxLength="100" />
-          <Property Name="APIPlayerId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="PlayerStats">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="CreatedByUserId" Type="uniqueidentifier" />
-          <Property Name="DateAdded" Type="datetime" />
-          <Property Name="Active" Type="bit" />
-          <Property Name="Deleted" Type="bit" />
-          <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
-          <Property Name="DateUpdated" Type="datetime" />
           <Property Name="PlayerId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="PositionX" Type="tinyint" Nullable="false" />
@@ -166,6 +162,12 @@
           <Property Name="PenaltiesScored" Type="tinyint" />
           <Property Name="PenaltiesMissed" Type="tinyint" />
           <Property Name="APIId" Type="int" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateAdded" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="Deleted" Type="bit" />
+          <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateUpdated" Type="datetime" />
         </EntityType>
         <EntityType Name="Rivals">
           <Key>
@@ -186,12 +188,6 @@
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="CreatedByUserId" Type="uniqueidentifier" />
-          <Property Name="DateAdded" Type="datetime" />
-          <Property Name="Active" Type="bit" />
-          <Property Name="Deleted" Type="bit" />
-          <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
-          <Property Name="DateUpdated" Type="datetime" />
           <Property Name="HomeTeamTotalShots" Type="tinyint" />
           <Property Name="HomeTeamOnGoalShots" Type="tinyint" />
           <Property Name="HomeTeamFouls" Type="tinyint" />
@@ -210,18 +206,18 @@
           <Property Name="AwayTeamYellowCards" Type="tinyint" />
           <Property Name="AwayTeamRedCards" Type="tinyint" />
           <Property Name="AwayTeamSaves" Type="tinyint" />
-        </EntityType>
-        <EntityType Name="Substitutions">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Substitutions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
           <Property Name="PlayerOff" Type="varchar" MaxLength="250" />
           <Property Name="PlayerOffId" Type="uniqueidentifier" Nullable="false" />
@@ -231,44 +227,50 @@
           <Property Name="APIPlayerOnId" Type="int" Nullable="false" />
           <Property Name="Minute" Type="tinyint" Nullable="false" />
           <Property Name="IsHomeTeam" Type="bit" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateAdded" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="Deleted" Type="bit" />
+          <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateUpdated" Type="datetime" />
         </EntityType>
         <EntityType Name="Summaries">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="HomeTeam" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="AwayTeam" Type="uniqueidentifier" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="MatchId" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="HomeTeam" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="AwayTeam" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <EntityType Name="TeamPlayers">
           <Key>
-            <PropertyRef Name="Player_Id" />
             <PropertyRef Name="Team_Id" />
+            <PropertyRef Name="Player_Id" />
           </Key>
-          <Property Name="Player_Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Team_Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Player_Id" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <EntityType Name="Teams">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="APIId" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="500" />
+          <Property Name="Stadium" Type="varchar" MaxLength="500" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="Name" Type="nvarchar(max)" />
-          <Property Name="APIId" Type="int" Nullable="false" />
-          <Property Name="Stadium" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="UpdateHistories">
           <Key>
@@ -278,13 +280,13 @@
           <Property Name="MatchAPIId" Type="int" Nullable="false" />
           <Property Name="MatchDetails" Type="bit" Nullable="false" />
           <Property Name="Lineups" Type="bit" Nullable="false" />
+          <Property Name="MatchStats" Type="bit" Nullable="false" />
           <Property Name="CreatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateAdded" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
-          <Property Name="MatchStats" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_dbo_Cards_dbo_Summaries_Summary_Id">
           <End Role="Summaries" Type="Self.Summaries" Multiplicity="0..1" />
@@ -374,7 +376,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_Matches_dbo_Teams_AwayTeamId">
+        <Association Name="FK_dbo_Matches_dbo_Teams_Team_Id">
           <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
           <End Role="Matches" Type="Self.Matches" Multiplicity="*" />
           <ReferentialConstraint>
@@ -382,11 +384,11 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Matches">
-              <PropertyRef Name="AwayTeamId" />
+              <PropertyRef Name="Team_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_Matches_dbo_Teams_HomeTeamId">
+        <Association Name="FK_dbo_Matches_dbo_Teams_Team_Id1">
           <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
           <End Role="Matches" Type="Self.Matches" Multiplicity="*" />
           <ReferentialConstraint>
@@ -394,7 +396,7 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Matches">
-              <PropertyRef Name="HomeTeamId" />
+              <PropertyRef Name="Team_Id1" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -423,34 +425,6 @@
             </Principal>
             <Dependent Role="PlayerStats">
               <PropertyRef Name="PlayerId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_PlayerTeams_dbo_Players_Player_Id">
-          <End Role="Players" Type="Self.Players" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="TeamPlayers" Type="Self.TeamPlayers" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Players">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="TeamPlayers">
-              <PropertyRef Name="Player_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_PlayerTeams_dbo_Teams_Team_Id">
-          <End Role="Teams" Type="Self.Teams" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="TeamPlayers" Type="Self.TeamPlayers" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Teams">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="TeamPlayers">
-              <PropertyRef Name="Team_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -510,7 +484,35 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="ModelStoreContainer">
+        <Association Name="FK_dbo_TeamPlayers_dbo_Players_Player_Id">
+          <End Role="Players" Type="Self.Players" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="TeamPlayers" Type="Self.TeamPlayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TeamPlayers">
+              <PropertyRef Name="Player_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_TeamPlayers_dbo_Teams_Team_Id">
+          <End Role="Teams" Type="Self.Teams" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="TeamPlayers" Type="Self.TeamPlayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teams">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TeamPlayers">
+              <PropertyRef Name="Team_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="HonestAppsModelStoreContainer">
           <EntitySet Name="Cards" EntityType="Self.Cards" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Events" EntityType="Self.Events" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Goals" EntityType="Self.Goals" Schema="dbo" store:Type="Tables" />
@@ -554,11 +556,11 @@
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Lineups" EntitySet="Lineups" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_AwayTeamId" Association="Self.FK_dbo_Matches_dbo_Teams_AwayTeamId">
+          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_Team_Id" Association="Self.FK_dbo_Matches_dbo_Teams_Team_Id">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Matches" EntitySet="Matches" />
           </AssociationSet>
-          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_HomeTeamId" Association="Self.FK_dbo_Matches_dbo_Teams_HomeTeamId">
+          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_Team_Id1" Association="Self.FK_dbo_Matches_dbo_Teams_Team_Id1">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Matches" EntitySet="Matches" />
           </AssociationSet>
@@ -569,14 +571,6 @@
           <AssociationSet Name="FK_dbo_PlayerStats_dbo_Players_PlayerId" Association="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId">
             <End Role="Players" EntitySet="Players" />
             <End Role="PlayerStats" EntitySet="PlayerStats" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_PlayerTeams_dbo_Players_Player_Id" Association="Self.FK_dbo_PlayerTeams_dbo_Players_Player_Id">
-            <End Role="Players" EntitySet="Players" />
-            <End Role="TeamPlayers" EntitySet="TeamPlayers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_PlayerTeams_dbo_Teams_Team_Id" Association="Self.FK_dbo_PlayerTeams_dbo_Teams_Team_Id">
-            <End Role="Teams" EntitySet="Teams" />
-            <End Role="TeamPlayers" EntitySet="TeamPlayers" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Rivals_dbo_Teams_TeamId" Association="Self.FK_dbo_Rivals_dbo_Teams_TeamId">
             <End Role="Teams" EntitySet="Teams" />
@@ -594,11 +588,20 @@
             <End Role="Matches" EntitySet="Matches" />
             <End Role="Summaries" EntitySet="Summaries" />
           </AssociationSet>
+          <AssociationSet Name="FK_dbo_TeamPlayers_dbo_Players_Player_Id" Association="Self.FK_dbo_TeamPlayers_dbo_Players_Player_Id">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="TeamPlayers" EntitySet="TeamPlayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_TeamPlayers_dbo_Teams_Team_Id" Association="Self.FK_dbo_TeamPlayers_dbo_Teams_Team_Id">
+            <End Role="Teams" EntitySet="Teams" />
+            <End Role="TeamPlayers" EntitySet="TeamPlayers" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="HonestAppsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Card">
           <Key>
             <PropertyRef Name="Id" />
@@ -609,15 +612,15 @@
           <Property Name="PlayerName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="APIPlayerId" Type="Int32" Nullable="false" />
           <Property Name="Minute" Type="Byte" Nullable="false" />
-          <Property Name="Discriminator" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Summary_Id" Type="Guid" />
-          <Property Name="Summary_Id1" Type="Guid" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+          <Property Name="Discriminator" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Summary_Id" Type="Guid" />
+          <Property Name="Summary_Id1" Type="Guid" />
           <NavigationProperty Name="Summary" Relationship="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id" FromRole="Cards" ToRole="Summaries" />
           <NavigationProperty Name="Summary1" Relationship="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id1" FromRole="Cards" ToRole="Summaries" />
         </EntityType>
@@ -627,21 +630,21 @@
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="MatchId" Type="Guid" Nullable="false" />
+          <Property Name="Important" Type="Boolean" Nullable="false" />
+          <Property Name="Goal" Type="Boolean" Nullable="false" />
+          <Property Name="Minute" Type="Byte" Nullable="false" />
+          <Property Name="Score" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="HomeTeamMatchRating" Type="Byte" Nullable="false" />
+          <Property Name="AwayTeamMatchRating" Type="Byte" Nullable="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="Important" Type="Boolean" Nullable="false" />
-          <Property Name="Goal" Type="Boolean" Nullable="false" />
-          <Property Name="Minute" Type="Byte" Nullable="false" />
-          <Property Name="Comment" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
-          <Property Name="APIId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Events_dbo_Matches_MatchId" FromRole="Events" ToRole="Matches" />
-          <Property Name="Score" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <Property Name="HomeTeamMatchRating" Type="Byte" Nullable="false" />
-          <Property Name="AwayTeamMatchRating" Type="Byte" Nullable="false" />
         </EntityType>
         <EntityType Name="Goal">
           <Key>
@@ -668,6 +671,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
+          <Property Name="IsHomePlayer" Type="Boolean" Nullable="false" />
+          <Property Name="IsSub" Type="Boolean" Nullable="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
@@ -676,9 +682,6 @@
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="Match_Id" Type="Guid" />
           <Property Name="Team_Id" Type="Guid" />
-          <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
-          <Property Name="IsHomePlayer" Type="Boolean" Nullable="false" />
-          <Property Name="IsSub" Type="Boolean" Nullable="false" />
           <Property Name="Player_Id" Type="Guid" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Lineups" ToRole="Matches" />
           <NavigationProperty Name="Player" Relationship="Self.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Lineups" ToRole="Players" />
@@ -689,49 +692,65 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="Stadium" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Attendance" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Time" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Referee" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="HomeTeamId" Type="Guid" Nullable="false" />
+          <Property Name="AwayTeamId" Type="Guid" Nullable="false" />
+          <Property Name="HomeTeamAPIId" Type="Int32" Nullable="false" />
+          <Property Name="AwayTeamAPIId" Type="Int32" Nullable="false" />
+          <Property Name="IsToday" Type="Boolean" Nullable="false" />
+          <Property Name="IsLive" Type="Boolean" Nullable="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="Stadium" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Attendance" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="Time" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="Referee" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="APIId" Type="Int32" Nullable="false" />
-          <Property Name="Date" Type="DateTime" Precision="3" />
-          <Property Name="HomeTeamAPIId" Type="Int32" Nullable="false" />
-          <Property Name="AwayTeamAPIId" Type="Int32" Nullable="false" />
-          <Property Name="IsToday" Type="Boolean" Nullable="false" />
-          <Property Name="IsLive" Type="Boolean" Nullable="false" />
-          <Property Name="EndDate" Type="DateTime" Precision="3" />
-          <Property Name="HomeTeamId" Type="Guid" />
-          <Property Name="AwayTeamId" Type="Guid" />
+          <Property Name="Team_Id" Type="Guid" />
+          <Property Name="Team_Id1" Type="Guid" />
           <NavigationProperty Name="Events" Relationship="Self.FK_dbo_Events_dbo_Matches_MatchId" FromRole="Matches" ToRole="Events" />
           <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Matches" ToRole="Lineups" />
+          <NavigationProperty Name="Team" Relationship="Self.FK_dbo_Matches_dbo_Teams_Team_Id" FromRole="Matches" ToRole="Teams" />
+          <NavigationProperty Name="Team1" Relationship="Self.FK_dbo_Matches_dbo_Teams_Team_Id1" FromRole="Matches" ToRole="Teams" />
           <NavigationProperty Name="PlayerStats" Relationship="Self.FK_dbo_PlayerStats_dbo_Matches_MatchId" FromRole="Matches" ToRole="PlayerStats" />
           <NavigationProperty Name="Stats" Relationship="Self.FK_dbo_Stats_dbo_Matches_MatchId" FromRole="Matches" ToRole="Stats" />
           <NavigationProperty Name="Substitutions" Relationship="Self.FK_dbo_Substitutions_dbo_Matches_MatchId" FromRole="Matches" ToRole="Substitutions" />
           <NavigationProperty Name="Summaries" Relationship="Self.FK_dbo_Summaries_dbo_Matches_MatchId" FromRole="Matches" ToRole="Summaries" />
-          <NavigationProperty Name="Team" Relationship="Model.FK_dbo_Matches_dbo_Teams_AwayTeamId" FromRole="Match" ToRole="Team" />
-          <NavigationProperty Name="Team1" Relationship="Model.FK_dbo_Matches_dbo_Teams_HomeTeamId" FromRole="Match" ToRole="Team" />
+        </EntityType>
+        <EntityType Name="MatchesToday">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="KickOffTime" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="SquadNumber" Type="Byte" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Position" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="APIPlayerId" Type="Int32" Nullable="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="SquadNumber" Type="Byte" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <Property Name="Position" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="APIPlayerId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Players" ToRole="Lineups" />
           <NavigationProperty Name="PlayerStats" Relationship="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId" FromRole="Players" ToRole="PlayerStats" />
           <NavigationProperty Name="Teams" Relationship="Self.TeamPlayers" FromRole="Players" ToRole="Teams" />
@@ -741,12 +760,6 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="CreatedByUserId" Type="Guid" />
-          <Property Name="DateAdded" Type="DateTime" Precision="3" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Deleted" Type="Boolean" />
-          <Property Name="UpdatedByUserId" Type="Guid" />
-          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="PlayerId" Type="Guid" Nullable="false" />
           <Property Name="MatchId" Type="Guid" Nullable="false" />
           <Property Name="PositionX" Type="Byte" Nullable="false" />
@@ -764,6 +777,12 @@
           <Property Name="PenaltiesScored" Type="Byte" />
           <Property Name="PenaltiesMissed" Type="Byte" />
           <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_PlayerStats_dbo_Matches_MatchId" FromRole="PlayerStats" ToRole="Matches" />
           <NavigationProperty Name="Player" Relationship="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId" FromRole="PlayerStats" ToRole="Players" />
         </EntityType>
@@ -787,12 +806,6 @@
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
           <Property Name="MatchId" Type="Guid" Nullable="false" />
-          <Property Name="CreatedByUserId" Type="Guid" />
-          <Property Name="DateAdded" Type="DateTime" Precision="3" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Deleted" Type="Boolean" />
-          <Property Name="UpdatedByUserId" Type="Guid" />
-          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="HomeTeamTotalShots" Type="Byte" />
           <Property Name="HomeTeamOnGoalShots" Type="Byte" />
           <Property Name="HomeTeamFouls" Type="Byte" />
@@ -811,6 +824,12 @@
           <Property Name="AwayTeamYellowCards" Type="Byte" />
           <Property Name="AwayTeamRedCards" Type="Byte" />
           <Property Name="AwayTeamSaves" Type="Byte" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Stats_dbo_Matches_MatchId" FromRole="Stats" ToRole="Matches" />
         </EntityType>
         <EntityType Name="Substitution">
@@ -818,12 +837,6 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="CreatedByUserId" Type="Guid" />
-          <Property Name="DateAdded" Type="DateTime" Precision="3" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Deleted" Type="Boolean" />
-          <Property Name="UpdatedByUserId" Type="Guid" />
-          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="MatchId" Type="Guid" Nullable="false" />
           <Property Name="PlayerOff" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="PlayerOffId" Type="Guid" Nullable="false" />
@@ -833,6 +846,12 @@
           <Property Name="APIPlayerOnId" Type="Int32" Nullable="false" />
           <Property Name="Minute" Type="Byte" Nullable="false" />
           <Property Name="IsHomeTeam" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Substitutions_dbo_Matches_MatchId" FromRole="Substitutions" ToRole="Matches" />
         </EntityType>
         <EntityType Name="Summary">
@@ -840,15 +859,15 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="MatchId" Type="Guid" Nullable="false" />
+          <Property Name="HomeTeam" Type="Guid" Nullable="false" />
+          <Property Name="AwayTeam" Type="Guid" Nullable="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="MatchId" Type="Guid" Nullable="false" />
-          <Property Name="HomeTeam" Type="Guid" Nullable="false" />
-          <Property Name="AwayTeam" Type="Guid" Nullable="false" />
           <NavigationProperty Name="Cards" Relationship="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id" FromRole="Summaries" ToRole="Cards" />
           <NavigationProperty Name="Cards1" Relationship="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id1" FromRole="Summaries" ToRole="Cards" />
           <NavigationProperty Name="Goals" Relationship="Self.FK_dbo_Goals_dbo_Summaries_SummaryId" FromRole="Summaries" ToRole="Goals" />
@@ -859,20 +878,20 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Stadium" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="APIId" Type="Int32" Nullable="false" />
-          <Property Name="Stadium" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Teams_Team_Id" FromRole="Teams" ToRole="Lineups" />
+          <NavigationProperty Name="Matches" Relationship="Self.FK_dbo_Matches_dbo_Teams_Team_Id" FromRole="Teams" ToRole="Matches" />
+          <NavigationProperty Name="Matches1" Relationship="Self.FK_dbo_Matches_dbo_Teams_Team_Id1" FromRole="Teams" ToRole="Matches" />
           <NavigationProperty Name="Rivals" Relationship="Self.FK_dbo_Rivals_dbo_Teams_TeamId" FromRole="Teams" ToRole="Rivals" />
           <NavigationProperty Name="Players" Relationship="Self.TeamPlayers" FromRole="Teams" ToRole="Players" />
-          <NavigationProperty Name="Matches" Relationship="Model.FK_dbo_Matches_dbo_Teams_AwayTeamId" FromRole="Team" ToRole="Match" />
-          <NavigationProperty Name="Matches1" Relationship="Model.FK_dbo_Matches_dbo_Teams_HomeTeamId" FromRole="Team" ToRole="Match" />
         </EntityType>
         <EntityType Name="UpdateHistory">
           <Key>
@@ -882,13 +901,13 @@
           <Property Name="MatchAPIId" Type="Int32" Nullable="false" />
           <Property Name="MatchDetails" Type="Boolean" Nullable="false" />
           <Property Name="Lineups" Type="Boolean" Nullable="false" />
+          <Property Name="MatchStats" Type="Boolean" Nullable="false" />
           <Property Name="CreatedByUserId" Type="Guid" />
           <Property Name="DateAdded" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <Property Name="MatchStats" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="FK_dbo_Cards_dbo_Summaries_Summary_Id">
           <End Role="Summaries" Type="Self.Summary" Multiplicity="0..1" />
@@ -975,6 +994,30 @@
             </Principal>
             <Dependent Role="Lineups">
               <PropertyRef Name="Team_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Matches_dbo_Teams_Team_Id">
+          <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
+          <End Role="Matches" Type="Self.Match" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teams">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Matches">
+              <PropertyRef Name="Team_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Matches_dbo_Teams_Team_Id1">
+          <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
+          <End Role="Matches" Type="Self.Match" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teams">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Matches">
+              <PropertyRef Name="Team_Id1" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1066,12 +1109,13 @@
           <End Role="Players" Type="Self.Player" Multiplicity="*" />
           <End Role="Teams" Type="Self.Team" Multiplicity="*" />
         </Association>
-        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="HonestAppsEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cards" EntityType="Self.Card" />
           <EntitySet Name="Events" EntityType="Self.Event" />
           <EntitySet Name="Goals" EntityType="Self.Goal" />
           <EntitySet Name="Lineups" EntityType="Self.Lineup" />
           <EntitySet Name="Matches" EntityType="Self.Match" />
+          <EntitySet Name="MatchesTodays" EntityType="Self.MatchesToday" />
           <EntitySet Name="Players" EntityType="Self.Player" />
           <EntitySet Name="PlayerStats" EntityType="Self.PlayerStat" />
           <EntitySet Name="Rivals" EntityType="Self.Rival" />
@@ -1108,6 +1152,14 @@
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Lineups" EntitySet="Lineups" />
           </AssociationSet>
+          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_Team_Id" Association="Self.FK_dbo_Matches_dbo_Teams_Team_Id">
+            <End Role="Teams" EntitySet="Teams" />
+            <End Role="Matches" EntitySet="Matches" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_Team_Id1" Association="Self.FK_dbo_Matches_dbo_Teams_Team_Id1">
+            <End Role="Teams" EntitySet="Teams" />
+            <End Role="Matches" EntitySet="Matches" />
+          </AssociationSet>
           <AssociationSet Name="FK_dbo_PlayerStats_dbo_Matches_MatchId" Association="Self.FK_dbo_PlayerStats_dbo_Matches_MatchId">
             <End Role="Matches" EntitySet="Matches" />
             <End Role="PlayerStats" EntitySet="PlayerStats" />
@@ -1136,62 +1188,15 @@
             <End Role="Players" EntitySet="Players" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
-          <EntitySet Name="MatchesTodays" EntityType="Model.MatchesToday" />
-          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_AwayTeamId" Association="Model.FK_dbo_Matches_dbo_Teams_AwayTeamId">
-            <End Role="Team" EntitySet="Teams" />
-            <End Role="Match" EntitySet="Matches" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Matches_dbo_Teams_HomeTeamId" Association="Model.FK_dbo_Matches_dbo_Teams_HomeTeamId">
-            <End Role="Team" EntitySet="Teams" />
-            <End Role="Match" EntitySet="Matches" />
-          </AssociationSet>
         </EntityContainer>
-        <EntityType Name="MatchesToday">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="APIId" Type="Int32" Nullable="false" />
-          <Property Name="KickOffTime" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedByUserId" Type="Guid" />
-          <Property Name="DateAdded" Type="DateTime" Precision="3" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Deleted" Type="Boolean" />
-          <Property Name="UpdatedByUserId" Type="Guid" />
-          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-        </EntityType>
-        <Association Name="FK_dbo_Matches_dbo_Teams_AwayTeamId">
-          <End Type="Model.Team" Role="Team" Multiplicity="0..1" />
-          <End Type="Model.Match" Role="Match" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Team">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Match">
-              <PropertyRef Name="AwayTeamId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_Matches_dbo_Teams_HomeTeamId">
-          <End Type="Model.Team" Role="Team" Multiplicity="0..1" />
-          <End Type="Model.Match" Role="Match" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Team">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Match">
-              <PropertyRef Name="HomeTeamId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="Entities">
+        <EntityContainerMapping StorageEntityContainer="HonestAppsModelStoreContainer" CdmEntityContainer="HonestAppsEntities">
           <EntitySetMapping Name="Cards">
-            <EntityTypeMapping TypeName="Model.Card">
+            <EntityTypeMapping TypeName="HonestAppsModel.Card">
               <MappingFragment StoreEntitySet="Cards">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1199,42 +1204,42 @@
                 <ScalarProperty Name="PlayerName" ColumnName="PlayerName" />
                 <ScalarProperty Name="APIPlayerId" ColumnName="APIPlayerId" />
                 <ScalarProperty Name="Minute" ColumnName="Minute" />
-                <ScalarProperty Name="Discriminator" ColumnName="Discriminator" />
-                <ScalarProperty Name="Summary_Id" ColumnName="Summary_Id" />
-                <ScalarProperty Name="Summary_Id1" ColumnName="Summary_Id1" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="Discriminator" ColumnName="Discriminator" />
+                <ScalarProperty Name="Summary_Id" ColumnName="Summary_Id" />
+                <ScalarProperty Name="Summary_Id1" ColumnName="Summary_Id1" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Events">
-            <EntityTypeMapping TypeName="Model.Event">
+            <EntityTypeMapping TypeName="HonestAppsModel.Event">
               <MappingFragment StoreEntitySet="Events">
-                <ScalarProperty Name="AwayTeamMatchRating" ColumnName="AwayTeamMatchRating" />
-                <ScalarProperty Name="HomeTeamMatchRating" ColumnName="HomeTeamMatchRating" />
-                <ScalarProperty Name="Score" ColumnName="Score" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
+                <ScalarProperty Name="Important" ColumnName="Important" />
+                <ScalarProperty Name="Goal" ColumnName="Goal" />
+                <ScalarProperty Name="Minute" ColumnName="Minute" />
+                <ScalarProperty Name="Score" ColumnName="Score" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
+                <ScalarProperty Name="HomeTeamMatchRating" ColumnName="HomeTeamMatchRating" />
+                <ScalarProperty Name="AwayTeamMatchRating" ColumnName="AwayTeamMatchRating" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="Important" ColumnName="Important" />
-                <ScalarProperty Name="Goal" ColumnName="Goal" />
-                <ScalarProperty Name="Minute" ColumnName="Minute" />
-                <ScalarProperty Name="Comment" ColumnName="Comment" />
-                <ScalarProperty Name="APIId" ColumnName="APIId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Goals">
-            <EntityTypeMapping TypeName="Model.Goal">
+            <EntityTypeMapping TypeName="HonestAppsModel.Goal">
               <MappingFragment StoreEntitySet="Goals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1254,9 +1259,12 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Lineups">
-            <EntityTypeMapping TypeName="Model.Lineup">
+            <EntityTypeMapping TypeName="HonestAppsModel.Lineup">
               <MappingFragment StoreEntitySet="Lineups">
                 <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
+                <ScalarProperty Name="IsHomePlayer" ColumnName="IsHomePlayer" />
+                <ScalarProperty Name="IsSub" ColumnName="IsSub" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
@@ -1265,66 +1273,74 @@
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="Match_Id" ColumnName="Match_Id" />
                 <ScalarProperty Name="Team_Id" ColumnName="Team_Id" />
-                <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
-                <ScalarProperty Name="IsHomePlayer" ColumnName="IsHomePlayer" />
-                <ScalarProperty Name="IsSub" ColumnName="IsSub" />
                 <ScalarProperty Name="Player_Id" ColumnName="Player_Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Matches">
-            <EntityTypeMapping TypeName="Model.Match">
+            <EntityTypeMapping TypeName="HonestAppsModel.Match">
               <MappingFragment StoreEntitySet="Matches">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
-                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
-                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
-                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
                 <ScalarProperty Name="Stadium" ColumnName="Stadium" />
                 <ScalarProperty Name="Attendance" ColumnName="Attendance" />
                 <ScalarProperty Name="Time" ColumnName="Time" />
                 <ScalarProperty Name="Referee" ColumnName="Referee" />
-                <ScalarProperty Name="APIId" ColumnName="APIId" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="HomeTeamId" ColumnName="HomeTeamId" />
+                <ScalarProperty Name="AwayTeamId" ColumnName="AwayTeamId" />
                 <ScalarProperty Name="HomeTeamAPIId" ColumnName="HomeTeamAPIId" />
                 <ScalarProperty Name="AwayTeamAPIId" ColumnName="AwayTeamAPIId" />
                 <ScalarProperty Name="IsToday" ColumnName="IsToday" />
                 <ScalarProperty Name="IsLive" ColumnName="IsLive" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="HomeTeamId" ColumnName="HomeTeamId" />
-                <ScalarProperty Name="AwayTeamId" ColumnName="AwayTeamId" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="Team_Id" ColumnName="Team_Id" />
+                <ScalarProperty Name="Team_Id1" ColumnName="Team_Id1" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MatchesTodays">
+            <EntityTypeMapping TypeName="HonestAppsModel.MatchesToday">
+              <MappingFragment StoreEntitySet="MatchesTodays">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
+                <ScalarProperty Name="KickOffTime" ColumnName="KickOffTime" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Players">
-            <EntityTypeMapping TypeName="Model.Player">
+            <EntityTypeMapping TypeName="HonestAppsModel.Player">
               <MappingFragment StoreEntitySet="Players">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
-                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
-                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
-                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="SquadNumber" ColumnName="SquadNumber" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Position" ColumnName="Position" />
                 <ScalarProperty Name="APIPlayerId" ColumnName="APIPlayerId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PlayerStats">
-            <EntityTypeMapping TypeName="Model.PlayerStat">
-              <MappingFragment StoreEntitySet="PlayerStats">
-                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlayerStats">
+            <EntityTypeMapping TypeName="HonestAppsModel.PlayerStat">
+              <MappingFragment StoreEntitySet="PlayerStats">
+                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="PlayerId" ColumnName="PlayerId" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
                 <ScalarProperty Name="PositionX" ColumnName="PositionX" />
@@ -1342,11 +1358,17 @@
                 <ScalarProperty Name="PenaltiesScored" ColumnName="PenaltiesScored" />
                 <ScalarProperty Name="PenaltiesMissed" ColumnName="PenaltiesMissed" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Rivals">
-            <EntityTypeMapping TypeName="Model.Rival">
+            <EntityTypeMapping TypeName="HonestAppsModel.Rival">
               <MappingFragment StoreEntitySet="Rivals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="TeamId" ColumnName="TeamId" />
@@ -1360,16 +1382,10 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Stats">
-            <EntityTypeMapping TypeName="Model.Stat">
+            <EntityTypeMapping TypeName="HonestAppsModel.Stat">
               <MappingFragment StoreEntitySet="Stats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
-                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
-                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
-                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
-                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="HomeTeamTotalShots" ColumnName="HomeTeamTotalShots" />
                 <ScalarProperty Name="HomeTeamOnGoalShots" ColumnName="HomeTeamOnGoalShots" />
                 <ScalarProperty Name="HomeTeamFouls" ColumnName="HomeTeamFouls" />
@@ -1388,19 +1404,19 @@
                 <ScalarProperty Name="AwayTeamYellowCards" ColumnName="AwayTeamYellowCards" />
                 <ScalarProperty Name="AwayTeamRedCards" ColumnName="AwayTeamRedCards" />
                 <ScalarProperty Name="AwayTeamSaves" ColumnName="AwayTeamSaves" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Substitutions">
-            <EntityTypeMapping TypeName="Model.Substitution">
-              <MappingFragment StoreEntitySet="Substitutions">
-                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Substitutions">
+            <EntityTypeMapping TypeName="HonestAppsModel.Substitution">
+              <MappingFragment StoreEntitySet="Substitutions">
+                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
                 <ScalarProperty Name="PlayerOff" ColumnName="PlayerOff" />
                 <ScalarProperty Name="PlayerOffId" ColumnName="PlayerOffId" />
@@ -1410,59 +1426,65 @@
                 <ScalarProperty Name="APIPlayerOnId" ColumnName="APIPlayerOnId" />
                 <ScalarProperty Name="Minute" ColumnName="Minute" />
                 <ScalarProperty Name="IsHomeTeam" ColumnName="IsHomeTeam" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Summaries">
-            <EntityTypeMapping TypeName="Model.Summary">
+            <EntityTypeMapping TypeName="HonestAppsModel.Summary">
               <MappingFragment StoreEntitySet="Summaries">
                 <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="MatchId" ColumnName="MatchId" />
+                <ScalarProperty Name="HomeTeam" ColumnName="HomeTeam" />
+                <ScalarProperty Name="AwayTeam" ColumnName="AwayTeam" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="MatchId" ColumnName="MatchId" />
-                <ScalarProperty Name="HomeTeam" ColumnName="HomeTeam" />
-                <ScalarProperty Name="AwayTeam" ColumnName="AwayTeam" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Teams">
-            <EntityTypeMapping TypeName="Model.Team">
+            <EntityTypeMapping TypeName="HonestAppsModel.Team">
               <MappingFragment StoreEntitySet="Teams">
                 <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Stadium" ColumnName="Stadium" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="APIId" ColumnName="APIId" />
-                <ScalarProperty Name="Stadium" ColumnName="Stadium" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="UpdateHistories">
-            <EntityTypeMapping TypeName="Model.UpdateHistory">
+            <EntityTypeMapping TypeName="HonestAppsModel.UpdateHistory">
               <MappingFragment StoreEntitySet="UpdateHistories">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
                 <ScalarProperty Name="MatchDetails" ColumnName="MatchDetails" />
                 <ScalarProperty Name="Lineups" ColumnName="Lineups" />
+                <ScalarProperty Name="MatchStats" ColumnName="MatchStats" />
                 <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
                 <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="MatchStats" ColumnName="MatchStats" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="TeamPlayers" TypeName="Model.TeamPlayers" StoreEntitySet="TeamPlayers">
+          <AssociationSetMapping Name="TeamPlayers" TypeName="HonestAppsModel.TeamPlayers" StoreEntitySet="TeamPlayers">
             <EndProperty Name="Players">
               <ScalarProperty Name="Id" ColumnName="Player_Id" />
             </EndProperty>
@@ -1470,21 +1492,6 @@
               <ScalarProperty Name="Id" ColumnName="Team_Id" />
             </EndProperty>
           </AssociationSetMapping>
-          <EntitySetMapping Name="MatchesTodays">
-            <EntityTypeMapping TypeName="Model.MatchesToday">
-              <MappingFragment StoreEntitySet="MatchesTodays">
-                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
-                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
-                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
-                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
-                <ScalarProperty Name="KickOffTime" ColumnName="KickOffTime" />
-                <ScalarProperty Name="APIId" ColumnName="APIId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

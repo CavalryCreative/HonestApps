@@ -15,6 +15,9 @@ namespace FeedData
     public partial class Lineup
     {
         public System.Guid Id { get; set; }
+        public int MatchAPIId { get; set; }
+        public bool IsHomePlayer { get; set; }
+        public bool IsSub { get; set; }
         public Nullable<System.Guid> CreatedByUserId { get; set; }
         public Nullable<System.DateTime> DateAdded { get; set; }
         public Nullable<bool> Active { get; set; }
@@ -23,9 +26,6 @@ namespace FeedData
         public Nullable<System.DateTime> DateUpdated { get; set; }
         public Nullable<System.Guid> Match_Id { get; set; }
         public Nullable<System.Guid> Team_Id { get; set; }
-        public int MatchAPIId { get; set; }
-        public bool IsHomePlayer { get; set; }
-        public bool IsSub { get; set; }
         public Nullable<System.Guid> Player_Id { get; set; }
     
         public virtual Match Match { get; set; }
