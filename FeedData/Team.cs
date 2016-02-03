@@ -20,6 +20,8 @@ namespace FeedData
             this.Lineups = new HashSet<Lineup>();
             this.Rivals = new HashSet<Rival>();
             this.Players = new HashSet<Player>();
+            this.Matches = new HashSet<Match>();
+            this.Matches1 = new HashSet<Match>();
         }
     
         public System.Guid Id { get; set; }
@@ -39,5 +41,9 @@ namespace FeedData
         public virtual ICollection<Rival> Rivals { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Player> Players { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Match> Matches { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Match> Matches1 { get; set; }
     }
 }

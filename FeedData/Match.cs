@@ -43,8 +43,8 @@ namespace FeedData
         public bool IsToday { get; set; }
         public bool IsLive { get; set; }
         public Nullable<System.DateTime> EndDate { get; set; }
-        public System.Guid HomeTeamId { get; set; }
-        public System.Guid AwayTeamId { get; set; }
+        public Nullable<System.Guid> HomeTeamId { get; set; }
+        public Nullable<System.Guid> AwayTeamId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Event> Events { get; set; }
@@ -58,5 +58,7 @@ namespace FeedData
         public virtual ICollection<Substitution> Substitutions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Summary> Summaries { get; set; }
+        public virtual Team Team { get; set; }
+        public virtual Team Team1 { get; set; }
     }
 }

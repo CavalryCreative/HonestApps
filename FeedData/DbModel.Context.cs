@@ -36,8 +36,8 @@ namespace FeedData
         public virtual DbSet<Stat> Stats { get; set; }
         public virtual DbSet<Substitution> Substitutions { get; set; }
         public virtual DbSet<Summary> Summaries { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<Team> Teams { get; set; }
         public virtual DbSet<UpdateHistory> UpdateHistories { get; set; }
+        public virtual DbSet<MatchesToday> MatchesTodays { get; set; }
     }
 }

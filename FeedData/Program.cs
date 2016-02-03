@@ -40,34 +40,37 @@ namespace FeedData
             //    Console.WriteLine("Hangfire Server started. Press any key to exit...");
             //    Console.ReadKey();
             //}
-
            
             //TODO - set live matches to false when ended
             //Only hit Get Fixtures once per day
             //Create live games table?
 
           //GetCommentaries(2148519);
-            Fixtures();
+            GetFixtures();
         }
 
-        private static void Fixtures()
+        private static void GetFixtures()
         {
-            IList<int> liveMatches = new List<int>();
+            //Clear today matches table
+            DeleteMatchesToday();
 
-            liveMatches = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
 
-            if (liveMatches.Count > 0)
+            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+
+            foreach (var kvp in matchesToday)
             {
-                foreach (var matchId in liveMatches)
-                {
-                    GetCommentaries(matchId);
-                }
+                MatchesToday match = new MatchesToday();
+                match.APIId = kvp.Key;
+                match.KickOffTime = kvp.Value;
+
+                SaveMatchToday(match);
             }
         }
 
-        private static IList<int> GetFixtures(DateTime startDate, DateTime endDate)
+        private static IDictionary<int, string> GetFixtures(DateTime startDate, DateTime endDate)
         {
-            IList<int> liveMatches = new List<int>();
+            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
             string retMsg = string.Empty;
 
             string startDateStr = startDate.ToShortDateString();
@@ -94,82 +97,82 @@ namespace FeedData
 
                     JObject obj = JObject.Parse(s);
 
-                    var postTitles = from p in obj["matches"] 
+                    var postTitles = from p in obj["matches"]
                                      select new
-                                         {
-                                             MatchDate = (string)p["match_formatted_date"],
-                                             APIId = (int)p["match_id"],
-                                             Time = (string)p["match_time"],
-                                             HomeTeamAPIId = (int)p["match_localteam_id"],
-                                             HomeTeam = (string)p["match_localteam_name"],
-                                             AwayTeamAPIId = (int)p["match_visitorteam_id"],
-                                             AwayTeam = (string)p["match_visitorteam_name"]
-                                         };
+                                     {
+                                         MatchDate = (string)p["match_formatted_date"],
+                                         APIId = (int)p["match_id"],
+                                         Time = (string)p["match_time"],
+                                         HomeTeamAPIId = (int)p["match_localteam_id"],
+                                         HomeTeam = (string)p["match_localteam_name"],
+                                         AwayTeamAPIId = (int)p["match_visitorteam_id"],
+                                         AwayTeam = (string)p["match_visitorteam_name"]
+                                     };
 
-                     foreach (var item in postTitles)
-                     {
-                         //Check if Update History Match details is true/false
-                         var updateHistory = GetUpdateHistoryByMatchAPIId(item.APIId);
-                         bool matchDetailsAdded = false;
+                    foreach (var item in postTitles)
+                    {
+                        //Check if Update History Match details is true/false
+                        var updateHistory = GetUpdateHistoryByMatchAPIId(item.APIId);
+                        bool matchDetailsAdded = false;
 
-                         if (updateHistory != null)
-                         {
-                             matchDetailsAdded = updateHistory.MatchDetails;
-                         }
+                        if (updateHistory != null)
+                        {
+                            matchDetailsAdded = updateHistory.MatchDetails;
+                        }
 
-                         if (matchDetailsAdded == false)
-                         {
-                             Match match = new Match();
+                        if (matchDetailsAdded == false)
+                        {
+                            Match match = new Match();
 
-                             match.APIId = item.APIId;
-                             match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
-                             match.EndDate = match.Date.Value.AddHours(2);
-                             match.Active = DateTime.Now <= match.EndDate ? true : false;
-                             match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-                             //change this when live
-                             //match.IsLive = true;
-                             match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
-                             match.Time = item.Time;
+                            match.APIId = item.APIId;
+                            match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
+                            match.EndDate = match.Date.Value.AddHours(2);
+                            match.Active = DateTime.Now <= match.EndDate ? true : false;
+                            match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
+                            //change this when live
+                            //match.IsLive = true;
+                            match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
+                            match.Time = item.Time;
 
-                             if (match.IsLive)
-                                 liveMatches.Add(match.APIId);
+                            if (match.IsLive)
+                                matchesToday.Add(match.APIId, match.Time);
 
-                             var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
-                             var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
+                            var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
+                            var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
 
-                             if (homeTeam != null)
-                             {
-                                 match.HomeTeamId = homeTeam.Id;
-                                 match.Stadium = homeTeam.Stadium;
-                             }
+                            if (homeTeam != null)
+                            {
+                                //match.HomeTeamId = homeTeam.Id;
+                                match.Stadium = homeTeam.Stadium;
+                            }
 
-                             if (awayTeam != null)
-                                 match.AwayTeamId = awayTeam.Id;
+                            if (awayTeam != null)
+                                //match.AwayTeamId = awayTeam.Id;
 
-                             match.HomeTeamAPIId = item.HomeTeamAPIId;
-                             match.AwayTeamAPIId = item.AwayTeamAPIId;
+                                match.HomeTeamAPIId = item.HomeTeamAPIId;
+                            match.AwayTeamAPIId = item.AwayTeamAPIId;
 
-                             SaveMatch(match);
+                            SaveMatch(match);
 
-                             UpdateHistory history = new UpdateHistory();
+                            UpdateHistory history = new UpdateHistory();
 
-                             history.MatchAPIId = match.APIId;
-                             history.MatchDetails = true;
-                             history.Id = System.Guid.Empty;
+                            history.MatchAPIId = match.APIId;
+                            history.MatchDetails = true;
+                            history.Id = System.Guid.Empty;
 
-                             SaveUpdateHistory(history);
-                         }
-                         else
-                         {
-                             var retMatch = GetMatchByAPIId(item.APIId);
+                            SaveUpdateHistory(history);
+                        }
+                        else
+                        {
+                            var retMatch = GetMatchByAPIId(item.APIId);
 
-                             if (retMatch != null)
-                             {
-                                 if (retMatch.IsLive == true)
-                                     liveMatches.Add(item.APIId);
-                             }                    
-                         }
-                     }
+                            if (retMatch != null)
+                            {
+                                if (DateTime.Now.ToShortDateString() == retMatch.Date.Value.ToShortDateString())
+                                    matchesToday.Add(retMatch.APIId, retMatch.Time);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -182,7 +185,7 @@ namespace FeedData
                 retMsg = "Error: " + ex.Message;
             }
 
-            return liveMatches;
+            return matchesToday;
         }
 
         private static string GetCommentaries(int matchId)
@@ -1049,6 +1052,62 @@ namespace FeedData
 
                 return isNewRecord ? string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString())
                     : string.Format("{0}:{1}", Res.Resources.RecordUpdated, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string SaveMatchToday(MatchesToday updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            Entities context = new Entities();
+
+            if (updatedRecord != null)
+            {
+                //Create record
+                updatedRecord.Id = Guid.NewGuid();
+                updatedRecord.Active = true;
+                updatedRecord.Deleted = false;
+                updatedRecord.DateAdded = DateTime.Now;
+                updatedRecord.DateUpdated = DateTime.Now;
+
+                context.MatchesTodays.Add(updatedRecord);
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}", Res.Resources.RecordAdded);
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string DeleteMatchesToday()
+        {
+            Entities context = new Entities();
+
+            var allRecords = context.MatchesTodays;
+
+            if (allRecords != null)
+            {
+                foreach (var record in allRecords)
+                {
+                    context.MatchesTodays.Remove(record);
+                }
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}", Res.Resources.RecordUpdated);
             }
             catch (Exception e)
             {

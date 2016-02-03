@@ -17,8 +17,8 @@ namespace CMS
             // For more information on how to configure your application using OWIN startup, visit http://go.microsoft.com/fwlink/?LinkID=316888
 
             ConfigureSignalR(app);
-            ConfigureAuth(app);          
-
+            ConfigureAuth(app);
+            
             //app.UseHangfireDashboard("/hangfire", new DashboardOptions
             //{
             //    AuthorizationFilters = new[] { new MyRestrictiveAuthorizationFilter() }

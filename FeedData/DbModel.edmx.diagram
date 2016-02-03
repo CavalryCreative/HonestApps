@@ -16,7 +16,6 @@
         <EntityTypeShape EntityType="Model.Stat" Width="1.5" PointX="3" PointY="24.5" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Substitution" Width="1.5" PointX="3" PointY="31.5" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Summary" Width="1.5" PointX="3" PointY="39.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Team" Width="1.5" PointX="0.75" PointY="25.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.UpdateHistory" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <AssociationConnector Association="Model.FK_dbo_Cards_dbo_Summaries_Summary_Id" ManuallyRouted="false" />
@@ -33,6 +32,9 @@
         <AssociationConnector Association="Model.FK_dbo_PlayerStats_dbo_Players_PlayerId" ManuallyRouted="false" />
         <AssociationConnector Association="Model.FK_dbo_Rivals_dbo_Teams_TeamId" ManuallyRouted="false" />
         <AssociationConnector Association="Model.TeamPlayers" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="Model.MatchesToday" Width="1.5" PointX="0.75" PointY="4.75" />
+        <AssociationConnector Association="Model.FK_dbo_Matches_dbo_Teams_AwayTeamId" />
+        <AssociationConnector Association="Model.FK_dbo_Matches_dbo_Teams_HomeTeamId" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

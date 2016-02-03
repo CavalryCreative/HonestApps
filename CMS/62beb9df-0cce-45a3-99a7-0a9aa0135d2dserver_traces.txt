@@ -1,0 +1,1 @@
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.

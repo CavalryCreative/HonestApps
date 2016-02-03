@@ -14,23 +14,27 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CMS.Infrastructure.Entities
 {
+    [NotMapped]
     public class FeedUpdate : IRegisteredObject
     {
         // Singleton instance
         private readonly static Lazy<FeedUpdate> _instance = new Lazy<FeedUpdate>(
             () => new FeedUpdate(GlobalHost.ConnectionManager.GetHubContext<FeedHub>().Clients));
+       
+        //private Timer matchTimer;
         private Timer eventsTimer;
-        private Timer matchTimer;
 
         private FeedUpdate(IHubConnectionContext<dynamic> clients)
         {
             HostingEnvironment.RegisterObject(this);
 
             Clients = clients;
-            matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
+            //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
             eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));         
         }
 
@@ -50,7 +54,7 @@ namespace CMS.Infrastructure.Entities
 
         public void Stop(bool immediate)
         {
-            matchTimer.Dispose();
+            //matchTimer.Dispose();
             eventsTimer.Dispose();
 
             HostingEnvironment.UnregisterObject(this);
@@ -58,8 +62,11 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
-            GetAllCommentaries();
+            BroadcastFeed();
+        }
 
+        public void BroadcastFeed()
+        {
             string feed = string.Empty;
             feed = GetFeed();
 
