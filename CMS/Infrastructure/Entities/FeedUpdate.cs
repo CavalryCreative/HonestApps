@@ -35,7 +35,7 @@ namespace CMS.Infrastructure.Entities
 
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));         
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120000));         
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -218,16 +218,18 @@ namespace CMS.Infrastructure.Entities
         private void GetAllCommentaries()
         {
             var liveMatches = GetLiveMatches();
+            Object thisLock = new Object();
 
             if (liveMatches.Count > 0)
             {
                 foreach (var match in liveMatches)
                 {
-                    GetCommentaries(match.APIId);
+                    //lock (thisLock)
+                    //{
+                        GetCommentaries(match.APIId);
+                    //}                    
                 }
             }
-
-           //GetCommentaries(2153970);
         }
 
         private static string GetCommentaries(int matchId)
@@ -290,6 +292,9 @@ namespace CMS.Infrastructure.Entities
 
                         string Id;
                         string actionMessage;
+                        Byte squadNumberByte;
+                        Int32 playerIdInt;
+                        bool result;
 
                         foreach (var childToken in y.Children())
                         {
@@ -308,11 +313,22 @@ namespace CMS.Infrastructure.Entities
                                 {
                                     Player newPlayer = new Player();
 
-                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
+                                    result = Byte.TryParse(evt["number"], out squadNumberByte);
+
+                                    if (result)
+                                        newPlayer.SquadNumber = squadNumberByte;
+                                    else
+                                        newPlayer.SquadNumber = 0;
+
                                     newPlayer.Name = evt["name"];
                                     newPlayer.Position = evt["pos"];
                                     newPlayer.Id = System.Guid.Empty;
                                     newPlayer.APIPlayerId = playerAPIId;
+
+                                    System.Diagnostics.Debug.WriteLine(string.Format("Home: {0},{1}", 
+                                         newPlayer.Name,
+                                          newPlayer.Position
+                                         ));
 
                                     retMsg = SavePlayer(newPlayer, homeTeam.Id);
 
@@ -377,6 +393,11 @@ namespace CMS.Infrastructure.Entities
                                     newPlayer.Id = System.Guid.Empty;
                                     newPlayer.APIPlayerId = playerAPIId;
 
+                                    System.Diagnostics.Debug.WriteLine(string.Format("HomeSub: {0},{1}",
+                                        newPlayer.Name,
+                                         newPlayer.Position
+                                        ));
+
                                     retMsg = SavePlayer(newPlayer, homeTeam.Id);
 
                                     ReturnId(retMsg, out actionMessage, out Id);
@@ -439,6 +460,11 @@ namespace CMS.Infrastructure.Entities
                                     newPlayer.Position = evt["pos"];
                                     newPlayer.Id = System.Guid.Empty;
                                     newPlayer.APIPlayerId = playerAPIId;
+
+                                    System.Diagnostics.Debug.WriteLine(string.Format("Away: {0},{1}",
+                                      newPlayer.Name,
+                                       newPlayer.Position
+                                      ));
 
                                     retMsg = SavePlayer(newPlayer, awayTeam.Id);
 
@@ -503,6 +529,11 @@ namespace CMS.Infrastructure.Entities
                                     newPlayer.Position = evt["pos"];
                                     newPlayer.Id = System.Guid.Empty;
                                     newPlayer.APIPlayerId = playerAPIId;
+
+                                    System.Diagnostics.Debug.WriteLine(string.Format("AwaySub: {0},{1}",
+                                      newPlayer.Name,
+                                       newPlayer.Position
+                                      ));
 
                                     retMsg = SavePlayer(newPlayer, awayTeam.Id);
 
@@ -776,306 +807,312 @@ namespace CMS.Infrastructure.Entities
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord == null)
+            using (EFDbContext context = new EFDbContext())
             {
-                return Res.Resources.NotFound;
-            }
+                if (updatedRecord == null)
+                {
+                    return Res.Resources.NotFound;
+                }
 
-            //Update record
-            var recordToUpdate = context.Matches.Where(x => x.APIId == updatedRecord.APIId).FirstOrDefault();
+                //Update record
+                var recordToUpdate = context.Matches.Where(x => x.APIId == updatedRecord.APIId).FirstOrDefault();
 
-            if (recordToUpdate == null)
-            {
-                //Create record
-                updatedRecord.Id = Guid.NewGuid();
-                updatedRecord.Active = true;
-                updatedRecord.Deleted = false;
-                updatedRecord.DateAdded = DateTime.Now;
-                updatedRecord.DateUpdated = DateTime.Now;
+                if (recordToUpdate == null)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
 
-                context.Matches.Add(updatedRecord);
-                Id = updatedRecord.Id;
-            }
-            else
-            {
-                recordToUpdate.Active = updatedRecord.Active;
-                recordToUpdate.APIId = updatedRecord.APIId;
-                recordToUpdate.Attendance = updatedRecord.Attendance;
-                recordToUpdate.AwayTeamAPIId = updatedRecord.AwayTeamAPIId;
-                //recordToUpdate.AwayTeamId = updatedRecord.AwayTeamId;
-                recordToUpdate.Date = updatedRecord.Date;
-                recordToUpdate.EndDate = updatedRecord.EndDate;
-                recordToUpdate.HomeTeamAPIId = updatedRecord.HomeTeamAPIId;
-                //recordToUpdate.HomeTeamId = updatedRecord.HomeTeamId;
-                recordToUpdate.DateUpdated = DateTime.Now;
-                recordToUpdate.IsLive = updatedRecord.IsLive;
-                recordToUpdate.IsToday = updatedRecord.IsToday;
-                recordToUpdate.Referee = updatedRecord.Referee;
-                recordToUpdate.Stadium = updatedRecord.Stadium;
-                recordToUpdate.Time = updatedRecord.Time;
+                    context.Matches.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+                else
+                {
+                    recordToUpdate.Active = updatedRecord.Active;
+                    recordToUpdate.APIId = updatedRecord.APIId;
+                    recordToUpdate.Attendance = updatedRecord.Attendance;
+                    recordToUpdate.AwayTeamAPIId = updatedRecord.AwayTeamAPIId;
+                    //recordToUpdate.AwayTeamId = updatedRecord.AwayTeamId;
+                    recordToUpdate.Date = updatedRecord.Date;
+                    recordToUpdate.EndDate = updatedRecord.EndDate;
+                    recordToUpdate.HomeTeamAPIId = updatedRecord.HomeTeamAPIId;
+                    //recordToUpdate.HomeTeamId = updatedRecord.HomeTeamId;
+                    recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.IsLive = updatedRecord.IsLive;
+                    recordToUpdate.IsToday = updatedRecord.IsToday;
+                    recordToUpdate.Referee = updatedRecord.Referee;
+                    recordToUpdate.Stadium = updatedRecord.Stadium;
+                    recordToUpdate.Time = updatedRecord.Time;
 
-                context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
-                Id = updatedRecord.Id;
-            }
+                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                    Id = updatedRecord.Id;
+                }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }          
         }
 
         private static string SaveMatchStats(Stat updatedRecord)
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord == null)
+            using (EFDbContext context = new EFDbContext())
             {
-                return Res.Resources.NotFound;
-            }
+                if (updatedRecord == null)
+                {
+                    return Res.Resources.NotFound;
+                }
 
-            //Update record
-            var recordToUpdate = context.Stats.Where(x => x.Id == updatedRecord.Id).FirstOrDefault();
+                //Update record
+                var recordToUpdate = context.Stats.Where(x => x.Id == updatedRecord.Id).FirstOrDefault();
 
-            if (recordToUpdate == null)
-            {
-                //Create record
-                updatedRecord.Id = Guid.NewGuid();
-                updatedRecord.Active = true;
-                updatedRecord.Deleted = false;
-                updatedRecord.DateAdded = DateTime.Now;
-                updatedRecord.DateUpdated = DateTime.Now;
+                if (recordToUpdate == null)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
 
-                context.Stats.Add(updatedRecord);
-                Id = updatedRecord.Id;
-            }
-            else
-            {
-                recordToUpdate.Active = updatedRecord.Active;
-                recordToUpdate.AwayTeamCorners = updatedRecord.AwayTeamCorners;
-                recordToUpdate.AwayTeamFouls = updatedRecord.AwayTeamFouls;
-                recordToUpdate.AwayTeamOffsides = updatedRecord.AwayTeamOffsides;
-                recordToUpdate.AwayTeamOnGoalShots = updatedRecord.AwayTeamOnGoalShots;
-                recordToUpdate.AwayTeamPossessionTime = updatedRecord.AwayTeamPossessionTime;
-                recordToUpdate.AwayTeamRedCards = updatedRecord.AwayTeamRedCards;
-                recordToUpdate.AwayTeamSaves = updatedRecord.AwayTeamSaves;
-                recordToUpdate.AwayTeamTotalShots = updatedRecord.AwayTeamTotalShots;
-                recordToUpdate.AwayTeamYellowCards = updatedRecord.AwayTeamYellowCards;
-                recordToUpdate.DateUpdated = DateTime.Now;
-                recordToUpdate.Deleted = false;
-                recordToUpdate.HomeTeamCorners = updatedRecord.HomeTeamCorners;
-                recordToUpdate.HomeTeamFouls = updatedRecord.HomeTeamFouls;
-                recordToUpdate.HomeTeamOffsides = updatedRecord.HomeTeamOffsides;
-                recordToUpdate.HomeTeamOnGoalShots = updatedRecord.HomeTeamOnGoalShots;
-                recordToUpdate.HomeTeamPossessionTime = updatedRecord.HomeTeamPossessionTime;
-                recordToUpdate.HomeTeamRedCards = updatedRecord.HomeTeamRedCards;
-                recordToUpdate.HomeTeamSaves = updatedRecord.HomeTeamSaves;
-                recordToUpdate.HomeTeamTotalShots = updatedRecord.HomeTeamTotalShots;
-                recordToUpdate.HomeTeamYellowCards = updatedRecord.HomeTeamYellowCards;
-                //recordToUpdate.Match = updatedRecord.Match;
-                recordToUpdate.MatchId = updatedRecord.MatchId;
-                recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+                    context.Stats.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+                else
+                {
+                    recordToUpdate.Active = updatedRecord.Active;
+                    recordToUpdate.AwayTeamCorners = updatedRecord.AwayTeamCorners;
+                    recordToUpdate.AwayTeamFouls = updatedRecord.AwayTeamFouls;
+                    recordToUpdate.AwayTeamOffsides = updatedRecord.AwayTeamOffsides;
+                    recordToUpdate.AwayTeamOnGoalShots = updatedRecord.AwayTeamOnGoalShots;
+                    recordToUpdate.AwayTeamPossessionTime = updatedRecord.AwayTeamPossessionTime;
+                    recordToUpdate.AwayTeamRedCards = updatedRecord.AwayTeamRedCards;
+                    recordToUpdate.AwayTeamSaves = updatedRecord.AwayTeamSaves;
+                    recordToUpdate.AwayTeamTotalShots = updatedRecord.AwayTeamTotalShots;
+                    recordToUpdate.AwayTeamYellowCards = updatedRecord.AwayTeamYellowCards;
+                    recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.Deleted = false;
+                    recordToUpdate.HomeTeamCorners = updatedRecord.HomeTeamCorners;
+                    recordToUpdate.HomeTeamFouls = updatedRecord.HomeTeamFouls;
+                    recordToUpdate.HomeTeamOffsides = updatedRecord.HomeTeamOffsides;
+                    recordToUpdate.HomeTeamOnGoalShots = updatedRecord.HomeTeamOnGoalShots;
+                    recordToUpdate.HomeTeamPossessionTime = updatedRecord.HomeTeamPossessionTime;
+                    recordToUpdate.HomeTeamRedCards = updatedRecord.HomeTeamRedCards;
+                    recordToUpdate.HomeTeamSaves = updatedRecord.HomeTeamSaves;
+                    recordToUpdate.HomeTeamTotalShots = updatedRecord.HomeTeamTotalShots;
+                    recordToUpdate.HomeTeamYellowCards = updatedRecord.HomeTeamYellowCards;
+                    //recordToUpdate.Match = updatedRecord.Match;
+                    recordToUpdate.MatchId = updatedRecord.MatchId;
+                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
 
-                context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
-                Id = updatedRecord.Id;
-            }
+                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                    Id = updatedRecord.Id;
+                }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }      
         }
 
         private static string SavePlayerStats(PlayerStat updatedRecord)
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord == null)
+            using (EFDbContext context = new EFDbContext())
             {
-                return Res.Resources.NotFound;
-            }
+                if (updatedRecord == null)
+                {
+                    return Res.Resources.NotFound;
+                }
 
-            //Update record
-            var recordToUpdate = context.PlayerStats.Where(x => x.PlayerId == updatedRecord.PlayerId && x.MatchId == updatedRecord.MatchId).FirstOrDefault();
+                //Update record
+                var recordToUpdate = context.PlayerStats.Where(x => x.PlayerId == updatedRecord.PlayerId && x.MatchId == updatedRecord.MatchId).FirstOrDefault();
 
-            if (recordToUpdate == null)
-            {
-                //Create record
-                updatedRecord.Id = Guid.NewGuid();
-                updatedRecord.Active = true;
-                updatedRecord.Deleted = false;
-                updatedRecord.DateAdded = DateTime.Now;
-                updatedRecord.DateUpdated = DateTime.Now;
+                if (recordToUpdate == null)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
 
-                context.PlayerStats.Add(updatedRecord);
-                Id = updatedRecord.Id;
-            }
-            else
-            {
-                recordToUpdate.Assists = updatedRecord.Assists;
-                recordToUpdate.FoulsCommitted = updatedRecord.FoulsCommitted;
-                recordToUpdate.FoulsDrawn = updatedRecord.FoulsDrawn;
-                recordToUpdate.Goals = updatedRecord.Goals;
-                recordToUpdate.Offsides = updatedRecord.Offsides;
-                recordToUpdate.PenaltiesMissed = updatedRecord.PenaltiesMissed;
-                recordToUpdate.PenaltiesScored = updatedRecord.PenaltiesScored;
-                //recordToUpdate.Player = updatedRecord.Player;
-                recordToUpdate.PlayerId = updatedRecord.PlayerId;
-                recordToUpdate.PositionX = updatedRecord.PositionX;
-                recordToUpdate.PositionY = updatedRecord.PositionY;
-                recordToUpdate.RedCards = updatedRecord.RedCards;
-                recordToUpdate.Saves = updatedRecord.Saves;
-                recordToUpdate.ShotsOnGoal = updatedRecord.ShotsOnGoal;
-                recordToUpdate.TotalShots = updatedRecord.TotalShots;
-                recordToUpdate.YellowCards = updatedRecord.YellowCards;
-                recordToUpdate.Active = updatedRecord.Active;
-                recordToUpdate.DateUpdated = DateTime.Now;
-                recordToUpdate.Deleted = false;
-                //recordToUpdate.Match = updatedRecord.Match;
-                recordToUpdate.MatchId = updatedRecord.MatchId;
-                recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+                    context.PlayerStats.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
+                else
+                {
+                    recordToUpdate.Assists = updatedRecord.Assists;
+                    recordToUpdate.FoulsCommitted = updatedRecord.FoulsCommitted;
+                    recordToUpdate.FoulsDrawn = updatedRecord.FoulsDrawn;
+                    recordToUpdate.Goals = updatedRecord.Goals;
+                    recordToUpdate.Offsides = updatedRecord.Offsides;
+                    recordToUpdate.PenaltiesMissed = updatedRecord.PenaltiesMissed;
+                    recordToUpdate.PenaltiesScored = updatedRecord.PenaltiesScored;
+                    //recordToUpdate.Player = updatedRecord.Player;
+                    recordToUpdate.PlayerId = updatedRecord.PlayerId;
+                    recordToUpdate.PositionX = updatedRecord.PositionX;
+                    recordToUpdate.PositionY = updatedRecord.PositionY;
+                    recordToUpdate.RedCards = updatedRecord.RedCards;
+                    recordToUpdate.Saves = updatedRecord.Saves;
+                    recordToUpdate.ShotsOnGoal = updatedRecord.ShotsOnGoal;
+                    recordToUpdate.TotalShots = updatedRecord.TotalShots;
+                    recordToUpdate.YellowCards = updatedRecord.YellowCards;
+                    recordToUpdate.Active = updatedRecord.Active;
+                    recordToUpdate.DateUpdated = DateTime.Now;
+                    recordToUpdate.Deleted = false;
+                    //recordToUpdate.Match = updatedRecord.Match;
+                    recordToUpdate.MatchId = updatedRecord.MatchId;
+                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
 
-                context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
-                Id = updatedRecord.Id;
-            }
+                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                    Id = updatedRecord.Id;
+                }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }          
         }
 
         private static string SaveEvent(Event updatedRecord)
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord != null)
+            using (EFDbContext context = new EFDbContext())
             {
-                if (updatedRecord.Id == System.Guid.Empty)
+                if (updatedRecord != null)
                 {
-                    //Create record
-                    updatedRecord.Id = Guid.NewGuid();
-                    updatedRecord.Active = true;
-                    updatedRecord.Deleted = false;
-                    updatedRecord.DateAdded = DateTime.Now;
-                    updatedRecord.DateUpdated = DateTime.Now;
+                    if (updatedRecord.Id == System.Guid.Empty)
+                    {
+                        //Create record
+                        updatedRecord.Id = Guid.NewGuid();
+                        updatedRecord.Active = true;
+                        updatedRecord.Deleted = false;
+                        updatedRecord.DateAdded = DateTime.Now;
+                        updatedRecord.DateUpdated = DateTime.Now;
 
-                    context.Events.Add(updatedRecord);
-                    Id = updatedRecord.Id;
+                        context.Events.Add(updatedRecord);
+                        Id = updatedRecord.Id;
+                    }
                 }
-            }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }    
         }
 
         private static string SavePlayer(Player updatedRecord, Guid teamId)
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord != null)
+            using (EFDbContext context = new EFDbContext())
             {
-                //Update record
-                var recordToUpdate = context.Teams.Find(teamId);
-
-                if (recordToUpdate == null)
+                if (updatedRecord != null)
                 {
-                    return Res.Resources.NotFound;
+                    //Update record
+                    var recordToUpdate = context.Teams.Find(teamId);
+
+                    if (recordToUpdate == null)
+                    {
+                        return Res.Resources.NotFound;
+                    }
+
+                    if (updatedRecord.Id == System.Guid.Empty)
+                    {
+                        //Create record
+                        updatedRecord.Id = Guid.NewGuid();
+                        updatedRecord.Active = true;
+                        updatedRecord.Deleted = false;
+                        updatedRecord.DateAdded = DateTime.Now;
+                        updatedRecord.DateUpdated = DateTime.Now;
+
+                        recordToUpdate.Players.Add(updatedRecord);
+                        Id = updatedRecord.Id;
+                    }
                 }
 
-                if (updatedRecord.Id == System.Guid.Empty)
+                try
                 {
-                    //Create record
-                    updatedRecord.Id = Guid.NewGuid();
-                    updatedRecord.Active = true;
-                    updatedRecord.Deleted = false;
-                    updatedRecord.DateAdded = DateTime.Now;
-                    updatedRecord.DateUpdated = DateTime.Now;
+                    context.SaveChanges();
 
-                    recordToUpdate.Players.Add(updatedRecord);
-                    Id = updatedRecord.Id;
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
                 }
-            }
-
-            try
-            {
-                context.SaveChanges();
-
-                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }      
         }
 
         private static string SavePlayerToMatchLineup(Lineup updatedRecord)
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord != null)
+            using (EFDbContext context = new EFDbContext())
             {
-                if (updatedRecord.Id == System.Guid.Empty)
+                if (updatedRecord != null)
                 {
-                    //Create record
-                    updatedRecord.Id = Guid.NewGuid();
-                    updatedRecord.Active = true;
-                    updatedRecord.Deleted = false;
-                    updatedRecord.DateAdded = DateTime.Now;
-                    updatedRecord.DateUpdated = DateTime.Now;
+                    if (updatedRecord.Id == System.Guid.Empty)
+                    {
+                        //Create record
+                        updatedRecord.Id = Guid.NewGuid();
+                        updatedRecord.Active = true;
+                        updatedRecord.Deleted = false;
+                        updatedRecord.DateAdded = DateTime.Now;
+                        updatedRecord.DateUpdated = DateTime.Now;
 
-                    context.Lineups.Add(updatedRecord);
-                    Id = updatedRecord.Id;
+                        context.Lineups.Add(updatedRecord);
+                        Id = updatedRecord.Id;
+                    }
                 }
-            }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }   
         }
 
         private static string SaveUpdateHistory(UpdateHistory updatedRecord)
@@ -1083,73 +1120,74 @@ namespace CMS.Infrastructure.Entities
             bool isNewRecord = false;
             Guid Id;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord != null)
+            using (EFDbContext context = new EFDbContext())
             {
-                if (updatedRecord.Id == System.Guid.Empty)
+                if (updatedRecord != null)
                 {
-                    //Create record  
-                    updatedRecord.Id = Guid.NewGuid();
-                    updatedRecord.Active = true;
-                    updatedRecord.Deleted = false;
-                    updatedRecord.DateAdded = DateTime.Now;
-                    updatedRecord.DateUpdated = DateTime.Now;
+                    if (updatedRecord.Id == System.Guid.Empty)
+                    {
+                        //Create record  
+                        updatedRecord.Id = Guid.NewGuid();
+                        updatedRecord.Active = true;
+                        updatedRecord.Deleted = false;
+                        updatedRecord.DateAdded = DateTime.Now;
+                        updatedRecord.DateUpdated = DateTime.Now;
 
-                    context.UpdateHistory.Add(updatedRecord);
-                    Id = updatedRecord.Id;
+                        context.UpdateHistory.Add(updatedRecord);
+                        Id = updatedRecord.Id;
 
-                    isNewRecord = true;
+                        isNewRecord = true;
+                    }
+                    else
+                    {
+                        //Update record
+                        var recordToUpdate = context.UpdateHistory.Find(updatedRecord.Id);
+
+                        if (recordToUpdate == null)
+                        {
+                            return Res.Resources.NotFound;
+                        }
+
+                        recordToUpdate.Active = updatedRecord.Active;
+                        recordToUpdate.Lineups = updatedRecord.Lineups;
+                        recordToUpdate.MatchAPIId = updatedRecord.MatchAPIId;
+                        recordToUpdate.MatchDetails = updatedRecord.MatchDetails;
+                        recordToUpdate.Deleted = updatedRecord.Deleted;
+                        recordToUpdate.DateUpdated = DateTime.Now;
+                        recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+                        recordToUpdate.Active = updatedRecord.Active;
+
+                        context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
+                        Id = updatedRecord.Id;
+                    }
                 }
                 else
                 {
-                    //Update record
-                    var recordToUpdate = context.UpdateHistory.Find(updatedRecord.Id);
-
-                    if (recordToUpdate == null)
-                    {
-                        return Res.Resources.NotFound;
-                    }
-
-                    recordToUpdate.Active = updatedRecord.Active;
-                    recordToUpdate.Lineups = updatedRecord.Lineups;
-                    recordToUpdate.MatchAPIId = updatedRecord.MatchAPIId;
-                    recordToUpdate.MatchDetails = updatedRecord.MatchDetails;
-                    recordToUpdate.Deleted = updatedRecord.Deleted;
-                    recordToUpdate.DateUpdated = DateTime.Now;
-                    recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
-                    recordToUpdate.Active = updatedRecord.Active;
-
-                    context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
-                    Id = updatedRecord.Id;
+                    return Res.Resources.NotFound;
                 }
-            }
-            else
-            {
-                return Res.Resources.NotFound;
-            }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return isNewRecord ? string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString())
-                    : string.Format("{0}:{1}", Res.Resources.RecordUpdated, Id.ToString());
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return isNewRecord ? string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString())
+                        : string.Format("{0}:{1}", Res.Resources.RecordUpdated, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            } 
         }
 
         private static string SaveMatchToday(MatchesToday updatedRecord)
         {
             Guid Id = Guid.Empty;
 
-            EFDbContext context = new EFDbContext();
-
-            if (updatedRecord != null)
-            {              
+            using (EFDbContext context = new EFDbContext())
+            {
+                if (updatedRecord != null)
+                {
                     //Create record
                     updatedRecord.Active = true;
                     updatedRecord.Deleted = false;
@@ -1157,44 +1195,46 @@ namespace CMS.Infrastructure.Entities
                     updatedRecord.DateUpdated = DateTime.Now;
 
                     context.MatchesToday.Add(updatedRecord);
-            }
+                }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}", Res.Resources.RecordAdded);
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}", Res.Resources.RecordAdded);
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }      
         }
 
         private static string DeleteMatchesToday()
         {
-            EFDbContext context = new EFDbContext();
+             using (EFDbContext context = new EFDbContext())
+             {
+                 var allRecords = context.MatchesToday;
 
-            var allRecords = context.MatchesToday;
- 
-            if (allRecords != null)
-            {
-                foreach (var record in allRecords)
-                {
-                    context.MatchesToday.Remove(record);
-                }     
-            }
+                 if (allRecords != null)
+                 {
+                     foreach (var record in allRecords)
+                     {
+                         context.MatchesToday.Remove(record);
+                     }
+                 }
 
-            try
-            {
-                context.SaveChanges();
+                 try
+                 {
+                     context.SaveChanges();
 
-                return string.Format("{0}", Res.Resources.RecordUpdated);
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                     return string.Format("{0}", Res.Resources.RecordUpdated);
+                 }
+                 catch (Exception e)
+                 {
+                     return string.Format("Error: {0}", e.InnerException.ToString());
+                 }
+             }    
         }
 
         #endregion
@@ -1203,72 +1243,113 @@ namespace CMS.Infrastructure.Entities
 
         private static Stat GetMatchStatsByAPIId(Guid matchGuid)
         {
-            EFDbContext context = new EFDbContext();
+            Stat stat = new Stat();
 
-            return context.Stats.Where(x => (x.MatchId == matchGuid)).FirstOrDefault();
+            using (EFDbContext context = new EFDbContext())
+            {
+                stat = context.Stats.Where(x => (x.MatchId == matchGuid)).FirstOrDefault();
+            }
+
+            return stat;
         }
 
         private static UpdateHistory GetUpdateHistoryByMatchAPIId(int id)
         {
-            EFDbContext context = new EFDbContext();
+            UpdateHistory hist = new UpdateHistory();
 
-            return context.UpdateHistory.Where(x => (x.MatchAPIId == id)).FirstOrDefault();
+            using (EFDbContext context = new EFDbContext())
+            {
+                hist = context.UpdateHistory.Where(x => (x.MatchAPIId == id)).FirstOrDefault();
+            }
+
+            return hist;
         }
 
         private static Player GetPlayerByAPIId(int id)
         {
-            EFDbContext context = new EFDbContext();
+            Player player = new Player();
 
-            return context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
+            using (EFDbContext context = new EFDbContext())
+            {
+                player = context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
+            }
+
+            return player;
         }
 
         private static Team GetTeamByAPIId(int id)
         {
-            EFDbContext context = new EFDbContext();
+            Team team = new Team();
 
-            return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
+            using (EFDbContext context = new EFDbContext())
+            {
+                team = context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
+            }
+
+            return team;
         }
 
         private static Match GetMatchByAPIId(int id)
         {
-            EFDbContext context = new EFDbContext();
+            Match match = new Match();
 
-            return context.Matches.Where(x => (x.APIId == id)).FirstOrDefault();
+            using (EFDbContext context = new EFDbContext())
+            {
+                match = context.Matches.Where(x => (x.APIId == id)).FirstOrDefault();
+            }
+
+            return match;
         }
 
         private static IList<Match> GetLiveMatches()
         {
-            EFDbContext context = new EFDbContext();
+            IList<Match> liveMatches = new List<Match>();
 
-            return context.Matches.Where(x => x.IsLive == true).ToList();
+            using (EFDbContext context = new EFDbContext())
+            {
+                liveMatches = context.Matches.Where(x => x.IsLive == true).ToList();
+            }
+
+            return liveMatches;
         }
 
         private static int GetLatestEventId(Guid id)
         {
-            EFDbContext context = new EFDbContext();
-
             int retInt = 0;
 
-            var evt = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.DateAdded).FirstOrDefault();
+            using (EFDbContext context = new EFDbContext())
+            {
+                var evt = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.DateAdded).FirstOrDefault();
 
-            if (evt != null)
-                retInt = evt.APIId;
+                if (evt != null)
+                    retInt = evt.APIId;
+            }    
 
             return retInt;
         }
 
         private static IList<Event> GetLatestEvents(int id)
         {
-            EFDbContext context = new EFDbContext();
+            IList<Event> latestEvents = new List<Event>();
 
-            return context.Events.Where(x => (x.APIId == id)).OrderByDescending(x => x.DateAdded).Take(5).ToList();
+            using (EFDbContext context = new EFDbContext())
+            {
+                latestEvents = context.Events.Where(x => (x.APIId == id)).OrderByDescending(x => x.DateAdded).Take(5).ToList();
+            }
+
+            return latestEvents;
         }
 
         private static IList<MatchesToday> GetTodayMatches()
         {
-            EFDbContext context = new EFDbContext();
+            IList<MatchesToday> matchesToday = new List<MatchesToday>();
 
-            return context.MatchesToday.ToList();
+            using (EFDbContext context = new EFDbContext())
+            {
+                matchesToday = context.MatchesToday.ToList();
+            }
+
+            return matchesToday;
         }
 
         #endregion
