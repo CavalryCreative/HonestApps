@@ -17,7 +17,6 @@ namespace FeedData
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Player()
         {
-            this.Lineups = new HashSet<Lineup>();
             this.PlayerStats = new HashSet<PlayerStat>();
             this.Teams = new HashSet<Team>();
         }
@@ -34,8 +33,6 @@ namespace FeedData
         public Nullable<System.Guid> UpdatedByUserId { get; set; }
         public Nullable<System.DateTime> DateUpdated { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Lineup> Lineups { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PlayerStat> PlayerStats { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -4,37 +4,37 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="a8b877c7e7ca4dbf9632eefb30801ffc" Name="Diagram1">
-        <EntityTypeShape EntityType="HonestAppsModel.Card" Width="1.5" PointX="9.75" PointY="37.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Event" Width="1.5" PointX="7.5" PointY="20.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Goal" Width="1.5" PointX="9.75" PointY="42.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Lineup" Width="1.5" PointX="10.5" PointY="28.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Match" Width="1.5" PointX="5.25" PointY="29.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.MatchesToday" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Player" Width="1.5" PointX="0.75" PointY="21.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.PlayerStat" Width="1.5" PointX="10.5" PointY="21.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Rival" Width="1.5" PointX="5.25" PointY="47" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Stat" Width="1.5" PointX="7.5" PointY="25.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Substitution" Width="1.5" PointX="7.5" PointY="32.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Summary" Width="1.5" PointX="7.5" PointY="40" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.Team" Width="1.5" PointX="3" PointY="33.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="HonestAppsModel.UpdateHistory" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Cards_dbo_Summaries_Summary_Id" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Cards_dbo_Summaries_Summary_Id1" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Events_dbo_Matches_MatchId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Goals_dbo_Summaries_SummaryId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Lineups_dbo_Matches_Match_Id" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Lineups_dbo_Players_Player_Id" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Lineups_dbo_Teams_Team_Id" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Matches_dbo_Teams_Team_Id" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Matches_dbo_Teams_Team_Id1" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_PlayerStats_dbo_Matches_MatchId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Stats_dbo_Matches_MatchId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Substitutions_dbo_Matches_MatchId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Summaries_dbo_Matches_MatchId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_PlayerStats_dbo_Players_PlayerId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.FK_dbo_Rivals_dbo_Teams_TeamId" ManuallyRouted="false" />
-        <AssociationConnector Association="HonestAppsModel.TeamPlayers" ManuallyRouted="false" />
+      <Diagram DiagramId="d9f4e7fd90f247729cd1b2b33d365592" Name="Diagram1">
+        <EntityTypeShape EntityType="honestappsModel.Card" Width="1.5" PointX="9.75" PointY="37" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Event" Width="1.5" PointX="7.5" PointY="20" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Goal" Width="1.5" PointX="9.75" PointY="42.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Lineup" Width="1.5" PointX="12.5" PointY="33.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Match" Width="1.5" PointX="5.25" PointY="29.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.MatchesToday" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Player" Width="1.5" PointX="0.75" PointY="21.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.PlayerStat" Width="1.5" PointX="10.5" PointY="26" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Rival" Width="1.5" PointX="5.25" PointY="46.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.SiteException" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Stat" Width="1.5" PointX="7.5" PointY="25" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Substitution" Width="1.5" PointX="7.5" PointY="32" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Summary" Width="1.5" PointX="7.5" PointY="39.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.Team" Width="1.5" PointX="3" PointY="28.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="honestappsModel.UpdateHistory" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Cards_dbo_Summaries_Summary_Id" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Cards_dbo_Summaries_Summary_Id1" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Events_dbo_Matches_MatchId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Goals_dbo_Summaries_SummaryId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Lineups_dbo_Matches_Match_Id" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Lineups_dbo_Teams_Team_Id" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Matches_dbo_Teams_Team_Id" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Matches_dbo_Teams_Team_Id1" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_PlayerStats_dbo_Matches_MatchId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Stats_dbo_Matches_MatchId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Substitutions_dbo_Matches_MatchId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Summaries_dbo_Matches_MatchId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_PlayerStats_dbo_Players_PlayerId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.FK_dbo_Rivals_dbo_Teams_TeamId" ManuallyRouted="false" />
+        <AssociationConnector Association="honestappsModel.TeamPlayers" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

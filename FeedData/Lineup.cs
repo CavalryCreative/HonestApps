@@ -26,10 +26,9 @@ namespace FeedData
         public Nullable<System.DateTime> DateUpdated { get; set; }
         public Nullable<System.Guid> Match_Id { get; set; }
         public Nullable<System.Guid> Team_Id { get; set; }
-        public Nullable<System.Guid> Player_Id { get; set; }
+        public System.Guid PlayerId { get; set; }
     
         public virtual Match Match { get; set; }
-        public virtual Player Player { get; set; }
         public virtual Team Team { get; set; }
     }
 }
