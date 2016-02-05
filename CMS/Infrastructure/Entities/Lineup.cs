@@ -12,7 +12,7 @@ namespace CMS.Infrastructure.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public int MatchAPIId { get; set; }
-        public Player Player { get; set; }
+        public Guid PlayerId { get; set; }
         public bool IsHomePlayer { get; set; }
         public bool IsSub { get; set; }
     }

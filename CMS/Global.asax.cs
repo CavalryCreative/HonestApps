@@ -8,6 +8,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.AspNet.SignalR;
 using CMS.Infrastructure.Entities;
+using CMS.Infrastructure.Concrete;
 
 namespace CMS
 {
@@ -28,6 +29,57 @@ namespace CMS
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             //HangfireBootstrapper.Instance.Start();
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            Exception exception = Server.GetLastError();
+            Response.Clear();
+
+            EFSiteException efSiteException = new EFSiteException();
+            SiteException siteException = new SiteException();
+
+            siteException.HResult = exception.HResult.ToString();
+
+            if (exception.InnerException != null)
+            {
+                siteException.InnerException = exception.InnerException.ToString();
+            }
+
+            siteException.Message = exception.Message;
+            siteException.Source = exception.Source;
+            siteException.TargetSite = exception.TargetSite.ToString();
+
+            efSiteException.Save(siteException);
+
+            HttpException httpException = exception as HttpException;
+
+            Server.ClearError();
+
+            //if (httpException != null)
+            //{
+            //    string action;
+
+            //    switch (httpException.GetHttpCode())
+            //    {
+            //        case 404:
+            //            // page not found
+            //            action = "HttpError404";
+            //            break;
+            //        case 500:
+            //            // server error
+            //            action = "HttpError500";
+            //            break;
+            //        default:
+            //            action = "General";
+            //            break;
+            //    }
+
+            //    // clear error on server
+            //    Server.ClearError();
+
+            //    //Response.Redirect(String.Format("~/Error/{0}", action));
+            //}
         }
 
         protected void Application_End(object sender, EventArgs e)

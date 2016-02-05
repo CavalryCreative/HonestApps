@@ -27,6 +27,7 @@ namespace CMS.Infrastructure.Concrete
             public DbSet<Card> Cards { get; set; }
             public DbSet<UpdateHistory> UpdateHistory { get; set; }
             public DbSet<MatchesToday> MatchesToday { get; set; }
+            public DbSet<SiteException> SiteException { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
@@ -38,6 +39,7 @@ namespace CMS.Infrastructure.Concrete
                 modelBuilder.Configurations.Add(new PlayerMap());
                 modelBuilder.Configurations.Add(new SubstitutionMap());
                 modelBuilder.Configurations.Add(new MatchesTodayMap());
+                modelBuilder.Configurations.Add(new SiteExceptionMap());
             }
         }
 
@@ -123,6 +125,19 @@ namespace CMS.Infrastructure.Concrete
             public MatchesTodayMap()
             {
                 Property(p => p.KickOffTime).HasMaxLength(10).IsUnicode(false);
+            }
+        }
+
+        public class SiteExceptionMap : EntityTypeConfiguration<SiteException>
+        {
+            public SiteExceptionMap()
+            {
+                Property(p => p.HResult).HasMaxLength(50).IsUnicode(false);
+                Property(p => p.InnerException).HasMaxLength(500).IsUnicode(false);
+                Property(p => p.Message).HasMaxLength(500).IsUnicode(false);
+                Property(p => p.Source).HasMaxLength(250).IsUnicode(false);
+                Property(p => p.StackTrace).IsUnicode(false);
+                Property(p => p.TargetSite).HasMaxLength(250).IsUnicode(false);
             }
         }
 }

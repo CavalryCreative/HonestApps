@@ -16,6 +16,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+//using System.Data.Entity;
+//using System.Data.Entity.Core.Objects;
+//using System.Data.Entity.Infrastructure;
 
 namespace CMS.Infrastructure.Entities
 {
@@ -65,7 +68,7 @@ namespace CMS.Infrastructure.Entities
             GetAllCommentaries();
             BroadcastFeed();
         }
-
+        
         public void BroadcastFeed()
         {
             string feed = string.Empty;
@@ -74,146 +77,7 @@ namespace CMS.Infrastructure.Entities
             Clients.All.showMessage(feed);
         }
 
-        public void GetFixtures(object sender)
-        {
-            //Clear today matches table
-            DeleteMatchesToday();
-
-            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
-
-            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
-
-            foreach (var kvp in matchesToday)
-            {
-                MatchesToday match = new MatchesToday();
-                match.APIId = kvp.Key;
-                match.KickOffTime = kvp.Value;
-
-                SaveMatchToday(match);
-            }
-        }
-
         #region Private Methods
-
-        private static IDictionary<int, string> GetFixtures(DateTime startDate, DateTime endDate)
-        {
-            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
-            string retMsg = string.Empty;
-
-            string startDateStr = startDate.ToShortDateString();
-            string endDateStr = endDate.ToShortDateString();
-
-            string[] startArr = startDateStr.Split('/');
-            string[] endArr = endDateStr.Split('/');
-
-            string formatStart = string.Format("{0}.{1}.{2}", startArr[0], startArr[1], startArr[2]);
-            string formatEnd = string.Format("{0}.{1}.{2}", endArr[0], endArr[1], endArr[2]);
-
-            try
-            {
-                string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
-
-                var webRequest = (HttpWebRequest)WebRequest.Create(uri);
-                webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
-                var webResponse = (HttpWebResponse)webRequest.GetResponse();
-
-                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
-                {
-                    var reader = new StreamReader(webResponse.GetResponseStream());
-                    string s = reader.ReadToEnd();
-
-                    JObject obj = JObject.Parse(s);
-
-                    var postTitles = from p in obj["matches"]
-                                     select new
-                                     {
-                                         MatchDate = (string)p["match_formatted_date"],
-                                         APIId = (int)p["match_id"],
-                                         Time = (string)p["match_time"],
-                                         HomeTeamAPIId = (int)p["match_localteam_id"],
-                                         HomeTeam = (string)p["match_localteam_name"],
-                                         AwayTeamAPIId = (int)p["match_visitorteam_id"],
-                                         AwayTeam = (string)p["match_visitorteam_name"]
-                                     };
-
-                    foreach (var item in postTitles)
-                    {
-                        //Check if Update History Match details is true/false
-                        var updateHistory = GetUpdateHistoryByMatchAPIId(item.APIId);
-                        bool matchDetailsAdded = false;
-
-                        if (updateHistory != null)
-                        {
-                            matchDetailsAdded = updateHistory.MatchDetails;
-                        }
-
-                        if (matchDetailsAdded == false)
-                        {
-                            Match match = new Match();
-
-                            match.APIId = item.APIId;
-                            match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
-                            match.EndDate = match.Date.Value.AddHours(2);
-                            match.Active = DateTime.Now <= match.EndDate ? true : false;
-                            match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-                            //change this when live
-                            //match.IsLive = true;
-                            match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
-                            match.Time = item.Time;
-
-                            if (match.IsLive)
-                                matchesToday.Add(match.APIId, match.Time);
-
-                            var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
-                            var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
-
-                            if (homeTeam != null)
-                            {
-                                //match.HomeTeamId = homeTeam.Id;
-                                match.Stadium = homeTeam.Stadium;
-                            }
-
-                            if (awayTeam != null)
-                                //match.AwayTeamId = awayTeam.Id;
-
-                                match.HomeTeamAPIId = item.HomeTeamAPIId;
-                            match.AwayTeamAPIId = item.AwayTeamAPIId;
-
-                            SaveMatch(match);
-
-                            UpdateHistory history = new UpdateHistory();
-
-                            history.MatchAPIId = match.APIId;
-                            history.MatchDetails = true;
-                            history.Id = System.Guid.Empty;
-
-                            SaveUpdateHistory(history);
-                        }
-                        else
-                        {
-                            var retMatch = GetMatchByAPIId(item.APIId);
-
-                            if (retMatch != null)
-                            {
-                                if (DateTime.Now.ToShortDateString() == retMatch.Date.Value.ToShortDateString())
-                                    matchesToday.Add(retMatch.APIId, retMatch.Time);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    retMsg = "Error: " + string.Format("Status code == {0}, Content length == {1}", webResponse.StatusCode, webResponse.ContentLength);
-                }
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show(ex.Message);
-                retMsg = "Error: " + ex.Message;
-            }
-
-            return matchesToday;
-        }
 
         private void GetAllCommentaries()
         {
@@ -293,75 +157,72 @@ namespace CMS.Infrastructure.Entities
                         string Id;
                         string actionMessage;
                         Byte squadNumberByte;
-                        Int32 playerIdInt;
+                        int playerAPIId;
                         bool result;
 
                         foreach (var childToken in y.Children())
                         {
                             var jeff = childToken.Children();
 
+                            Player playerExists = new Player();
+
                             foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                             {
-                                int playerAPIId = Convert.ToInt32(evt["id"]);
+                                result = Int32.TryParse(evt["id"], out playerAPIId);
 
-                                //Check if player exists
-                                var player = GetPlayerByAPIId(playerAPIId);
-                                Guid playerId = Guid.Empty;
+                                //Check if player exists                           
+                                if (result)
+                                    playerExists = GetPlayerByAPIId(playerAPIId);
+
+                                if (playerExists == null)
+                                    playerExists = GetPlayerByName(evt["name"]);                              
 
                                 //Add to Players if not already added
-                                if (player == null)
+                                if (playerExists == null)
                                 {
-                                    Player newPlayer = new Player();
+                                    Player homePlayer = new Player();
 
                                     result = Byte.TryParse(evt["number"], out squadNumberByte);
 
                                     if (result)
-                                        newPlayer.SquadNumber = squadNumberByte;
+                                        homePlayer.SquadNumber = squadNumberByte;
                                     else
-                                        newPlayer.SquadNumber = 0;
+                                        homePlayer.SquadNumber = 0;
 
-                                    newPlayer.Name = evt["name"];
-                                    newPlayer.Position = evt["pos"];
-                                    newPlayer.Id = System.Guid.Empty;
-                                    newPlayer.APIPlayerId = playerAPIId;
+                                    homePlayer.Name = evt["name"];
+                                    homePlayer.Position = evt["pos"];
+                                    homePlayer.Id = System.Guid.Empty;
+                                    homePlayer.APIPlayerId = playerAPIId;
 
-                                    System.Diagnostics.Debug.WriteLine(string.Format("Home: {0},{1}", 
-                                         newPlayer.Name,
-                                          newPlayer.Position
-                                         ));
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Home: {0},{1}",
+                                    //     homePlayer.Name,
+                                    //      homePlayer.Position
+                                    //     ));
 
-                                    retMsg = SavePlayer(newPlayer, homeTeam.Id);
+                                    retMsg = SavePlayer(homePlayer, homeTeam.Id);
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
                                     if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
                                     {
-                                        newPlayer.Id = new Guid(Id);
+                                        homePlayer.Id = new Guid(Id);
                                     }
 
-                                    player = newPlayer;
-                                }
-                                else
-                                {
-                                    playerId = player.Id;
-                                }
+                                    //add to Lineups
+                                    Lineup lineup = new Lineup();
 
-                                //add to Lineups
-                                Lineup lineup = new Lineup();
-
-                                lineup.IsHomePlayer = true;
-                                lineup.IsSub = false;
-                                //lineup.Match = match;
-                                //lineup.Match_Id = match.Id;
-                                lineup.MatchAPIId = matchId;
-                                lineup.Player = player;
-                                //lineup.Player_Id = player.Id;
-                                //lineup.Team = homeTeam;
-                                //lineup.Team_Id = homeTeam.Id;
-
-                                SavePlayerToMatchLineup(lineup);
+                                    lineup.IsHomePlayer = true;
+                                    lineup.IsSub = false;                                   
+                                    lineup.MatchAPIId = matchId;
+                                    lineup.PlayerId = homePlayer.Id;
+                                                                     
+                                    SavePlayerToMatchLineup(lineup);
+                                }                       
                             }
                         }
+
+                        System.Diagnostics.Debug.WriteLine("Home players complete");
+
                         #endregion
 
                         #region Home subs
@@ -376,60 +237,63 @@ namespace CMS.Infrastructure.Entities
 
                             foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                             {
-                                int playerAPIId = Convert.ToInt32(evt["id"]);
+                                result = Int32.TryParse(evt["id"], out playerAPIId);
 
                                 //Check if player exists
-                                var player = GetPlayerByAPIId(playerAPIId);
-                                Guid playerId = Guid.Empty;
+                                Player playerExists = new Player();
+
+                                if (result)
+                                    playerExists = GetPlayerByAPIId(playerAPIId);
+
+                                if (playerExists == null)
+                                    playerExists = GetPlayerByName(evt["name"]);
 
                                 //Add to Players if not already added
-                                if (player == null)
+                                if (playerExists == null)
                                 {
-                                    Player newPlayer = new Player();
+                                    Player homeSubPlayer = new Player();
 
-                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
-                                    newPlayer.Name = evt["name"];
-                                    newPlayer.Position = evt["pos"];
-                                    newPlayer.Id = System.Guid.Empty;
-                                    newPlayer.APIPlayerId = playerAPIId;
+                                    result = Byte.TryParse(evt["number"], out squadNumberByte);
 
-                                    System.Diagnostics.Debug.WriteLine(string.Format("HomeSub: {0},{1}",
-                                        newPlayer.Name,
-                                         newPlayer.Position
-                                        ));
+                                    if (result)
+                                        homeSubPlayer.SquadNumber = squadNumberByte;
+                                    else
+                                        homeSubPlayer.SquadNumber = 0;
 
-                                    retMsg = SavePlayer(newPlayer, homeTeam.Id);
+                                    homeSubPlayer.Name = evt["name"];
+                                    homeSubPlayer.Position = evt["pos"];
+                                    homeSubPlayer.Id = System.Guid.Empty;
+                                    homeSubPlayer.APIPlayerId = playerAPIId;
+
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("HomeSub: {0},{1}",
+                                    //    homeSubPlayer.Name,
+                                    //     homeSubPlayer.Position
+                                    //    ));
+
+                                    retMsg = SavePlayer(homeSubPlayer, homeTeam.Id);
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
                                     if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
                                     {
-                                        newPlayer.Id = new Guid(Id);
+                                        homeSubPlayer.Id = new Guid(Id);
                                     }
 
-                                    player = newPlayer;
-                                }
-                                else
-                                {
-                                    playerId = player.Id;
-                                }
+                                    //add to Lineups
+                                    Lineup lineup = new Lineup();
 
-                                //add to Lineups
-                                Lineup lineup = new Lineup();
-
-                                lineup.IsHomePlayer = true;
-                                lineup.IsSub = true;
-                                //lineup.Match = match;
-                                //lineup.Match_Id = match.Id;
-                                lineup.MatchAPIId = matchId;
-                                lineup.Player = player;
-                                //lineup.Player_Id = player.Id;
-                                //lineup.Team = homeTeam;
-                                //lineup.Team_Id = homeTeam.Id;
-
-                                SavePlayerToMatchLineup(lineup);
+                                    lineup.IsHomePlayer = true;
+                                    lineup.IsSub = true;
+                                    lineup.MatchAPIId = matchId;
+                                    lineup.PlayerId = homeSubPlayer.Id;
+                                   
+                                    SavePlayerToMatchLineup(lineup);
+                                }                              
                             }
                         }
+
+                        System.Diagnostics.Debug.WriteLine("Home players subs complete");
+
                         #endregion
 
                         #region Away Team
@@ -444,60 +308,62 @@ namespace CMS.Infrastructure.Entities
 
                             foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                             {
-                                int playerAPIId = Convert.ToInt32(evt["id"]);
+                                result = Int32.TryParse(evt["id"], out playerAPIId);
 
                                 //Check if player exists
-                                var player = GetPlayerByAPIId(playerAPIId);
-                                Guid playerId = Guid.Empty;
+                                Player playerExists = new Player();
+
+                                if (result)
+                                    playerExists = GetPlayerByAPIId(playerAPIId);
+
+                                if (playerExists == null)
+                                    playerExists = GetPlayerByName(evt["name"]);
 
                                 //Add to Players if not already added
-                                if (player == null)
+                                if (playerExists == null)
                                 {
-                                    Player newPlayer = new Player();
+                                    Player awayPlayer = new Player();
 
-                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
-                                    newPlayer.Name = evt["name"];
-                                    newPlayer.Position = evt["pos"];
-                                    newPlayer.Id = System.Guid.Empty;
-                                    newPlayer.APIPlayerId = playerAPIId;
+                                    result = Byte.TryParse(evt["number"], out squadNumberByte);
 
-                                    System.Diagnostics.Debug.WriteLine(string.Format("Away: {0},{1}",
-                                      newPlayer.Name,
-                                       newPlayer.Position
-                                      ));
+                                    if (result)
+                                        awayPlayer.SquadNumber = squadNumberByte;
+                                    else
+                                        awayPlayer.SquadNumber = 0;
 
-                                    retMsg = SavePlayer(newPlayer, awayTeam.Id);
+                                    awayPlayer.Name = evt["name"];
+                                    awayPlayer.Position = evt["pos"];
+                                    awayPlayer.Id = System.Guid.Empty;
+                                    awayPlayer.APIPlayerId = playerAPIId;
+
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Away: {0},{1}",
+                                    //  awayPlayer.Name,
+                                    //   awayPlayer.Position
+                                    //  ));
+
+                                    retMsg = SavePlayer(awayPlayer, awayTeam.Id);
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
                                     if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
                                     {
-                                        newPlayer.Id = new Guid(Id);
+                                        awayPlayer.Id = new Guid(Id);
                                     }
 
-                                    player = newPlayer;
-                                }
-                                else
-                                {
-                                    playerId = player.Id;
-                                }
+                                    //add to Lineups
+                                    Lineup lineup = new Lineup();
 
-                                //add to Lineups
-                                Lineup lineup = new Lineup();
-
-                                lineup.IsHomePlayer = false;
-                                lineup.IsSub = false;
-                                //lineup.Match = match;
-                                //lineup.Match_Id = match.Id;
-                                lineup.MatchAPIId = matchId;
-                                lineup.Player = player;
-                                //lineup.Player_Id = player.Id;
-                                //lineup.Team = homeTeam;
-                                //lineup.Team_Id = awayTeam.Id;
-
-                                SavePlayerToMatchLineup(lineup);
+                                    lineup.IsHomePlayer = false;
+                                    lineup.IsSub = false;                                  
+                                    lineup.MatchAPIId = matchId;
+                                    lineup.PlayerId = awayPlayer.Id;
+                                   
+                                    SavePlayerToMatchLineup(lineup);
+                                }                               
                             }
                         }
+
+                        System.Diagnostics.Debug.WriteLine("Away players complete");
 
                         #endregion
 
@@ -513,60 +379,63 @@ namespace CMS.Infrastructure.Entities
 
                             foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                             {
-                                int playerAPIId = Convert.ToInt32(evt["id"]);
+                                result = Int32.TryParse(evt["id"], out playerAPIId);
 
                                 //Check if player exists
-                                var player = GetPlayerByAPIId(playerAPIId);
-                                Guid playerId = Guid.Empty;
+                                Player playerExists = new Player();
+
+                                if (result)
+                                    playerExists = GetPlayerByAPIId(playerAPIId);
+
+                                if (playerExists == null)
+                                    playerExists = GetPlayerByName(evt["name"]);
 
                                 //Add to Players if not already added
-                                if (player == null)
+                                if (playerExists == null)
                                 {
-                                    Player newPlayer = new Player();
+                                    Player awaySubPlayer = new Player();
 
-                                    newPlayer.SquadNumber = Convert.ToByte(evt["number"]);
-                                    newPlayer.Name = evt["name"];
-                                    newPlayer.Position = evt["pos"];
-                                    newPlayer.Id = System.Guid.Empty;
-                                    newPlayer.APIPlayerId = playerAPIId;
+                                    result = Byte.TryParse(evt["number"], out squadNumberByte);
 
-                                    System.Diagnostics.Debug.WriteLine(string.Format("AwaySub: {0},{1}",
-                                      newPlayer.Name,
-                                       newPlayer.Position
-                                      ));
+                                    if (result)
+                                        awaySubPlayer.SquadNumber = squadNumberByte;
+                                    else
+                                        awaySubPlayer.SquadNumber = 0;
 
-                                    retMsg = SavePlayer(newPlayer, awayTeam.Id);
+                                    awaySubPlayer.Name = evt["name"];
+                                    awaySubPlayer.Position = evt["pos"];
+                                    awaySubPlayer.Id = System.Guid.Empty;
+                                    awaySubPlayer.APIPlayerId = playerAPIId;
+
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("AwaySub: {0},{1}",
+                                    //  awaySubPlayer.Name,
+                                    //   awaySubPlayer.Position
+                                    //  ));
+
+                                    retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
                                     if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
                                     {
-                                        newPlayer.Id = new Guid(Id);
+                                        awaySubPlayer.Id = new Guid(Id);
                                     }
 
-                                    player = newPlayer;
+                                    //add to Lineups
+                                    Lineup lineup = new Lineup();
+
+                                    lineup.IsHomePlayer = false;
+                                    lineup.IsSub = true;                                   
+                                    lineup.MatchAPIId = matchId;
+                                    lineup.PlayerId = awaySubPlayer.Id;
+                                    
+                                    SavePlayerToMatchLineup(lineup);
                                 }
-                                else
-                                {
-                                    playerId = player.Id;
-                                }
-
-                                //add to Lineups
-                                Lineup lineup = new Lineup();
-
-                                lineup.IsHomePlayer = false;
-                                lineup.IsSub = true;
-                                //lineup.Match = match;
-                                //lineup.Match_Id = match.Id;
-                                lineup.MatchAPIId = matchId;
-                                lineup.Player = player;
-                                //lineup.Player_Id = player.Id;
-                                //lineup.Team = homeTeam;
-                                //lineup.Team_Id = awayTeam.Id;
-
-                                SavePlayerToMatchLineup(lineup);
                             }
                         }
+
+                        System.Diagnostics.Debug.WriteLine("Away players subs complete");
+
                         #endregion
 
                         UpdateHistory history = new UpdateHistory();
@@ -611,90 +480,118 @@ namespace CMS.Infrastructure.Entities
                     stat.AwayTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.redcards.total").ToString());
                     stat.AwayTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.yellowcards.total").ToString());
 
-                    SaveMatchStats(stat);
+                    try
+                    {
+                        SaveMatchStats(stat);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    }                            
+
+                    System.Diagnostics.Debug.WriteLine("Match stats complete");
 
                     #endregion
 
-                    #region Player Stats
+                    //#region Player Stats
 
-                    //Home players
-                    jPath = "commentaries.[0].comm_match_player_stats.localteam.player";
+                    ////Home players
+                    //jPath = "commentaries.[0].comm_match_player_stats.localteam.player";
 
-                    var playerStats = token.SelectTokens(jPath);
+                    //var playerStats = token.SelectTokens(jPath);
 
-                    foreach (var statToken in playerStats.Children())
-                    {
-                        var fred = statToken.Children();
+                    //foreach (var statToken in playerStats.Children())
+                    //{
+                    //    var fred = statToken.Children();
 
-                        foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
-                        {
-                            PlayerStat playerStat = new PlayerStat();
+                    //    foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                    //    {
+                    //        PlayerStat playerStat = new PlayerStat();
 
-                            playerStat.APIId = Convert.ToInt32(evt["id"]);
+                    //        playerStat.APIId = Convert.ToInt32(evt["id"]);
 
-                            Player player = new Player();
-                            player = GetPlayerByAPIId(playerStat.APIId);
+                    //        Player player = new Player();
+                    //        player = GetPlayerByAPIId(playerStat.APIId);
 
-                            playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
-                            playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
-                            playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
-                            playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
-                            playerStat.MatchId = match.Id;
-                            playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
-                            playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
-                            playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
-                            playerStat.PlayerId = player.Id;
-                            playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
-                            playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
-                            playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
-                            playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
-                            playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
-                            playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
-                            playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+                    //        playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
+                    //        playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
+                    //        playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
+                    //        playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
+                    //        playerStat.MatchId = match.Id;
+                    //        playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
+                    //        playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
+                    //        playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
+                    //        playerStat.PlayerId = player.Id;
+                    //        playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
+                    //        playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
+                    //        playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
+                    //        playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
+                    //        playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
+                    //        playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
+                    //        playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
 
-                            SavePlayerStats(playerStat);
-                        }
-                    }
+                    //        try
+                    //        {
+                    //            SavePlayerStats(playerStat);
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+                    //            System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    //        }          
+                    //    }
+                    //}
 
-                    //Away players
-                    jPath = "commentaries.[0].comm_match_player_stats.visitorteam.player";
+                    //System.Diagnostics.Debug.WriteLine("Home player stats complete");
 
-                    playerStats = token.SelectTokens(jPath);
+                    ////Away players
+                    //jPath = "commentaries.[0].comm_match_player_stats.visitorteam.player";
 
-                    foreach (var statToken in playerStats.Children())
-                    {
-                        var fred = statToken.Children();
+                    //playerStats = token.SelectTokens(jPath);
 
-                        foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
-                        {
-                            PlayerStat playerStat = new PlayerStat();
+                    //foreach (var statToken in playerStats.Children())
+                    //{
+                    //    var fred = statToken.Children();
 
-                            playerStat.APIId = Convert.ToInt32(evt["id"]);
+                    //    foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                    //    {
+                    //        PlayerStat playerStat = new PlayerStat();
 
-                            Player player = new Player();
-                            player = GetPlayerByAPIId(playerStat.APIId);
+                    //        playerStat.APIId = Convert.ToInt32(evt["id"]);
 
-                            playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
-                            playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
-                            playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
-                            playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
-                            playerStat.MatchId = match.Id;
-                            playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
-                            playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
-                            playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
-                            playerStat.PlayerId = player.Id;
-                            playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
-                            playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
-                            playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
-                            playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
-                            playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
-                            playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
-                            playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+                    //        Player player = new Player();
+                    //        player = GetPlayerByAPIId(playerStat.APIId);
 
-                            SavePlayerStats(playerStat);
-                        }
-                    }
-                    #endregion
+                    //        playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
+                    //        playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
+                    //        playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
+                    //        playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
+                    //        playerStat.MatchId = match.Id;
+                    //        playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
+                    //        playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
+                    //        playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
+                    //        playerStat.PlayerId = player.Id;
+                    //        playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
+                    //        playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
+                    //        playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
+                    //        playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
+                    //        playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
+                    //        playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
+                    //        playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+
+                    //        try
+                    //        {
+                    //            SavePlayerStats(playerStat);
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+                    //            System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    //        }
+                    //    }
+                    //}
+
+                    //System.Diagnostics.Debug.WriteLine("Away players stats complete");
+
+                    //#endregion
 
                     #region Events
 
@@ -745,9 +642,18 @@ namespace CMS.Infrastructure.Entities
 
                             //Todo - set match rating for both teams
 
-                            SaveEvent(commEvent);
+                            try
+                            {
+                                SaveEvent(commEvent);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                            }                                   
                         }
                     }
+
+                    System.Diagnostics.Debug.WriteLine("Events complete");
                     #endregion
                 }
                 else
@@ -1062,6 +968,7 @@ namespace CMS.Infrastructure.Entities
                         updatedRecord.DateAdded = DateTime.Now;
                         updatedRecord.DateUpdated = DateTime.Now;
 
+                        //recordToUpdate.Players.Clear();
                         recordToUpdate.Players.Add(updatedRecord);
                         Id = updatedRecord.Id;
                     }
@@ -1069,12 +976,12 @@ namespace CMS.Infrastructure.Entities
 
                 try
                 {
-                    context.SaveChanges();
+                    context.SaveChanges();                   
 
                     return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
                 }
                 catch (Exception e)
-                {
+                {                  
                     return string.Format("Error: {0}", e.InnerException.ToString());
                 }
             }      
@@ -1096,7 +1003,7 @@ namespace CMS.Infrastructure.Entities
                         updatedRecord.Deleted = false;
                         updatedRecord.DateAdded = DateTime.Now;
                         updatedRecord.DateUpdated = DateTime.Now;
-
+                      
                         context.Lineups.Add(updatedRecord);
                         Id = updatedRecord.Id;
                     }
@@ -1123,23 +1030,7 @@ namespace CMS.Infrastructure.Entities
             using (EFDbContext context = new EFDbContext())
             {
                 if (updatedRecord != null)
-                {
-                    if (updatedRecord.Id == System.Guid.Empty)
-                    {
-                        //Create record  
-                        updatedRecord.Id = Guid.NewGuid();
-                        updatedRecord.Active = true;
-                        updatedRecord.Deleted = false;
-                        updatedRecord.DateAdded = DateTime.Now;
-                        updatedRecord.DateUpdated = DateTime.Now;
-
-                        context.UpdateHistory.Add(updatedRecord);
-                        Id = updatedRecord.Id;
-
-                        isNewRecord = true;
-                    }
-                    else
-                    {
+                {                 
                         //Update record
                         var recordToUpdate = context.UpdateHistory.Find(updatedRecord.Id);
 
@@ -1159,7 +1050,6 @@ namespace CMS.Infrastructure.Entities
 
                         context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                         Id = updatedRecord.Id;
-                    }
                 }
                 else
                 {
@@ -1179,64 +1069,7 @@ namespace CMS.Infrastructure.Entities
                 }
             } 
         }
-
-        private static string SaveMatchToday(MatchesToday updatedRecord)
-        {
-            Guid Id = Guid.Empty;
-
-            using (EFDbContext context = new EFDbContext())
-            {
-                if (updatedRecord != null)
-                {
-                    //Create record
-                    updatedRecord.Active = true;
-                    updatedRecord.Deleted = false;
-                    updatedRecord.DateAdded = DateTime.Now;
-                    updatedRecord.DateUpdated = DateTime.Now;
-
-                    context.MatchesToday.Add(updatedRecord);
-                }
-
-                try
-                {
-                    context.SaveChanges();
-
-                    return string.Format("{0}", Res.Resources.RecordAdded);
-                }
-                catch (Exception e)
-                {
-                    return string.Format("Error: {0}", e.InnerException.ToString());
-                }
-            }      
-        }
-
-        private static string DeleteMatchesToday()
-        {
-             using (EFDbContext context = new EFDbContext())
-             {
-                 var allRecords = context.MatchesToday;
-
-                 if (allRecords != null)
-                 {
-                     foreach (var record in allRecords)
-                     {
-                         context.MatchesToday.Remove(record);
-                     }
-                 }
-
-                 try
-                 {
-                     context.SaveChanges();
-
-                     return string.Format("{0}", Res.Resources.RecordUpdated);
-                 }
-                 catch (Exception e)
-                 {
-                     return string.Format("Error: {0}", e.InnerException.ToString());
-                 }
-             }    
-        }
-
+              
         #endregion
 
         #region Get
@@ -1272,6 +1105,18 @@ namespace CMS.Infrastructure.Entities
             using (EFDbContext context = new EFDbContext())
             {
                 player = context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
+            }
+
+            return player;
+        }
+
+        private static Player GetPlayerByName(string name)
+        {
+            Player player = new Player();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                player = context.Players.Where(x => x.Name.ToLower() == name.ToLower()).FirstOrDefault();
             }
 
             return player;
