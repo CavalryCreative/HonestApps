@@ -34,6 +34,7 @@ namespace FeedData
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<PlayerStat> PlayerStats { get; set; }
         public virtual DbSet<Rival> Rivals { get; set; }
+        public virtual DbSet<SiteException> SiteExceptions { get; set; }
         public virtual DbSet<Stat> Stats { get; set; }
         public virtual DbSet<Substitution> Substitutions { get; set; }
         public virtual DbSet<Summary> Summaries { get; set; }

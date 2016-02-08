@@ -128,3 +128,29 @@ Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSoc
 Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
 Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
 Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+SignalR.Transports.WebSocketTransport Information: 0 : CloseSocket(e2847052-3da2-42e4-b9ae-e84416a137a1)
+SignalR.Transports.WebSocketTransport Information: 0 : Abort(e2847052-3da2-42e4-b9ae-e84416a137a1)
+SignalR.Transports.WebSocketTransport Information: 0 : End(e2847052-3da2-42e4-b9ae-e84416a137a1)
+SignalR.Transports.WebSocketTransport Verbose: 0 : DrainWrites(e2847052-3da2-42e4-b9ae-e84416a137a1)
+SignalR.Transports.WebSocketTransport Information: 0 : CompleteRequest (e2847052-3da2-42e4-b9ae-e84416a137a1)
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.
+Microsoft.Owin.Host.SystemWeb.OwinAppContext Information: 0 : Support for WebSockets has been detected.

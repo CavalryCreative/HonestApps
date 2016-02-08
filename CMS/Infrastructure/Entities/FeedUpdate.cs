@@ -38,7 +38,7 @@ namespace CMS.Infrastructure.Entities
 
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120000));         
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));  //TODO - change to 2 minutes    120000   
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -90,7 +90,7 @@ namespace CMS.Infrastructure.Entities
                 {
                     //lock (thisLock)
                     //{
-                        GetCommentaries(match.APIId);
+                        GetCommentaries(match);
                     //}                    
                 }
             }
@@ -440,10 +440,10 @@ namespace CMS.Infrastructure.Entities
 
                         UpdateHistory history = new UpdateHistory();
 
+                        history.MatchDetails = true;
                         history.MatchAPIId = matchId;
                         history.Lineups = true;
-                        history.Id = System.Guid.Empty;
-
+                       
                         SaveUpdateHistory(history);
                     }
 
@@ -493,105 +493,117 @@ namespace CMS.Infrastructure.Entities
 
                     #endregion
 
-                    //#region Player Stats
+                    #region Player Stats
 
-                    ////Home players
-                    //jPath = "commentaries.[0].comm_match_player_stats.localteam.player";
+                    #region Home players
 
-                    //var playerStats = token.SelectTokens(jPath);
+                    jPath = "commentaries.[0].comm_match_player_stats.localteam.player";
 
-                    //foreach (var statToken in playerStats.Children())
-                    //{
-                    //    var fred = statToken.Children();
+                    var playerStats = token.SelectTokens(jPath);
 
-                    //    foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
-                    //    {
-                    //        PlayerStat playerStat = new PlayerStat();
+                    foreach (var statToken in playerStats.Children())
+                    {
+                        var fred = statToken.Children();
 
-                    //        playerStat.APIId = Convert.ToInt32(evt["id"]);
+                        foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            PlayerStat playerStat = new PlayerStat();
 
-                    //        Player player = new Player();
-                    //        player = GetPlayerByAPIId(playerStat.APIId);
+                            playerStat.APIId = Convert.ToInt32(evt["id"]);
 
-                    //        playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
-                    //        playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
-                    //        playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
-                    //        playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
-                    //        playerStat.MatchId = match.Id;
-                    //        playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
-                    //        playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
-                    //        playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
-                    //        playerStat.PlayerId = player.Id;
-                    //        playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
-                    //        playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
-                    //        playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
-                    //        playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
-                    //        playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
-                    //        playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
-                    //        playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+                            Player player = new Player();
+                            player = GetPlayerByAPIId(playerStat.APIId);
 
-                    //        try
-                    //        {
-                    //            SavePlayerStats(playerStat);
-                    //        }
-                    //        catch (Exception ex)
-                    //        {
-                    //            System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                    //        }          
-                    //    }
-                    //}
+                            if (player != null)
+                            {
+                                playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
+                                playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
+                                playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
+                                playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
+                                playerStat.MatchId = match.Id;
+                                playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
+                                playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
+                                playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
+                                playerStat.PlayerId = player.Id;
+                                playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
+                                playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
+                                playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
+                                playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
+                                playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
+                                playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
+                                playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
 
-                    //System.Diagnostics.Debug.WriteLine("Home player stats complete");
+                                try
+                                {
+                                    SavePlayerStats(playerStat);
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                }
+                            }                       
+                        }
+                    }
 
-                    ////Away players
-                    //jPath = "commentaries.[0].comm_match_player_stats.visitorteam.player";
+                    System.Diagnostics.Debug.WriteLine("Home player stats complete");
 
-                    //playerStats = token.SelectTokens(jPath);
+                    #endregion
 
-                    //foreach (var statToken in playerStats.Children())
-                    //{
-                    //    var fred = statToken.Children();
+                    #region Away players
 
-                    //    foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
-                    //    {
-                    //        PlayerStat playerStat = new PlayerStat();
+                    jPath = "commentaries.[0].comm_match_player_stats.visitorteam.player";
 
-                    //        playerStat.APIId = Convert.ToInt32(evt["id"]);
+                    playerStats = token.SelectTokens(jPath);
 
-                    //        Player player = new Player();
-                    //        player = GetPlayerByAPIId(playerStat.APIId);
+                    foreach (var statToken in playerStats.Children())
+                    {
+                        var fred = statToken.Children();
 
-                    //        playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
-                    //        playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
-                    //        playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
-                    //        playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
-                    //        playerStat.MatchId = match.Id;
-                    //        playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
-                    //        playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
-                    //        playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
-                    //        playerStat.PlayerId = player.Id;
-                    //        playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
-                    //        playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
-                    //        playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
-                    //        playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
-                    //        playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
-                    //        playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
-                    //        playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+                        foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            PlayerStat playerStat = new PlayerStat();
 
-                    //        try
-                    //        {
-                    //            SavePlayerStats(playerStat);
-                    //        }
-                    //        catch (Exception ex)
-                    //        {
-                    //            System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                    //        }
-                    //    }
-                    //}
+                            playerStat.APIId = Convert.ToInt32(evt["id"]);
 
-                    //System.Diagnostics.Debug.WriteLine("Away players stats complete");
+                            Player player = new Player();
+                            player = GetPlayerByAPIId(playerStat.APIId);
 
-                    //#endregion
+                            if (player != null)
+                            {
+                                playerStat.Assists = string.IsNullOrWhiteSpace(evt["assists"]) ? (byte)0 : Convert.ToByte(evt["assists"]);
+                                playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(evt["fouls_commited"]) ? (byte)0 : Convert.ToByte(evt["fouls_commited"]);
+                                playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(evt["fouls_drawn"]) ? (byte)0 : Convert.ToByte(evt["fouls_drawn"]);
+                                playerStat.Goals = string.IsNullOrWhiteSpace(evt["goals"]) ? (byte)0 : Convert.ToByte(evt["goals"]);
+                                playerStat.MatchId = match.Id;
+                                playerStat.Offsides = string.IsNullOrWhiteSpace(evt["offsides"]) ? (byte)0 : Convert.ToByte(evt["offsides"]);
+                                playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(evt["pen_miss"]) ? (byte)0 : Convert.ToByte(evt["pen_miss"]);
+                                playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(evt["pen_score"]) ? (byte)0 : Convert.ToByte(evt["pen_score"]);
+                                playerStat.PlayerId = player.Id;
+                                playerStat.PositionX = string.IsNullOrWhiteSpace(evt["posx"]) ? (byte)0 : Convert.ToByte(evt["posx"]);
+                                playerStat.PositionY = string.IsNullOrWhiteSpace(evt["posy"]) ? (byte)0 : Convert.ToByte(evt["posy"]);
+                                playerStat.RedCards = string.IsNullOrWhiteSpace(evt["redcards"]) ? (byte)0 : Convert.ToByte(evt["redcards"]);
+                                playerStat.Saves = string.IsNullOrWhiteSpace(evt["saves"]) ? (byte)0 : Convert.ToByte(evt["saves"]);
+                                playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(evt["shots_on_goal"]) ? (byte)0 : Convert.ToByte(evt["shots_on_goal"]);
+                                playerStat.TotalShots = string.IsNullOrWhiteSpace(evt["shots_total"]) ? (byte)0 : Convert.ToByte(evt["shots_total"]);
+                                playerStat.YellowCards = string.IsNullOrWhiteSpace(evt["yellowcards"]) ? (byte)0 : Convert.ToByte(evt["yellowcards"]);
+
+                                try
+                                {
+                                    SavePlayerStats(playerStat);
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                }
+                            }                          
+                        }
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("Away players stats complete");
+
+                    #endregion
+
+                    #endregion
 
                     #region Events
 
@@ -609,7 +621,13 @@ namespace CMS.Infrastructure.Entities
                         foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                         {
                             string id = evt["id"];
-                            int eventId = Convert.ToInt32(id);
+                            int eventId;
+
+                            bool result = Int32.TryParse(id, out eventId);
+
+                            //Check if player exists                           
+                            if (!result)
+                                eventId = 0;
 
                             if (eventId <= lastUpdateId)
                             {
@@ -684,7 +702,7 @@ namespace CMS.Infrastructure.Entities
             foreach (var match in todaysMatches)
             {
                 var matchDetails = GetMatchByAPIId(match.APIId);
-                var latestEvents = GetLatestEvents(match.APIId);
+                var latestEvents = GetLatestEvents(matchDetails.Id);
 
                 foreach (var evt in latestEvents)
                 {
@@ -903,6 +921,8 @@ namespace CMS.Infrastructure.Entities
                 }
                 catch (Exception e)
                 {
+                    System.Diagnostics.Debug.WriteLine(string.Format("SavePlayerStats: {0}, Message: {1}, Player Id: {2}", e.InnerException, e.Message, updatedRecord.APIId));
+                            
                     return string.Format("Error: {0}", e.InnerException.ToString());
                 }
             }          
@@ -1032,7 +1052,7 @@ namespace CMS.Infrastructure.Entities
                 if (updatedRecord != null)
                 {                 
                         //Update record
-                        var recordToUpdate = context.UpdateHistory.Find(updatedRecord.Id);
+                    var recordToUpdate = context.UpdateHistory.Where(x => x.MatchAPIId == updatedRecord.MatchAPIId).FirstOrDefault();
 
                         if (recordToUpdate == null)
                         {
@@ -1146,13 +1166,16 @@ namespace CMS.Infrastructure.Entities
             return match;
         }
 
-        private static IList<Match> GetLiveMatches()
+        private static IList<int> GetLiveMatches()
         {
-            IList<Match> liveMatches = new List<Match>();
+            IList<int> liveMatches = new List<int>();
 
             using (EFDbContext context = new EFDbContext())
             {
-                liveMatches = context.Matches.Where(x => x.IsLive == true).ToList();
+                foreach(var match in context.MatchesToday)
+                {
+                    liveMatches.Add(match.APIId);
+                }
             }
 
             return liveMatches;
@@ -1173,13 +1196,13 @@ namespace CMS.Infrastructure.Entities
             return retInt;
         }
 
-        private static IList<Event> GetLatestEvents(int id)
+        private static IList<Event> GetLatestEvents(Guid id)
         {
             IList<Event> latestEvents = new List<Event>();
 
             using (EFDbContext context = new EFDbContext())
             {
-                latestEvents = context.Events.Where(x => (x.APIId == id)).OrderByDescending(x => x.DateAdded).Take(5).ToList();
+                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.APIId).Take(5).ToList();
             }
 
             return latestEvents;

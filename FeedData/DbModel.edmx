@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="HonestAppsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="honestappsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cards">
           <Key>
             <PropertyRef Name="Id" />
@@ -81,7 +81,7 @@
           <Property Name="DateUpdated" Type="datetime" />
           <Property Name="Match_Id" Type="uniqueidentifier" />
           <Property Name="Team_Id" Type="uniqueidentifier" />
-          <Property Name="Player_Id" Type="uniqueidentifier" />
+          <Property Name="PlayerId" Type="uniqueidentifier" Nullable="false" />
         </EntityType>
         <EntityType Name="Matches">
           <Key>
@@ -181,6 +181,19 @@
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+        </EntityType>
+        <EntityType Name="SiteExceptions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="HResult" Type="varchar" MaxLength="50" />
+          <Property Name="InnerException" Type="varchar" MaxLength="500" />
+          <Property Name="Message" Type="varchar" MaxLength="500" />
+          <Property Name="Source" Type="varchar" MaxLength="250" />
+          <Property Name="StackTrace" Type="varchar(max)" />
+          <Property Name="TargetSite" Type="varchar" MaxLength="250" />
+          <Property Name="DateAdded" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Stats">
           <Key>
@@ -352,18 +365,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_Lineups_dbo_Players_Player_Id">
-          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
-          <End Role="Lineups" Type="Self.Lineups" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Players">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Lineups">
-              <PropertyRef Name="Player_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_dbo_Lineups_dbo_Teams_Team_Id">
           <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
           <End Role="Lineups" Type="Self.Lineups" Multiplicity="*" />
@@ -512,7 +513,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="HonestAppsModelStoreContainer">
+        <EntityContainer Name="honestappsModelStoreContainer">
           <EntitySet Name="Cards" EntityType="Self.Cards" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Events" EntityType="Self.Events" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Goals" EntityType="Self.Goals" Schema="dbo" store:Type="Tables" />
@@ -522,6 +523,7 @@
           <EntitySet Name="Players" EntityType="Self.Players" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PlayerStats" EntityType="Self.PlayerStats" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Rivals" EntityType="Self.Rivals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SiteExceptions" EntityType="Self.SiteExceptions" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Stats" EntityType="Self.Stats" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Substitutions" EntityType="Self.Substitutions" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Summaries" EntityType="Self.Summaries" Schema="dbo" store:Type="Tables" />
@@ -546,10 +548,6 @@
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_Match_Id" Association="Self.FK_dbo_Lineups_dbo_Matches_Match_Id">
             <End Role="Matches" EntitySet="Matches" />
-            <End Role="Lineups" EntitySet="Lineups" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Lineups_dbo_Players_Player_Id" Association="Self.FK_dbo_Lineups_dbo_Players_Player_Id">
-            <End Role="Players" EntitySet="Players" />
             <End Role="Lineups" EntitySet="Lineups" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Lineups_dbo_Teams_Team_Id" Association="Self.FK_dbo_Lineups_dbo_Teams_Team_Id">
@@ -601,7 +599,7 @@
     </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="HonestAppsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="honestappsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Card">
           <Key>
             <PropertyRef Name="Id" />
@@ -682,9 +680,8 @@
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <Property Name="Match_Id" Type="Guid" />
           <Property Name="Team_Id" Type="Guid" />
-          <Property Name="Player_Id" Type="Guid" />
+          <Property Name="PlayerId" Type="Guid" Nullable="false" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Lineups_dbo_Matches_Match_Id" FromRole="Lineups" ToRole="Matches" />
-          <NavigationProperty Name="Player" Relationship="Self.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Lineups" ToRole="Players" />
           <NavigationProperty Name="Team" Relationship="Self.FK_dbo_Lineups_dbo_Teams_Team_Id" FromRole="Lineups" ToRole="Teams" />
         </EntityType>
         <EntityType Name="Match">
@@ -751,7 +748,6 @@
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Lineups" Relationship="Self.FK_dbo_Lineups_dbo_Players_Player_Id" FromRole="Players" ToRole="Lineups" />
           <NavigationProperty Name="PlayerStats" Relationship="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId" FromRole="Players" ToRole="PlayerStats" />
           <NavigationProperty Name="Teams" Relationship="Self.TeamPlayers" FromRole="Players" ToRole="Teams" />
         </EntityType>
@@ -799,6 +795,19 @@
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Team" Relationship="Self.FK_dbo_Rivals_dbo_Teams_TeamId" FromRole="Rivals" ToRole="Teams" />
+        </EntityType>
+        <EntityType Name="SiteException">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="HResult" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="InnerException" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Message" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Source" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="StackTrace" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="TargetSite" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="DateAdded" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         <EntityType Name="Stat">
           <Key>
@@ -973,18 +982,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_Lineups_dbo_Players_Player_Id">
-          <End Role="Players" Type="Self.Player" Multiplicity="0..1" />
-          <End Role="Lineups" Type="Self.Lineup" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Players">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Lineups">
-              <PropertyRef Name="Player_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_dbo_Lineups_dbo_Teams_Team_Id">
           <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
           <End Role="Lineups" Type="Self.Lineup" Multiplicity="*" />
@@ -1119,6 +1116,7 @@
           <EntitySet Name="Players" EntityType="Self.Player" />
           <EntitySet Name="PlayerStats" EntityType="Self.PlayerStat" />
           <EntitySet Name="Rivals" EntityType="Self.Rival" />
+          <EntitySet Name="SiteExceptions" EntityType="Self.SiteException" />
           <EntitySet Name="Stats" EntityType="Self.Stat" />
           <EntitySet Name="Substitutions" EntityType="Self.Substitution" />
           <EntitySet Name="Summaries" EntityType="Self.Summary" />
@@ -1142,10 +1140,6 @@
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Lineups_dbo_Matches_Match_Id" Association="Self.FK_dbo_Lineups_dbo_Matches_Match_Id">
             <End Role="Matches" EntitySet="Matches" />
-            <End Role="Lineups" EntitySet="Lineups" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_Lineups_dbo_Players_Player_Id" Association="Self.FK_dbo_Lineups_dbo_Players_Player_Id">
-            <End Role="Players" EntitySet="Players" />
             <End Role="Lineups" EntitySet="Lineups" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Lineups_dbo_Teams_Team_Id" Association="Self.FK_dbo_Lineups_dbo_Teams_Team_Id">
@@ -1194,9 +1188,9 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="HonestAppsModelStoreContainer" CdmEntityContainer="HonestAppsEntities">
+        <EntityContainerMapping StorageEntityContainer="honestappsModelStoreContainer" CdmEntityContainer="HonestAppsEntities">
           <EntitySetMapping Name="Cards">
-            <EntityTypeMapping TypeName="HonestAppsModel.Card">
+            <EntityTypeMapping TypeName="honestappsModel.Card">
               <MappingFragment StoreEntitySet="Cards">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1217,7 +1211,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Events">
-            <EntityTypeMapping TypeName="HonestAppsModel.Event">
+            <EntityTypeMapping TypeName="honestappsModel.Event">
               <MappingFragment StoreEntitySet="Events">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1239,7 +1233,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Goals">
-            <EntityTypeMapping TypeName="HonestAppsModel.Goal">
+            <EntityTypeMapping TypeName="honestappsModel.Goal">
               <MappingFragment StoreEntitySet="Goals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1259,7 +1253,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Lineups">
-            <EntityTypeMapping TypeName="HonestAppsModel.Lineup">
+            <EntityTypeMapping TypeName="honestappsModel.Lineup">
               <MappingFragment StoreEntitySet="Lineups">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
@@ -1273,12 +1267,12 @@
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
                 <ScalarProperty Name="Match_Id" ColumnName="Match_Id" />
                 <ScalarProperty Name="Team_Id" ColumnName="Team_Id" />
-                <ScalarProperty Name="Player_Id" ColumnName="Player_Id" />
+                <ScalarProperty Name="PlayerId" ColumnName="PlayerId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Matches">
-            <EntityTypeMapping TypeName="HonestAppsModel.Match">
+            <EntityTypeMapping TypeName="honestappsModel.Match">
               <MappingFragment StoreEntitySet="Matches">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
@@ -1306,7 +1300,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="MatchesTodays">
-            <EntityTypeMapping TypeName="HonestAppsModel.MatchesToday">
+            <EntityTypeMapping TypeName="honestappsModel.MatchesToday">
               <MappingFragment StoreEntitySet="MatchesTodays">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
@@ -1321,7 +1315,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Players">
-            <EntityTypeMapping TypeName="HonestAppsModel.Player">
+            <EntityTypeMapping TypeName="honestappsModel.Player">
               <MappingFragment StoreEntitySet="Players">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SquadNumber" ColumnName="SquadNumber" />
@@ -1338,7 +1332,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PlayerStats">
-            <EntityTypeMapping TypeName="HonestAppsModel.PlayerStat">
+            <EntityTypeMapping TypeName="honestappsModel.PlayerStat">
               <MappingFragment StoreEntitySet="PlayerStats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="PlayerId" ColumnName="PlayerId" />
@@ -1368,7 +1362,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Rivals">
-            <EntityTypeMapping TypeName="HonestAppsModel.Rival">
+            <EntityTypeMapping TypeName="honestappsModel.Rival">
               <MappingFragment StoreEntitySet="Rivals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="TeamId" ColumnName="TeamId" />
@@ -1381,8 +1375,22 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="SiteExceptions">
+            <EntityTypeMapping TypeName="honestappsModel.SiteException">
+              <MappingFragment StoreEntitySet="SiteExceptions">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="HResult" ColumnName="HResult" />
+                <ScalarProperty Name="InnerException" ColumnName="InnerException" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="StackTrace" ColumnName="StackTrace" />
+                <ScalarProperty Name="TargetSite" ColumnName="TargetSite" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Stats">
-            <EntityTypeMapping TypeName="HonestAppsModel.Stat">
+            <EntityTypeMapping TypeName="honestappsModel.Stat">
               <MappingFragment StoreEntitySet="Stats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1414,7 +1422,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Substitutions">
-            <EntityTypeMapping TypeName="HonestAppsModel.Substitution">
+            <EntityTypeMapping TypeName="honestappsModel.Substitution">
               <MappingFragment StoreEntitySet="Substitutions">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1436,7 +1444,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Summaries">
-            <EntityTypeMapping TypeName="HonestAppsModel.Summary">
+            <EntityTypeMapping TypeName="honestappsModel.Summary">
               <MappingFragment StoreEntitySet="Summaries">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1452,7 +1460,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Teams">
-            <EntityTypeMapping TypeName="HonestAppsModel.Team">
+            <EntityTypeMapping TypeName="honestappsModel.Team">
               <MappingFragment StoreEntitySet="Teams">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
@@ -1468,7 +1476,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="UpdateHistories">
-            <EntityTypeMapping TypeName="HonestAppsModel.UpdateHistory">
+            <EntityTypeMapping TypeName="honestappsModel.UpdateHistory">
               <MappingFragment StoreEntitySet="UpdateHistories">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
@@ -1484,7 +1492,7 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="TeamPlayers" TypeName="HonestAppsModel.TeamPlayers" StoreEntitySet="TeamPlayers">
+          <AssociationSetMapping Name="TeamPlayers" TypeName="honestappsModel.TeamPlayers" StoreEntitySet="TeamPlayers">
             <EndProperty Name="Players">
               <ScalarProperty Name="Id" ColumnName="Player_Id" />
             </EndProperty>
