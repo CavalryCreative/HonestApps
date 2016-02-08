@@ -497,6 +497,7 @@ namespace CMS.Infrastructure.Entities
 
                     #region Home players
 
+                    //Home players
                     jPath = "commentaries.[0].comm_match_player_stats.localteam.player";
 
                     var playerStats = token.SelectTokens(jPath);
