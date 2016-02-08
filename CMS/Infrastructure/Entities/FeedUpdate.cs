@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 //using System.Data.Entity;
 //using System.Data.Entity.Core.Objects;
 //using System.Data.Entity.Infrastructure;
@@ -67,6 +68,9 @@ namespace CMS.Infrastructure.Entities
         {
             GetAllCommentaries();
             BroadcastFeed();
+
+            Exception ex = new Exception();
+            SaveException(ex, "Broadcast feed");
         }
         
         public void BroadcastFeed()
@@ -194,12 +198,20 @@ namespace CMS.Infrastructure.Entities
                                     homePlayer.Id = System.Guid.Empty;
                                     homePlayer.APIPlayerId = playerAPIId;
 
-                                    //System.Diagnostics.Debug.WriteLine(string.Format("Home: {0},{1}",
+                                    ////System.Diagnostics.Debug.WriteLine(string.Format("Home: {0},{1}",
                                     //     homePlayer.Name,
                                     //      homePlayer.Position
                                     //     ));
 
-                                    retMsg = SavePlayer(homePlayer, homeTeam.Id);
+                                    try
+                                    {
+                                        retMsg = SavePlayer(homePlayer, homeTeam.Id);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                        SaveException(ex, string.Format("SavePlayer - Home, PlayerAPIId: {0}, Match Id: {1}", homePlayer.APIPlayerId.ToString(), matchId.ToString()));
+                                    }                                 
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
@@ -221,7 +233,7 @@ namespace CMS.Infrastructure.Entities
                             }
                         }
 
-                        System.Diagnostics.Debug.WriteLine("Home players complete");
+                        //System.Diagnostics.Debug.WriteLine("Home players complete");
 
                         #endregion
 
@@ -265,12 +277,20 @@ namespace CMS.Infrastructure.Entities
                                     homeSubPlayer.Id = System.Guid.Empty;
                                     homeSubPlayer.APIPlayerId = playerAPIId;
 
-                                    //System.Diagnostics.Debug.WriteLine(string.Format("HomeSub: {0},{1}",
+                                    ////System.Diagnostics.Debug.WriteLine(string.Format("HomeSub: {0},{1}",
                                     //    homeSubPlayer.Name,
                                     //     homeSubPlayer.Position
                                     //    ));
 
-                                    retMsg = SavePlayer(homeSubPlayer, homeTeam.Id);
+                                    try
+                                    {
+                                        retMsg = SavePlayer(homeSubPlayer, homeTeam.Id);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                        SaveException(ex, string.Format("SavePlayer - Home Sub, PlayerAPIId: {0}, Match Id: {1}", homeSubPlayer.APIPlayerId.ToString(), matchId.ToString()));
+                                    }            
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
@@ -292,7 +312,7 @@ namespace CMS.Infrastructure.Entities
                             }
                         }
 
-                        System.Diagnostics.Debug.WriteLine("Home players subs complete");
+                        //System.Diagnostics.Debug.WriteLine("Home players subs complete");
 
                         #endregion
 
@@ -336,12 +356,20 @@ namespace CMS.Infrastructure.Entities
                                     awayPlayer.Id = System.Guid.Empty;
                                     awayPlayer.APIPlayerId = playerAPIId;
 
-                                    //System.Diagnostics.Debug.WriteLine(string.Format("Away: {0},{1}",
+                                    ////System.Diagnostics.Debug.WriteLine(string.Format("Away: {0},{1}",
                                     //  awayPlayer.Name,
                                     //   awayPlayer.Position
                                     //  ));
 
-                                    retMsg = SavePlayer(awayPlayer, awayTeam.Id);
+                                    try
+                                    {
+                                        retMsg = SavePlayer(awayPlayer, awayTeam.Id);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                        SaveException(ex, string.Format("SavePlayer - Away, PlayerAPIId: {0}, Match Id: {1}", awayPlayer.APIPlayerId.ToString(), matchId.ToString()));
+                                    }                                              
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
@@ -363,7 +391,7 @@ namespace CMS.Infrastructure.Entities
                             }
                         }
 
-                        System.Diagnostics.Debug.WriteLine("Away players complete");
+                        //System.Diagnostics.Debug.WriteLine("Away players complete");
 
                         #endregion
 
@@ -407,12 +435,20 @@ namespace CMS.Infrastructure.Entities
                                     awaySubPlayer.Id = System.Guid.Empty;
                                     awaySubPlayer.APIPlayerId = playerAPIId;
 
-                                    //System.Diagnostics.Debug.WriteLine(string.Format("AwaySub: {0},{1}",
+                                    ////System.Diagnostics.Debug.WriteLine(string.Format("AwaySub: {0},{1}",
                                     //  awaySubPlayer.Name,
                                     //   awaySubPlayer.Position
                                     //  ));
 
-                                    retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
+                                    try
+                                    {
+                                        retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                        SaveException(ex, string.Format("SavePlayer - Away Sub, PlayerAPIId:{0}, Match Id: {1} ", awaySubPlayer.APIPlayerId.ToString(), matchId.ToString()));
+                                    }                                              
 
                                     ReturnId(retMsg, out actionMessage, out Id);
 
@@ -434,7 +470,7 @@ namespace CMS.Infrastructure.Entities
                             }
                         }
 
-                        System.Diagnostics.Debug.WriteLine("Away players subs complete");
+                        //System.Diagnostics.Debug.WriteLine("Away players subs complete");
 
                         #endregion
 
@@ -450,46 +486,48 @@ namespace CMS.Infrastructure.Entities
                     #endregion
 
                     #region Match Stats
-
-                    Stat stat = new Stat();
-                    stat.MatchId = match.Id;
-
-                    var matchStats = GetMatchStatsByAPIId(match.Id);
-
-                    if (matchStats != null)
-                        stat.Id = matchStats.Id;
-
-                    JObject obj = JObject.Parse(s);
-                    stat.HomeTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.corners.total").ToString());
-                    stat.HomeTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString());
-                    stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString();
-                    stat.HomeTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.saves.total").ToString());
-                    stat.HomeTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.ongoal").ToString());
-                    stat.HomeTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.total").ToString());
-                    stat.HomeTeamFouls = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.fouls.total").ToString());
-                    stat.HomeTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.redcards.total").ToString());
-                    stat.HomeTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.yellowcards.total").ToString());
-
-                    stat.AwayTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.corners.total").ToString());
-                    stat.AwayTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString());
-                    stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString();
-                    stat.AwayTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.saves.total").ToString());
-                    stat.AwayTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.ongoal").ToString());
-                    stat.AwayTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.total").ToString());
-                    stat.AwayTeamFouls = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.fouls.total").ToString());
-                    stat.AwayTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.redcards.total").ToString());
-                    stat.AwayTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.yellowcards.total").ToString());
-
                     try
                     {
+                        Stat stat = new Stat();
+                        stat.MatchId = match.Id;
+
+                        var matchStats = GetMatchStatsByAPIId(match.Id);
+
+                        if (matchStats != null)
+                            stat.Id = matchStats.Id;
+
+                        JObject obj = JObject.Parse(s);                  
+
+                        stat.HomeTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.corners.total").ToString());
+                        stat.HomeTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString());
+                        stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString();
+                        stat.HomeTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.saves.total").ToString());
+                        stat.HomeTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.ongoal").ToString());
+                        stat.HomeTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.total").ToString());
+                        stat.HomeTeamFouls = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.fouls.total").ToString());
+                        stat.HomeTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.redcards.total").ToString());
+                        stat.HomeTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.yellowcards.total").ToString());
+
+                        stat.AwayTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.corners.total").ToString());
+                        stat.AwayTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString());
+                        stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString();
+                        stat.AwayTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.saves.total").ToString());
+                        stat.AwayTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.ongoal").ToString());
+                        stat.AwayTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.total").ToString());
+                        stat.AwayTeamFouls = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.fouls.total").ToString());
+                        stat.AwayTeamRedCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.redcards.total").ToString());
+                        stat.AwayTeamYellowCards = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.yellowcards.total").ToString());
+   
                         SaveMatchStats(stat);
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+
+                        SaveException(ex, string.Format("SaveMatchStats, MatchId: ", match.Id.ToString()));
                     }                            
 
-                    System.Diagnostics.Debug.WriteLine("Match stats complete");
+                    //System.Diagnostics.Debug.WriteLine("Match stats complete");
 
                     #endregion
 
@@ -540,13 +578,14 @@ namespace CMS.Infrastructure.Entities
                                 }
                                 catch (Exception ex)
                                 {
-                                    System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    SaveException(ex, string.Format("SavePlayerStats - Home, PlayerAPIId: ", player.APIPlayerId.ToString()));
                                 }
                             }                       
                         }
                     }
 
-                    System.Diagnostics.Debug.WriteLine("Home player stats complete");
+                    //System.Diagnostics.Debug.WriteLine("Home player stats complete");
 
                     #endregion
 
@@ -594,13 +633,14 @@ namespace CMS.Infrastructure.Entities
                                 }
                                 catch (Exception ex)
                                 {
-                                    System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    SaveException(ex, string.Format("SavePlayerStats - Away, PlayerAPIId: ", player.APIPlayerId.ToString()));
                                 }
                             }                          
                         }
                     }
 
-                    System.Diagnostics.Debug.WriteLine("Away players stats complete");
+                    //System.Diagnostics.Debug.WriteLine("Away players stats complete");
 
                     #endregion
 
@@ -621,58 +661,59 @@ namespace CMS.Infrastructure.Entities
 
                         foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
                         {
-                            string id = evt["id"];
-                            int eventId;
-
-                            bool result = Int32.TryParse(id, out eventId);
-
-                            //Check if player exists                           
-                            if (!result)
-                                eventId = 0;
-
-                            if (eventId <= lastUpdateId)
-                            {
-                                break;
-                            }
-
-                            Event commEvent = new Event();
-
-                            string important = evt["important"];
-                            string isgoal = evt["isgoal"];
-                            string minute = evt["minute"];
-
-                            if (minute.Contains('\''))
-                            {
-                                minute = minute.Remove(minute.Length - 1, 1);
-                            }
-
-                            string comment = evt["comment"];
-
-                            commEvent.Important = important == "True" ? true : false;
-                            commEvent.Goal = isgoal == "True" ? true : false;
-
-                            if (!string.IsNullOrWhiteSpace(minute))
-                                commEvent.Minute = Convert.ToByte(minute);
-
-                            commEvent.Comment = comment;
-                            commEvent.APIId = eventId;
-                            commEvent.MatchId = match.Id;
-                            commEvent.Score = "";
-
-                            //Todo - set match rating for both teams
-
                             try
                             {
+                                string id = evt["id"];
+                                int eventId;
+
+                                bool result = Int32.TryParse(id, out eventId);
+
+                                //Check if player exists                           
+                                if (!result)
+                                    eventId = 0;
+
+                                if (eventId <= lastUpdateId)
+                                {
+                                    break;
+                                }
+
+                                Event commEvent = new Event();
+
+                                string important = evt["important"];
+                                string isgoal = evt["isgoal"];
+                                string minute = evt["minute"];
+
+                                if (minute.Contains('\''))
+                                {
+                                    minute = minute.Remove(minute.Length - 1, 1);
+                                }
+
+                                string comment = evt["comment"];
+
+                                commEvent.Important = important == "True" ? true : false;
+                                commEvent.Goal = isgoal == "True" ? true : false;
+
+                                if (!string.IsNullOrWhiteSpace(minute))
+                                    commEvent.Minute = Convert.ToByte(minute);
+
+                                commEvent.Comment = comment;
+                                commEvent.APIId = eventId;
+                                commEvent.MatchId = match.Id;
+                                commEvent.Score = "";
+
+                                //Todo - set match rating for both teams
+
                                 SaveEvent(commEvent);
                             }
                             catch (Exception ex)
                             {
-                                System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                SaveException(ex, string.Format("SaveEvent, MatchId: ", match.Id.ToString()));
                             }                                   
                         }
                     }
 
-                    System.Diagnostics.Debug.WriteLine("Events complete");
+                    //System.Diagnostics.Debug.WriteLine("Events complete");
                     #endregion
                 }
                 else
@@ -922,7 +963,7 @@ namespace CMS.Infrastructure.Entities
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(string.Format("SavePlayerStats: {0}, Message: {1}, Player Id: {2}", e.InnerException, e.Message, updatedRecord.APIId));
+                    //System.Diagnostics.Debug.WriteLine(string.Format("SavePlayerStats: {0}, Message: {1}, Player Id: {2}", e.InnerException, e.Message, updatedRecord.APIId));
                             
                     return string.Format("Error: {0}", e.InnerException.ToString());
                 }
@@ -1089,6 +1130,34 @@ namespace CMS.Infrastructure.Entities
                     return string.Format("Error: {0}", e.InnerException.ToString());
                 }
             } 
+        }
+
+        private static void SaveException(Exception exception, string additionalInfo)
+        {
+            SiteException record = new SiteException();
+
+             using (EFDbContext context = new EFDbContext())
+            {
+                if (exception != null)
+                {
+                    //Create record
+                    record.HResult = exception.HResult.ToString();
+                    record.InnerException = exception.InnerException.ToString();
+                    record.Message = exception.Message;
+                    record.Source = exception.Source;
+                    record.StackTrace = string.Format("Additional Info: {0}, Stack Trace: {1}", additionalInfo, exception.StackTrace);
+                    record.TargetSite = exception.TargetSite.ToString();
+                    record.DateAdded = DateTime.Now;
+
+                    context.SiteException.Add(record);
+                }
+               
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch { }
+             }
         }
               
         #endregion

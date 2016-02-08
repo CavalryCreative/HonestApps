@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using System.Net;
 using Microsoft.AspNet.SignalR;
 using CMS.Infrastructure.Entities;
 using CMS.Infrastructure.Concrete;
@@ -27,6 +28,18 @@ namespace CMS
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+
+            EFSiteException efSiteException = new EFSiteException();
+            SiteException siteException = new SiteException();
+
+            siteException.HResult = string.Empty;
+            siteException.InnerException = "Application started";
+            siteException.Message = string.Format("Started: {0}", DateTime.Now.ToString());
+            siteException.Source = string.Empty;
+            siteException.TargetSite = string.Empty;
+
+            efSiteException.Save(siteException);
 
             //HangfireBootstrapper.Instance.Start();
         }
@@ -84,7 +97,33 @@ namespace CMS
 
         protected void Application_End(object sender, EventArgs e)
         {
+            EFSiteException efSiteException = new EFSiteException();
+            SiteException siteException = new SiteException();
+
+            siteException.HResult = string.Empty;
+            siteException.InnerException = "Application ended";            
+            siteException.Message = string.Format("Ended: {0}", DateTime.Now.ToString());
+            siteException.Source = string.Empty;
+            siteException.TargetSite = string.Empty;
+
+            efSiteException.Save(siteException);
+
+            PingServer();
+
             //HangfireBootstrapper.Instance.Stop();
+        }
+
+        private void PingServer()
+        {
+            try
+            {
+                WebClient http = new WebClient();
+                string Result = http.DownloadString("http://honest-apps.elasticbeanstalk.com/");
+            }
+            catch (Exception ex)
+            {
+                string Message = ex.Message;
+            }
         }
     }
 }

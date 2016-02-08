@@ -30,7 +30,7 @@ namespace CMS.Infrastructure.Concrete
                 record.TargetSite = exception.TargetSite;
                 record.DateAdded = DateTime.Now;
 
-                //context.SiteExceptions.Add(record);
+                context.SiteException.Add(record);
 
                 isNewRecord = true;
             }

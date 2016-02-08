@@ -117,45 +117,57 @@ namespace FeedData
 
                         if (matchDetailsAdded == false)
                         {
-                            Match match = new Match();
+                            int matchAPIId = -1;
 
-                            match.APIId = item.APIId;
-                            match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
-                            match.EndDate = match.Date.Value.AddHours(2);
-                            match.Active = DateTime.Now <= match.EndDate ? true : false;
-                            match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-                            //change this when live
-                            //match.IsLive = true;
-                            match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
-                            match.Time = item.Time;
-
-                            if (match.IsLive)
-                                matchesToday.Add(match.APIId, match.Time);
-
-                            var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
-                            var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
-
-                            if (homeTeam != null)
+                            try
                             {
-                                //match.HomeTeamId = homeTeam.Id;
-                                match.Stadium = homeTeam.Stadium;
-                            }
+                                Match match = new Match();
 
-                            if (awayTeam != null)
-                                //match.AwayTeamId = awayTeam.Id;
+                                match.APIId = item.APIId;
+                                match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
+                                match.EndDate = match.Date.Value.AddHours(2);
+                                match.Active = DateTime.Now <= match.EndDate ? true : false;
+                                match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
+                                //change this when live
+                                //match.IsLive = true;
+                                match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
+                                match.Time = item.Time;
+
+                                if (match.IsLive)
+                                    matchesToday.Add(match.APIId, match.Time);
+
+                                var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
+                                var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
+
+                                if (homeTeam != null)
+                                {
+                                    //match.HomeTeamId = homeTeam.Id;
+                                    match.Stadium = homeTeam.Stadium;
+                                }
+
+                                if (awayTeam != null)
+                                    //match.AwayTeamId = awayTeam.Id;
 
                                 match.HomeTeamAPIId = item.HomeTeamAPIId;
-                            match.AwayTeamAPIId = item.AwayTeamAPIId;
+                                match.AwayTeamAPIId = item.AwayTeamAPIId;
 
-                            SaveMatch(match);
+                                SaveMatch(match);
 
-                            UpdateHistory history = new UpdateHistory();
+                                UpdateHistory history = new UpdateHistory();
 
-                            history.MatchAPIId = match.APIId;
-                            history.MatchDetails = true;
-                            history.Id = System.Guid.Empty;
+                                history.MatchAPIId = match.APIId;
+                                history.MatchDetails = true;
+                                history.Id = System.Guid.Empty;
 
-                            SaveUpdateHistory(history);
+                                SaveUpdateHistory(history);
+
+                                matchAPIId = match.APIId;
+                            }
+                            catch (Exception ex)
+                            {
+                                //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                SaveException(ex, string.Format("SaveMatch - FeedData, MatchAPIId: {0}", matchAPIId.ToString()));
+                            }                                   
                         }
                         else
                         {
@@ -363,6 +375,32 @@ namespace FeedData
             {
                 return string.Format("Error: {0}", e.InnerException.ToString());
             }
+        }
+
+        private static void SaveException(Exception exception, string additionalInfo)
+        {
+            SiteException record = new SiteException();
+            HonestAppsEntities context = new HonestAppsEntities();
+      
+                if (exception != null)
+                {
+                    //Create record
+                    record.HResult = exception.HResult.ToString();
+                    record.InnerException = exception.InnerException.ToString();
+                    record.Message = exception.Message;
+                    record.Source = exception.Source;
+                    record.StackTrace = string.Format("Additional Info: {0}, Stack Trace: {1}", additionalInfo, exception.StackTrace);
+                    record.TargetSite = exception.TargetSite.ToString();
+                    record.DateAdded = DateTime.Now;
+
+                    context.SiteExceptions.Add(record);
+                }
+
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch { }
         }
 
         #endregion
