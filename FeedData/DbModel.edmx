@@ -4,7 +4,16 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="honestappsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="honestappsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BroadcastFeeds">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Message" Type="varchar" MaxLength="500" />
+          <Property Name="IPAddress" Type="varchar" MaxLength="100" />
+          <Property Name="DateAdded" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="Cards">
           <Key>
             <PropertyRef Name="Id" />
@@ -24,6 +33,16 @@
           <Property Name="Discriminator" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Summary_Id" Type="uniqueidentifier" />
           <Property Name="Summary_Id1" Type="uniqueidentifier" />
+        </EntityType>
+        <EntityType Name="Comments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Text" Type="varchar" MaxLength="500" />
+          <Property Name="MatchRating" Type="tinyint" Nullable="false" />
+          <Property Name="TeamComment" Type="bit" Nullable="false" />
+          <Property Name="PlayerComment" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Events">
           <Key>
@@ -514,7 +533,9 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="honestappsModelStoreContainer">
+          <EntitySet Name="BroadcastFeeds" EntityType="Self.BroadcastFeeds" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Cards" EntityType="Self.Cards" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Comments" EntityType="Self.Comments" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Events" EntityType="Self.Events" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Goals" EntityType="Self.Goals" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Lineups" EntityType="Self.Lineups" Schema="dbo" store:Type="Tables" />
@@ -595,8 +616,7 @@
             <End Role="TeamPlayers" EntitySet="TeamPlayers" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="honestappsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -1182,7 +1202,28 @@
             <End Role="Players" EntitySet="Players" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
+          <EntitySet Name="BroadcastFeeds" EntityType="honestappsModel.BroadcastFeed" />
+          <EntitySet Name="Comments" EntityType="honestappsModel.Comment" />
         </EntityContainer>
+        <EntityType Name="BroadcastFeed">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Message" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="IPAddress" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DateAdded" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="Text" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="MatchRating" Type="Byte" Nullable="false" />
+          <Property Name="TeamComment" Type="Boolean" Nullable="false" />
+          <Property Name="PlayerComment" Type="Boolean" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1500,6 +1541,27 @@
               <ScalarProperty Name="Id" ColumnName="Team_Id" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="BroadcastFeeds">
+            <EntityTypeMapping TypeName="honestappsModel.BroadcastFeed">
+              <MappingFragment StoreEntitySet="BroadcastFeeds">
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comments">
+            <EntityTypeMapping TypeName="honestappsModel.Comment">
+              <MappingFragment StoreEntitySet="Comments">
+                <ScalarProperty Name="PlayerComment" ColumnName="PlayerComment" />
+                <ScalarProperty Name="TeamComment" ColumnName="TeamComment" />
+                <ScalarProperty Name="MatchRating" ColumnName="MatchRating" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

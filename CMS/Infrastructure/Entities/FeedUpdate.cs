@@ -32,6 +32,7 @@ namespace CMS.Infrastructure.Entities
        
         //private Timer matchTimer;
         private Timer eventsTimer;
+        string IPAddress = string.Empty;
 
         private FeedUpdate(IHubConnectionContext<dynamic> clients)
         {
@@ -39,7 +40,7 @@ namespace CMS.Infrastructure.Entities
 
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));  //TODO - change to 2 minutes    120000   
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120)); 
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -69,8 +70,7 @@ namespace CMS.Infrastructure.Entities
             GetAllCommentaries();
             BroadcastFeed();
 
-            Exception ex = new Exception();
-            SaveException(ex, "Broadcast feed");
+            SaveBroadcastFeed("", GetIPAddress());
         }
         
         public void BroadcastFeed()
@@ -149,7 +149,6 @@ namespace CMS.Infrastructure.Entities
 
                     #region Lineups
 
-                    //TODO - create Player stats record for each player
                     if (lineupsAdded == false)
                     {
                         #region Home Team
@@ -699,7 +698,9 @@ namespace CMS.Infrastructure.Entities
                                 commEvent.Comment = comment;
                                 commEvent.APIId = eventId;
                                 commEvent.MatchId = match.Id;
-                                commEvent.Score = "";
+                                commEvent.Score = GetMatchScore(match.APIId, homeTeam.Name, awayTeam.Name);
+                                commEvent.HomeTeamMatchRating = GetMatchRating(match.HomeTeamAPIId);
+                                commEvent.AwayTeamMatchRating = GetMatchRating(match.AwayTeamAPIId);
 
                                 //Todo - set match rating for both teams
 
@@ -752,13 +753,13 @@ namespace CMS.Infrastructure.Entities
 
                     //TODO - generate home/away comment based on match rating
                     feedEvent.EventComment = evt.Comment;
-                    feedEvent.Score = "1-0";//TODO - return score from event
+                    feedEvent.Score = evt.Score;//TODO - return score from event
                     feedEvent.Minute = evt.Minute;
                     feedEvent.EventAPIId = evt.APIId;
                     feedEvent.MatchAPIId = matchDetails.APIId;
-                    feedEvent.HomeComment = "Test";
+                    feedEvent.HomeComment = GetComment(matchDetails.HomeTeamAPIId, evt.Comment, evt.HomeTeamMatchRating);
                     feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
-                    feedEvent.AwayComment = "Test";
+                    feedEvent.AwayComment = GetComment(matchDetails.AwayTeamAPIId, evt.Comment, evt.AwayTeamMatchRating);
                     feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
                     feed.Events.Add(feedEvent);
@@ -1136,7 +1137,7 @@ namespace CMS.Infrastructure.Entities
         {
             SiteException record = new SiteException();
 
-             using (EFDbContext context = new EFDbContext())
+            using (EFDbContext context = new EFDbContext())
             {
                 if (exception != null)
                 {
@@ -1151,6 +1152,27 @@ namespace CMS.Infrastructure.Entities
 
                     context.SiteException.Add(record);
                 }
+
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch { }
+            }
+        }
+
+        private static void SaveBroadcastFeed(string message, string ipAddress)
+        {
+            BroadcastFeed record = new BroadcastFeed();
+
+             using (EFDbContext context = new EFDbContext())
+            {
+                 //Create record
+                 record.Message = message;
+                 record.IPAddress = ipAddress;
+                 record.DateAdded = DateTime.Now;
+
+                 context.BroadcastFeed.Add(record);
                
                 try
                 {
@@ -1288,6 +1310,50 @@ namespace CMS.Infrastructure.Entities
             }
 
             return matchesToday;
+        }
+
+        private static byte GetMatchRating(int teamAPIId)
+        {
+            byte ret = 0;
+
+            return ret;
+        }
+
+        private static string GetMatchScore(int matchAPIId, string homeTeam, string awayTeam)
+        {
+            string score = string.Empty;
+
+            score = string.Format("{0} {1}", homeTeam, awayTeam);
+
+            return score;
+        }
+
+        private static string GetComment(int teamAPIId, string feedComment, byte matchRating)
+        {
+            string comment = string.Empty;
+
+            //
+            //score = string.Format("{0} {1}", homeTeam, awayTeam);
+
+            return comment;
+        }
+        
+        public string GetIPAddress()
+        {
+            IPHostEntry Host = default(IPHostEntry);
+            string Hostname = null;
+            Hostname = System.Environment.MachineName;
+            Host = Dns.GetHostEntry(Hostname);
+
+            foreach (IPAddress IP in Host.AddressList)
+            {
+                if (IP.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    IPAddress = Convert.ToString(IP);
+                }
+            }
+
+            return IPAddress;
         }
 
         #endregion

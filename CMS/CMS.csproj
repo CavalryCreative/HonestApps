@@ -231,6 +231,18 @@
     <Compile Include="EntitiesMigrations\201602051706215_AddSiteException.Designer.cs">
       <DependentUpon>201602051706215_AddSiteException.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201602081541060_AddBroadcastFeed.cs" />
+    <Compile Include="EntitiesMigrations\201602081541060_AddBroadcastFeed.Designer.cs">
+      <DependentUpon>201602081541060_AddBroadcastFeed.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201602081706331_AddComment.cs" />
+    <Compile Include="EntitiesMigrations\201602081706331_AddComment.Designer.cs">
+      <DependentUpon>201602081706331_AddComment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201602081712438_UpdateComment.cs" />
+    <Compile Include="EntitiesMigrations\201602081712438_UpdateComment.Designer.cs">
+      <DependentUpon>201602081712438_UpdateComment.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -263,8 +275,10 @@
     <Compile Include="Infrastructure\Concrete\EFTeam.cs" />
     <Compile Include="Infrastructure\Concrete\EFUpdateHistory.cs" />
     <Compile Include="Infrastructure\Concrete\EFYellowCard.cs" />
+    <Compile Include="Infrastructure\Entities\BroadcastFeed.cs" />
     <Compile Include="Infrastructure\Entities\Card.cs" />
     <Compile Include="Infrastructure\Entities\CMSBase.cs" />
+    <Compile Include="Infrastructure\Entities\Comment.cs" />
     <Compile Include="Infrastructure\Entities\Event.cs" />
     <Compile Include="Infrastructure\Entities\Feed.cs" />
     <Compile Include="FeedHub.cs" />
@@ -383,6 +397,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201602051706215_AddSiteException.resx">
       <DependentUpon>201602051706215_AddSiteException.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602081541060_AddBroadcastFeed.resx">
+      <DependentUpon>201602081541060_AddBroadcastFeed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602081706331_AddComment.resx">
+      <DependentUpon>201602081706331_AddComment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602081712438_UpdateComment.resx">
+      <DependentUpon>201602081712438_UpdateComment.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

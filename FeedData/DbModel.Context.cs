@@ -40,5 +40,7 @@ namespace FeedData
         public virtual DbSet<Summary> Summaries { get; set; }
         public virtual DbSet<Team> Teams { get; set; }
         public virtual DbSet<UpdateHistory> UpdateHistories { get; set; }
+        public virtual DbSet<BroadcastFeed> BroadcastFeeds { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
     }
 }

@@ -28,6 +28,8 @@ namespace CMS.Infrastructure.Concrete
             public DbSet<UpdateHistory> UpdateHistory { get; set; }
             public DbSet<MatchesToday> MatchesToday { get; set; }
             public DbSet<SiteException> SiteException { get; set; }
+            public DbSet<BroadcastFeed> BroadcastFeed { get; set; }
+            public DbSet<Comment> Comment { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
@@ -40,6 +42,8 @@ namespace CMS.Infrastructure.Concrete
                 modelBuilder.Configurations.Add(new SubstitutionMap());
                 modelBuilder.Configurations.Add(new MatchesTodayMap());
                 modelBuilder.Configurations.Add(new SiteExceptionMap());
+                modelBuilder.Configurations.Add(new BroadcastFeedMap());
+                modelBuilder.Configurations.Add(new CommentMap());
             }
         }
 
@@ -138,6 +142,23 @@ namespace CMS.Infrastructure.Concrete
                 Property(p => p.Source).HasMaxLength(250).IsUnicode(false);
                 Property(p => p.StackTrace).IsUnicode(false);
                 Property(p => p.TargetSite).HasMaxLength(250).IsUnicode(false);
+            }
+        }
+
+        public class BroadcastFeedMap : EntityTypeConfiguration<BroadcastFeed>
+        {
+            public BroadcastFeedMap()
+            {
+                Property(p => p.Message).HasMaxLength(500).IsUnicode(false);
+                Property(p => p.IPAddress).HasMaxLength(100).IsUnicode(false);
+            }
+        }
+
+        public class CommentMap : EntityTypeConfiguration<Comment>
+        {
+            public CommentMap()
+            {
+                Property(p => p.Text).HasMaxLength(500).IsUnicode(false);
             }
         }
 }
