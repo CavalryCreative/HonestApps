@@ -67,7 +67,7 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
-            GetAllCommentaries();
+            //GetAllCommentaries(); TODO - uncomment
             BroadcastFeed();
 
             SaveBroadcastFeed("", GetIPAddress());
@@ -856,8 +856,6 @@ namespace CMS.Infrastructure.Entities
                                 commEvent.HomeTeamMatchRating = GetMatchRating(match.HomeTeamAPIId);
                                 commEvent.AwayTeamMatchRating = GetMatchRating(match.AwayTeamAPIId);
 
-                                //Todo - set match rating for both teams
-
                                 SaveEvent(commEvent);
                             }
                             catch (Exception ex)
@@ -907,13 +905,13 @@ namespace CMS.Infrastructure.Entities
 
                     //TODO - generate home/away comment based on match rating
                     feedEvent.EventComment = evt.Comment;
-                    feedEvent.Score = evt.Score;//TODO - return score from event
+                    feedEvent.Score = evt.Score;
                     feedEvent.Minute = evt.Minute;
                     feedEvent.EventAPIId = evt.APIId;
                     feedEvent.MatchAPIId = matchDetails.APIId;
-                    feedEvent.HomeComment = GetComment(matchDetails.HomeTeamAPIId, evt.Comment, evt.HomeTeamMatchRating);
+                    feedEvent.HomeComment = GetComment(matchDetails.Id, matchDetails.HomeTeamAPIId, evt.Comment, evt.HomeTeamMatchRating);
                     feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
-                    feedEvent.AwayComment = GetComment(matchDetails.AwayTeamAPIId, evt.Comment, evt.AwayTeamMatchRating);
+                    feedEvent.AwayComment = GetComment(matchDetails.Id, matchDetails.AwayTeamAPIId, evt.Comment, evt.AwayTeamMatchRating);
                     feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
                     feed.Events.Add(feedEvent);
@@ -1443,6 +1441,18 @@ namespace CMS.Infrastructure.Entities
             return player;
         }
 
+        private static PlayerStat GetPlayerStatsByIdAndMatch(Guid Id, Guid matchId)
+        {
+            PlayerStat playerStat = new PlayerStat();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                playerStat = context.PlayerStats.Where(x => (x.Id == Id) && (x.MatchId == matchId)).FirstOrDefault();
+            }
+
+            return playerStat;
+        }
+        
         private static Team GetTeamByAPIId(int id)
         {
             Team team = new Team();
@@ -1457,6 +1467,7 @@ namespace CMS.Infrastructure.Entities
 
         private static Summary GetSummaryByMatchId(Guid id)
         {
+            //TODO - add summaries to already added matches
             Summary summary = new Summary();
 
             using (EFDbContext context = new EFDbContext())
@@ -1535,9 +1546,53 @@ namespace CMS.Infrastructure.Entities
 
         private static byte GetMatchRating(int teamAPIId)
         {
+            //Todo - set match rating for both teams
+
             byte ret = 0;
 
+            //Return match stats, score
+
             return ret;
+        }
+
+        private static byte GetPlayerRating(string playerName, Guid matchId)
+        {
+            //Todo - set player rating
+            Player player = new Player();
+            byte playerRating = 0;
+
+            if (!string.IsNullOrWhiteSpace(playerName))
+            {
+                player = GetPlayerByName(playerName);
+
+                var playerStat = GetPlayerStatsByIdAndMatch(player.Id, matchId);
+
+                if (playerStat != null)
+                {
+                    switch (player.Position)
+                    {
+                        case "G":
+
+                            break;
+                        case "D":
+
+                            break;
+                        case "M":
+
+                            break;
+                        case "F":
+
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            //Return match stats, score
+
+            return playerRating;
         }
 
         private static string GetMatchScore(Guid matchId, string homeTeam, string awayTeam)
@@ -1562,16 +1617,122 @@ namespace CMS.Infrastructure.Entities
             return score;
         }
 
-        private static string GetComment(int teamAPIId, string feedComment, byte matchRating)
+        private static string GetComment(Guid matchId, int teamAPIId, string feedComment, byte matchRating)
         {
             string comment = string.Empty;
+            string playerName = string.Empty;
+            string teamName = string.Empty;
+            byte playerRating = 0;
 
-            //
-            //score = string.Format("{0} {1}", homeTeam, awayTeam);
+            var team = GetTeamByAPIId(teamAPIId);
+
+           if (feedComment.StartsWith("Attempt blocked."))
+           {
+               feedComment = feedComment.Replace("Attempt blocked.", "").Trim();
+
+               GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
+
+               playerRating = GetPlayerRating(playerName, matchId);
+           }
+           else if (feedComment.StartsWith("Attempt missed."))
+           {
+               feedComment = feedComment.Replace("Attempt missed.", "").Trim();
+
+               GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
+           }
+            else if (feedComment.StartsWith("Attempt saved."))
+            {
+                feedComment = feedComment.Replace("Attempt saved.", "").Trim();
+
+                GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
+            }
+            else if (feedComment.Contains("is shown the yellow card."))
+            {
+
+            }
+            else if (feedComment.Contains("is shown the red card."))
+            {
+
+            }
+            else if (feedComment.StartsWith("Corner, Team. Conceded by"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Delay in match"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Delay over"))
+            {
+
+            }
+            else if (feedComment.StartsWith("First Half begins."))
+            {
+
+            }
+            else if (feedComment.StartsWith("First Half ends"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Foul by"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Goal!"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Lineups announced"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Offside"))
+            {
+
+            }
+            else if (feedComment.Contains("hits the bar"))
+            {
+
+            }
+            else if (feedComment.Contains("hits the post"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Second half begins."))
+            {
+
+            }
+            else if (feedComment.StartsWith("Substitution"))
+            {
+
+            }
+            else if (feedComment.StartsWith("Hand ball by"))
+            {
+
+            }
+           else if (feedComment.Contains("wins a free kick"))
+           {
+
+           }
+           else
+           {
+
+           }
 
             return comment;
         }
         
+        private static void GetPlayerAndTeamFromComment(string comment, out string player, out string team)
+        {
+            var arr = comment.Split('(');
+
+            player = arr[0];
+
+            var arr2 = arr[1].Split(')');
+
+            team = arr2[0];
+        }
+
         public string GetIPAddress()
         {
             IPHostEntry Host = default(IPHostEntry);
@@ -1611,5 +1772,13 @@ namespace CMS.Infrastructure.Entities
         }
 
         #endregion
+    }
+
+    public enum CommentType
+    {
+        Team = 1,        
+        Player = 2,
+        Game = 3,
+        Rivals = 4
     }
 }

@@ -14,6 +14,7 @@ namespace CMS.Infrastructure.Entities
         public Guid Id { get; set; }
         public string Text { get; set; }
         public byte MatchRating { get; set; }
+        public byte PlayerRating { get; set; }
         public bool TeamComment { get; set; }
         public bool PlayerComment { get; set; }
     }
