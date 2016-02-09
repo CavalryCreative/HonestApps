@@ -1146,6 +1146,7 @@ namespace CMS.Infrastructure.Entities
                     //recordToUpdate.Match = updatedRecord.Match;
                     recordToUpdate.MatchId = updatedRecord.MatchId;
                     recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+                    recordToUpdate.Rating = updatedRecord.Rating;
 
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                     Id = updatedRecord.Id;
@@ -1566,31 +1567,73 @@ namespace CMS.Infrastructure.Entities
                 player = GetPlayerByName(playerName);
 
                 var playerStat = GetPlayerStatsByIdAndMatch(player.Id, matchId);
-
+                
                 if (playerStat != null)
                 {
+                    decimal calcRating = playerStat.Rating;
+
                     switch (player.Position)
                     {
                         case "G":
-
+                            //saves +0.2
+                            //goals conceeded -0.4
+                            //fouls committed -0.1
+                            //yellow cards -0.3
+                            //red card -1
+                            //penalties saved +0.3
                             break;
                         case "D":
-
+                            //goals conceeded -0.4
+                            //fouls committed -0.1
+                            //fouls drawn +0.1
+                            //yellow cards  -0.3
+                            //red card -1
+                            //penalties scored +0.5
+                            //penalties missed -0.3
+                            //goals scored +0.5
+                            //assists +0.3
                             break;
                         case "M":
-
+                            //goals conceeded -0.2
+                            //fouls committed -0.1
+                            //fouls drawn +0.1
+                            //yellow cards  -0.3
+                            //red card -1
+                            //penalties scored +0.5
+                            //penalties missed -0.3
+                            //goals scored +0.5
+                            //assists +0.3
+                            //total shots +/-
+                            //shots on goal +/-
+                            //If total shots > 2
+                            //0-25% = -0.3, 25-50% = -0.1, 50-75% = +0.1, 75-100% = +0.3
+                            //offsides -0.1
                             break;
                         case "F":
-
+                            //goals conceeded -0.1
+                            //fouls committed -0.1
+                            //fouls drawn +0.1
+                            //yellow cards  -0.3
+                            //red card -1
+                            //penalties scored +0.5
+                            //penalties missed -0.3
+                            //assists +0.3
+                            //goals scored +0.5
+                            //total shots +/-
+                            //shots on goal +/-
+                            //If total shots > 2
+                            //0-25% = -0.5, 25-50% = -0.25, 50-75% = +0.25, 75-100% = +0.5
+                            //offsides -0.1
                             break;
 
                         default:
                             break;
                     }
+
+                    //update playerstat object with updated rating
+                    SavePlayerStats(playerStat);
                 }
             }
-
-            //Return match stats, score
 
             return playerRating;
         }
@@ -1619,6 +1662,7 @@ namespace CMS.Infrastructure.Entities
 
         private static string GetComment(Guid matchId, int teamAPIId, string feedComment, byte matchRating)
         {
+            //TODO - set inital default value of player rating to 3
             string comment = string.Empty;
             string playerName = string.Empty;
             string teamName = string.Empty;
@@ -1626,7 +1670,7 @@ namespace CMS.Infrastructure.Entities
 
             var team = GetTeamByAPIId(teamAPIId);
 
-           if (feedComment.StartsWith("Attempt blocked."))
+           if (feedComment.StartsWith("Attempt blocked."))//Player
            {
                feedComment = feedComment.Replace("Attempt blocked.", "").Trim();
 
@@ -1634,87 +1678,88 @@ namespace CMS.Infrastructure.Entities
 
                playerRating = GetPlayerRating(playerName, matchId);
            }
-           else if (feedComment.StartsWith("Attempt missed."))
+           else if (feedComment.StartsWith("Attempt missed."))//Player
            {
+               //TODO - distinguish between different misses
                feedComment = feedComment.Replace("Attempt missed.", "").Trim();
 
                GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
            }
-            else if (feedComment.StartsWith("Attempt saved."))
+            else if (feedComment.StartsWith("Attempt saved."))//Player attacker/GK
             {
                 feedComment = feedComment.Replace("Attempt saved.", "").Trim();
 
                 GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
             }
-            else if (feedComment.Contains("is shown the yellow card."))
+           else if (feedComment.Contains("is shown the yellow card."))//Player
             {
 
             }
-            else if (feedComment.Contains("is shown the red card."))
+           else if (feedComment.Contains("is shown the red card."))//Player
             {
 
             }
-            else if (feedComment.StartsWith("Corner, Team. Conceded by"))
+           else if (feedComment.StartsWith("Corner, Team. Conceded by"))//Player or Match
             {
 
             }
-            else if (feedComment.StartsWith("Delay in match"))
+            else if (feedComment.StartsWith("Delay in match"))//Match
             {
 
             }
-            else if (feedComment.StartsWith("Delay over"))
+           else if (feedComment.StartsWith("Delay over"))//Match
             {
 
             }
-            else if (feedComment.StartsWith("First Half begins."))
+           else if (feedComment.StartsWith("First Half begins."))//Match or team
             {
 
             }
-            else if (feedComment.StartsWith("First Half ends"))
+           else if (feedComment.StartsWith("First Half ends"))//Match
             {
 
             }
-            else if (feedComment.StartsWith("Foul by"))
+           else if (feedComment.StartsWith("Foul by"))//Player
             {
 
             }
-            else if (feedComment.StartsWith("Goal!"))
+           else if (feedComment.StartsWith("Goal!"))//Player or Match or team
             {
 
             }
-            else if (feedComment.StartsWith("Lineups announced"))
+           else if (feedComment.StartsWith("Lineups announced"))//Match or team
             {
 
             }
-            else if (feedComment.StartsWith("Offside"))
+           else if (feedComment.StartsWith("Offside"))//Player
             {
 
             }
-            else if (feedComment.Contains("hits the bar"))
+           else if (feedComment.Contains("hits the bar"))//Player
             {
 
             }
-            else if (feedComment.Contains("hits the post"))
+           else if (feedComment.Contains("hits the post"))//Player
             {
 
             }
-            else if (feedComment.StartsWith("Second half begins."))
+           else if (feedComment.StartsWith("Second half begins."))//Match
             {
 
             }
-            else if (feedComment.StartsWith("Substitution"))
+           else if (feedComment.StartsWith("Substitution"))//Player/Match/Team
             {
 
             }
-            else if (feedComment.StartsWith("Hand ball by"))
+            else if (feedComment.StartsWith("Hand ball by"))//Player
             {
 
             }
-           else if (feedComment.Contains("wins a free kick"))
+           else if (feedComment.Contains("wins a free kick"))//Player
            {
 
            }
-           else
+           else//Match/Team
            {
 
            }

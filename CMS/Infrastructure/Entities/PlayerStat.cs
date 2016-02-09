@@ -28,5 +28,6 @@ namespace CMS.Infrastructure.Entities
         public byte? PenaltiesScored { get; set; }
         public byte? PenaltiesMissed { get; set; }
         public int APIId { get; set; }
+        public byte Rating { get; set; }
     }
 }
