@@ -135,6 +135,7 @@ namespace CMS.Infrastructure.Entities
 
                     var homeTeam = GetTeamByAPIId(match.HomeTeamAPIId);
                     var awayTeam = GetTeamByAPIId(match.AwayTeamAPIId);
+                    var summary = GetSummaryByMatchId(match.Id);
 
                     string jPath = string.Empty;
 
@@ -484,6 +485,159 @@ namespace CMS.Infrastructure.Entities
 
                     #endregion
 
+                    #region Summaries
+
+                        #region HomeTeam - Goals
+
+                    jPath = "commentaries.[0].comm_match_summary.localteam.goals.player";
+
+                    var goals = token.SelectTokens(jPath);
+                    int APIId;
+                    Byte numberByte;
+                    bool isValid;
+
+                    foreach (var childToken in goals.Children())
+                    {
+                        var jeff = childToken.Children();
+
+                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            isValid = Int32.TryParse(evt["id"], out APIId);
+                      
+                            if (isValid)
+                            {
+                                //Check if goal exists
+                                Goal goalExists = new Goal();
+
+                                goalExists = GetGoalByAPIId(APIId);
+
+                                if (goalExists == null)
+                                {
+                                    Goal homeGoal = new Goal();
+
+                                    homeGoal.APIId = APIId;
+                                    homeGoal.SummaryId = summary.Id;
+                                    homeGoal.IsHomeTeam = true;
+                                    var player = GetPlayerByName(evt["name"]);
+
+                                    if (player != null)
+                                    {
+                                        homeGoal.PlayerName = player.Name;
+                                        homeGoal.APIPlayerId = player.APIPlayerId;
+                                    }
+                                    else
+                                    {
+                                        homeGoal.PlayerName = player.Name;
+                                        homeGoal.APIPlayerId = 0;
+                                    }
+
+                                    homeGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
+                                    homeGoal.Penalty = evt["penalty"] == "False" ? false : true;
+
+                                    string minute = evt["minute"];
+
+                                    if (homeGoal.Penalty == true)
+                                    {
+                                        minute = minute.Trim().Remove(0, 4);
+                                    }
+
+                                    isValid = Byte.TryParse(evt["minute"], out numberByte);
+
+                                    if (isValid)
+                                        homeGoal.Minute = numberByte;
+                                    else
+                                        homeGoal.Minute = 0;                                
+
+                                    try
+                                    {
+                                        retMsg = SaveGoal(homeGoal);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                        SaveException(ex, string.Format("HomeGoal, Match Id: {0} ", matchId.ToString()));
+                                    }
+                                }
+                            }
+                        }        
+                    }
+                        #endregion
+
+                        #region AwayTeam - Goals
+
+                    jPath = "commentaries.[0].comm_match_summary.visitorteam.goals.player";
+
+                    goals = token.SelectTokens(jPath);
+                    
+                    foreach (var childToken in goals.Children())
+                    {
+                        var jeff = childToken.Children();
+
+                        foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        {
+                            isValid = Int32.TryParse(evt["id"], out APIId);
+
+                            if (isValid)
+                            {
+                                //Check if goal exists
+                                Goal goalExists = new Goal();
+
+                                goalExists = GetGoalByAPIId(APIId);
+
+                                if (goalExists == null)
+                                {
+                                    Goal awayGoal = new Goal();
+
+                                    awayGoal.APIId = APIId;
+                                    awayGoal.SummaryId = summary.Id;
+                                    awayGoal.IsHomeTeam = false;
+                                    var player = GetPlayerByName(evt["name"]);
+
+                                    if (player != null)
+                                    {
+                                        awayGoal.PlayerName = player.Name;
+                                        awayGoal.APIPlayerId = player.APIPlayerId;
+                                    }
+                                    else
+                                    {
+                                        awayGoal.PlayerName = player.Name;
+                                        awayGoal.APIPlayerId = 0;
+                                    }
+
+                                    awayGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
+                                    awayGoal.Penalty = evt["penalty"] == "False" ? false : true;
+
+                                    string minute = evt["minute"];
+
+                                    if (awayGoal.Penalty == true)
+                                    {
+                                        minute = minute.Trim().Remove(0, 4);
+                                    }
+
+                                    isValid = Byte.TryParse(minute, out numberByte);
+
+                                    if (isValid)
+                                        awayGoal.Minute = numberByte;
+                                    else
+                                        awayGoal.Minute = 0;
+
+                                    try
+                                    {
+                                        retMsg = SaveGoal(awayGoal);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                        SaveException(ex, string.Format("HomeGoal, Match Id: {0} ", matchId.ToString()));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                        #endregion
+
+                    #endregion
+
                     #region Match Stats
                     try
                     {
@@ -698,7 +852,7 @@ namespace CMS.Infrastructure.Entities
                                 commEvent.Comment = comment;
                                 commEvent.APIId = eventId;
                                 commEvent.MatchId = match.Id;
-                                commEvent.Score = GetMatchScore(match.APIId, homeTeam.Name, awayTeam.Name);
+                                commEvent.Score = GetMatchScore(match.Id, homeTeam.Name, awayTeam.Name);
                                 commEvent.HomeTeamMatchRating = GetMatchRating(match.HomeTeamAPIId);
                                 commEvent.AwayTeamMatchRating = GetMatchRating(match.AwayTeamAPIId);
 
@@ -899,6 +1053,49 @@ namespace CMS.Infrastructure.Entities
                     return string.Format("Error: {0}", e.InnerException.ToString());
                 }
             }      
+        }
+
+        private static string SaveGoal(Goal updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                if (updatedRecord == null)
+                {
+                    return Res.Resources.RecordNull;
+                }
+
+                //Update record
+                var recordToUpdate = context.Goals.Where(x => x.APIId == updatedRecord.APIId).FirstOrDefault();
+
+                if (recordToUpdate != null)
+                {
+                    return Res.Resources.RecordFound;
+                }
+
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    context.Goals.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                
+                
+                try
+                {
+                    context.SaveChanges();
+
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }
         }
 
         private static string SavePlayerStats(PlayerStat updatedRecord)
@@ -1210,6 +1407,18 @@ namespace CMS.Infrastructure.Entities
             return hist;
         }
 
+        private static Goal GetGoalByAPIId(int id)
+        {
+            Goal goal = new Goal();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                goal = context.Goals.Where(x => (x.APIId == id)).FirstOrDefault();
+            }
+
+            return goal;
+        }
+
         private static Player GetPlayerByAPIId(int id)
         {
             Player player = new Player();
@@ -1244,6 +1453,18 @@ namespace CMS.Infrastructure.Entities
             }
 
             return team;
+        }
+
+        private static Summary GetSummaryByMatchId(Guid id)
+        {
+            Summary summary = new Summary();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                summary = context.Summaries.Where(x => (x.MatchId == id)).FirstOrDefault();
+            }
+
+            return summary;
         }
 
         private static Match GetMatchByAPIId(int id)
@@ -1319,11 +1540,24 @@ namespace CMS.Infrastructure.Entities
             return ret;
         }
 
-        private static string GetMatchScore(int matchAPIId, string homeTeam, string awayTeam)
+        private static string GetMatchScore(Guid matchId, string homeTeam, string awayTeam)
         {
             string score = string.Empty;
+            var summary = GetSummaryByMatchId(matchId);
 
-            score = string.Format("{0} {1}", homeTeam, awayTeam);
+            int homeGoals = 0;
+            int awayGoals = 0;
+
+            if (summary != null)
+            {
+                using (EFDbContext context = new EFDbContext())
+                {
+                    homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                    awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                }               
+            }
+
+            score = string.Format("{0} {1} - {2} {3}", homeTeam, homeGoals, awayGoals, awayTeam);
 
             return score;
         }

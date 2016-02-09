@@ -83,6 +83,7 @@
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+          <Property Name="APIId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Lineups">
           <Key>
@@ -683,6 +684,7 @@
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Summary" Relationship="Self.FK_dbo_Goals_dbo_Summaries_SummaryId" FromRole="Goals" ToRole="Summaries" />
+          <Property Name="APIId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Lineup">
           <Key>
@@ -1276,6 +1278,7 @@
           <EntitySetMapping Name="Goals">
             <EntityTypeMapping TypeName="honestappsModel.Goal">
               <MappingFragment StoreEntitySet="Goals">
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
                 <ScalarProperty Name="IsHomeTeam" ColumnName="IsHomeTeam" />

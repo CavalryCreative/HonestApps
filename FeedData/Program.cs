@@ -151,8 +151,28 @@ namespace FeedData
                                 match.HomeTeamAPIId = item.HomeTeamAPIId;
                                 match.AwayTeamAPIId = item.AwayTeamAPIId;
 
-                                SaveMatch(match);
+                                string Id;
+                                string actionMessage;
 
+                                retMsg = SaveMatch(match);
+
+                                ReturnId(retMsg, out actionMessage, out Id);
+
+                                if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                {
+                                    match.Id = new Guid(Id);
+                                }
+
+                                //Add summary
+                                Summary summary = new Summary();
+
+                                summary.MatchId = match.Id;
+                                summary.HomeTeam = homeTeam.Id;
+                                summary.AwayTeam = awayTeam.Id;
+
+                                SaveMatchSummary(summary);
+
+                                //Add update history
                                 UpdateHistory history = new UpdateHistory();
 
                                 history.MatchAPIId = match.APIId;
@@ -255,6 +275,38 @@ namespace FeedData
             {
                 return string.Format("Error: {0}", e.InnerException.ToString());
             }
+        }
+
+        private static string SaveMatchSummary(Summary updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+           HonestAppsEntities context = new HonestAppsEntities();
+
+                if (updatedRecord == null)
+                {
+                    return Res.Resources.NotFound;
+                }
+                //Create record
+                updatedRecord.Id = Guid.NewGuid();
+                updatedRecord.Active = true;
+                updatedRecord.Deleted = false;
+                updatedRecord.DateAdded = DateTime.Now;
+                updatedRecord.DateUpdated = DateTime.Now;
+
+                context.Summaries.Add(updatedRecord);
+                Id = updatedRecord.Id;
+
+                try
+                {
+                    context.SaveChanges();
+
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
         }
 
         private static string SaveUpdateHistory(UpdateHistory updatedRecord)
@@ -429,5 +481,23 @@ namespace FeedData
         }
 
         #endregion
+
+        private static void ReturnId(string retMessage, out string recordMessage, out string Id)
+        {
+            string[] message = retMessage.Split(':');
+
+            recordMessage = string.Empty;
+            Id = string.Empty;
+
+            if (message.Count() == 2)
+            {
+                recordMessage = message[0];
+                Id = message[1];
+            }
+            else
+            {
+                recordMessage = message[0];
+            }
+        }
     }
 }

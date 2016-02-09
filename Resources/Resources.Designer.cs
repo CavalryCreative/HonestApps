@@ -79,6 +79,24 @@ namespace Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Record found.
+        /// </summary>
+        public static string RecordFound {
+            get {
+                return ResourceManager.GetString("RecordFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Record null.
+        /// </summary>
+        public static string RecordNull {
+            get {
+                return ResourceManager.GetString("RecordNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Record updated.
         /// </summary>
         public static string RecordUpdated {

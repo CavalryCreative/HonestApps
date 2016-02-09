@@ -243,6 +243,10 @@
     <Compile Include="EntitiesMigrations\201602081712438_UpdateComment.Designer.cs">
       <DependentUpon>201602081712438_UpdateComment.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201602091116413_UpdateGoal.cs" />
+    <Compile Include="EntitiesMigrations\201602091116413_UpdateGoal.Designer.cs">
+      <DependentUpon>201602091116413_UpdateGoal.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -406,6 +410,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201602081712438_UpdateComment.resx">
       <DependentUpon>201602081712438_UpdateComment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602091116413_UpdateGoal.resx">
+      <DependentUpon>201602091116413_UpdateGoal.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

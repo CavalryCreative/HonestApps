@@ -11,6 +11,7 @@ namespace CMS.Infrastructure.Entities
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+        public int APIId { get; set; }
         public Guid SummaryId { get; set; }
         public bool IsHomeTeam { get; set; }
         public string PlayerName { get; set; }
