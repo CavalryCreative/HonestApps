@@ -1770,53 +1770,17 @@ namespace CMS.Infrastructure.Entities
             //TODO - set inital default value of player rating to 3
             homeTeamComment = string.Empty;
             awayTeamComment = string.Empty;
-            string comment = string.Empty;
-            string playerName = string.Empty;
-            string teamName = string.Empty;
-            byte playerRating = 0;
-
-            var summary = GetSummaryByMatchId(matchId);
-
-            int homeGoals = 0;
-            int awayGoals = 0;
-            byte goalsConceeded = 0;
-
-            if (summary != null)
-            {
-                using (EFDbContext context = new EFDbContext())
-                {
-                    homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
-                    awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
-                }
-            }
-
-            //goalsConceeded = isHomeTeam == true ? (byte)homeGoals : (byte)awayGoals;
-
-            var homeTeam = GetTeamByAPIId(homeTeamAPIId);
-            var awayTeam = GetTeamByAPIId(awayTeamAPIId);
-
+           
            if (feedComment.StartsWith("Attempt blocked."))//Player
            {
                feedComment = feedComment.Replace("Attempt blocked.", "").Trim();
-
-               GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
-               var player = GetPlayerByName(playerName);
-               var position = string.Empty;
-
-               if (player != null)
-               {
-                   position = player.Position;
-               }
-
-               playerRating = GetPlayerRating(playerName, goalsConceeded, matchId);
-
+  
                GeneratePlayerComment(
-                   player.Name, 
-                   teamName, 
-                   position, 
-                   playerRating, 
-                   homeTeam.Name, 
-                   awayTeam.Name, 
+                   matchId, 
+                   homeTeamAPIId, 
+                   awayTeamAPIId, 
+                   feedComment, 
+                   false,
                    CommentType.Player, 
                    EventType.AttemptBlocked, 
                    out homeTeamComment, 
@@ -1827,13 +1791,12 @@ namespace CMS.Infrastructure.Entities
                //TODO - distinguish between different misses
                feedComment = feedComment.Replace("Attempt missed.", "").Trim();
 
-               GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
            }
             else if (feedComment.StartsWith("Attempt saved."))//Player attacker/GK
             {
                 feedComment = feedComment.Replace("Attempt saved.", "").Trim();
 
-                GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
+                //GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
             }
            else if (feedComment.Contains("is shown the yellow card."))//Player
             {
@@ -1911,35 +1874,111 @@ namespace CMS.Infrastructure.Entities
 
         private static void GeneratePlayerComment
             (
-            string playerName, 
-            string playerTeam, 
-            string playerPosition, 
-            byte playerRating, 
-            string homeTeam, 
-            string awayTeam, 
+            Guid matchId,
+            int homeTeamAPIId, 
+            int awayTeamAPIId,
+            string feedComment,
+            bool isPositiveEvent,
             CommentType commentType, 
             EventType eventType, 
             out string homeTeamComment,
             out string awayTeamComment
             )
         {
+            //TODO - set inital default value of player rating to 3
+            homeTeamComment = string.Empty;
+            awayTeamComment = string.Empty;
+            string comment = string.Empty;
+            string playerName = string.Empty;
+            string teamName = string.Empty;
+
+            var summary = GetSummaryByMatchId(matchId);
+
+            int homeGoals = 0;
+            int awayGoals = 0;
+            byte goalsConceeded = 0;
+
+            if (summary != null)
+            {
+                using (EFDbContext context = new EFDbContext())
+                {
+                    homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                    awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                }
+            }
+
+            //Get teams
+            var homeTeam = GetTeamByAPIId(homeTeamAPIId);
+            var awayTeam = GetTeamByAPIId(awayTeamAPIId);
+
+            //Get player and team from comment
+            GetPlayerAndTeamFromComment(feedComment, '(', ')', out playerName, out teamName);
+
+            var player = GetPlayerByName(playerName);
+
+            //Get player position
+            var position = string.Empty;
+
+            if (player != null)
+            {
+                position = player.Position;
+            }
+
+            Position pos = Position.All;
+
+            switch (position)
+            {
+                case "G":
+                    pos = Position.Goalkeeper;
+                    break;
+
+                case "D":
+                    pos = Position.Defender;
+                    break;
+
+                case "M":
+                    pos = Position.Midfielder;
+                    break;
+
+                case "F":
+                    pos = Position.Forward;
+                    break;
+            }
+
+            //Get player rating
+            byte playerRating = GetPlayerRating(playerName, goalsConceeded, matchId);
+
             byte commType = (byte)commentType;
             byte evType = (byte)eventType;
             byte perpPos = (byte)Perspective.Positive;
             byte perpNeg = (byte)Perspective.Negative;
+            byte playerPosition = (byte)pos;
 
             IList<string> positiveComments = new List<string>();
             IList<string> negativeComments = new List<string>();
             
             using (EFDbContext context = new EFDbContext())
             {
-                positiveComments = context.Comment
-                    .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == perpPos))
+                if (pos == Position.All)
+                {
+                    positiveComments = context.Comment
+                    .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == perpPos) && (x.PlayerRating == playerRating))
                     .Select(x => x.Text).ToList();
 
-                negativeComments = context.Comment
-                    .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == perpNeg))
+                    negativeComments = context.Comment
+                        .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == perpNeg) && (x.PlayerRating == playerRating))
+                        .Select(x => x.Text).ToList();
+                }
+                else
+                {
+                    positiveComments = context.Comment
+                    .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == perpPos) && (x.Position == playerPosition) && (x.PlayerRating == playerRating))
                     .Select(x => x.Text).ToList();
+
+                    negativeComments = context.Comment
+                        .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == perpNeg) && (x.Position == playerPosition) && (x.PlayerRating == playerRating))
+                        .Select(x => x.Text).ToList();
+                }             
             }
 
             var random = new Random();
@@ -1950,7 +1989,7 @@ namespace CMS.Infrastructure.Entities
             Dictionary<string, string> placeholders = new Dictionary<string, string>();
 
             placeholders.Add("PLAYERNAME", playerName);
-            placeholders.Add("TEAM", playerTeam);
+            placeholders.Add("TEAM", teamName);
 
             if (positiveComments != null)
             {
@@ -1986,8 +2025,33 @@ namespace CMS.Infrastructure.Entities
                 }
             }
 
-            homeTeamComment = "";
-            awayTeamComment = "";
+            //Assign comment
+            if (teamName.Trim().ToLower() == homeTeam.Name) //Does comment relate to home team
+            {
+                if (isPositiveEvent == true)
+                {
+                    homeTeamComment = posComment;
+                    awayTeamComment = negComment;
+                }
+                else
+                {
+                    homeTeamComment = negComment;
+                    awayTeamComment = posComment;
+                }           
+            }
+            else
+            {
+                if (isPositiveEvent == true)
+                {
+                    awayTeamComment = posComment;
+                    homeTeamComment = negComment;
+                }
+                else
+                {
+                    awayTeamComment = negComment;
+                    homeTeamComment = posComment;
+                }           
+            }         
         }
 
         private static void GenerateTeamComment
@@ -2029,13 +2093,13 @@ namespace CMS.Infrastructure.Entities
             awayTeamComment = "";
         }
         
-        private static void GetPlayerAndTeamFromComment(string comment, out string player, out string team)
+        private static void GetPlayerAndTeamFromComment(string comment, char firstsep, char secondsep, out string player, out string team)
         {
-            var arr = comment.Split('(');
+            var arr = comment.Split(firstsep);
 
             player = arr[0];
 
-            var arr2 = arr[1].Split(')');
+            var arr2 = arr[1].Split(secondsep);
 
             team = arr2[0];
         }

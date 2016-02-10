@@ -18,6 +18,7 @@ namespace CMS.Infrastructure.Entities
         public byte CommentType { get; set; }
         public byte EventType { get; set; }
         public byte Perspective { get; set; }
+        public byte Position { get; set; }
     }
 
     public enum Perspective
@@ -61,5 +62,14 @@ namespace CMS.Infrastructure.Entities
         SecondHalfBegins = 22,
         Substitution = 23,
         Handball = 24
+    }
+
+    public enum Position
+    {
+        All = 0,
+        Goalkeeper = 1,
+        Defender = 2,
+        Midfielder = 3,
+        Forward = 4
     }
 }
