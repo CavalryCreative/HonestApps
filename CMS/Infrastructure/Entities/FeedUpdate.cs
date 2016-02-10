@@ -653,7 +653,7 @@ namespace CMS.Infrastructure.Entities
 
                         stat.HomeTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.corners.total").ToString());
                         stat.HomeTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString());
-                        stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.offsides.total").ToString();
+                        stat.HomeTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.localteam.possestiontime.total").ToString();
                         stat.HomeTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.saves.total").ToString());
                         stat.HomeTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.ongoal").ToString());
                         stat.HomeTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.localteam.shots.total").ToString());
@@ -663,7 +663,7 @@ namespace CMS.Infrastructure.Entities
 
                         stat.AwayTeamCorners = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.corners.total").ToString());
                         stat.AwayTeamOffsides = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString());
-                        stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.offsides.total").ToString();
+                        stat.AwayTeamPossessionTime = obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.possestiontime.total").ToString();
                         stat.AwayTeamSaves = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.saves.total").ToString());
                         stat.AwayTeamOnGoalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.ongoal").ToString());
                         stat.AwayTeamTotalShots = Convert.ToByte(obj.SelectToken("commentaries.[0].comm_match_stats.visitorteam.shots.total").ToString());
@@ -853,8 +853,14 @@ namespace CMS.Infrastructure.Entities
                                 commEvent.APIId = eventId;
                                 commEvent.MatchId = match.Id;
                                 commEvent.Score = GetMatchScore(match.Id, homeTeam.Name, awayTeam.Name);
-                                commEvent.HomeTeamMatchRating = GetMatchRating(match.HomeTeamAPIId);
-                                commEvent.AwayTeamMatchRating = GetMatchRating(match.AwayTeamAPIId);
+
+                                byte homeRating = 0;
+                                byte awayRating = 0;
+
+                                GetMatchRating(match.Id, out homeRating, out awayRating);
+
+                                commEvent.HomeTeamMatchRating = homeRating;
+                                commEvent.AwayTeamMatchRating = awayRating;
 
                                 SaveEvent(commEvent);
                             }
@@ -1040,6 +1046,8 @@ namespace CMS.Infrastructure.Entities
                     //recordToUpdate.Match = updatedRecord.Match;
                     recordToUpdate.MatchId = updatedRecord.MatchId;
                     recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
+                    recordToUpdate.HomeTeamRating = updatedRecord.HomeTeamRating;
+                    recordToUpdate.AwayTeamRating = updatedRecord.AwayTeamRating;
 
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                     Id = updatedRecord.Id;
@@ -1550,15 +1558,94 @@ namespace CMS.Infrastructure.Entities
             return matchesToday;
         }
 
-        private static byte GetMatchRating(int teamAPIId)
+        private static void GetMatchRating(Guid matchId, out byte homeRating, out byte awayRating)
         {
             //Todo - set match rating for both teams
+            homeRating = 0;
+            awayRating = 0;
 
-            byte ret = 0;
+                var matchstat = GetMatchStatsByAPIId(matchId);
 
-            //Return match stats, score
+                    decimal homeCalcRating = matchstat.HomeTeamRating;
+                    decimal awayCalcRating = matchstat.AwayTeamRating;
 
-            return ret;
+                    //recordToUpdate.AwayTeamCorners +0.1
+                    //recordToUpdate.AwayTeamFouls -0.1
+                    //recordToUpdate.AwayTeamOffsides -0.1
+                    //recordToUpdate.AwayTeamOnGoalShots
+                    //recordToUpdate.AwayTeamPossessionTime 
+                    //recordToUpdate.AwayTeamRedCards -0.5
+                    //recordToUpdate.AwayTeamSaves +0.1
+                    //recordToUpdate.AwayTeamTotalShots 
+                    //recordToUpdate.AwayTeamYellowCards -0.2
+                 
+                    //recordToUpdate.HomeTeamCorners
+                    //recordToUpdate.HomeTeamFouls
+                    //recordToUpdate.HomeTeamOffsides 
+                    //recordToUpdate.HomeTeamOnGoalShots
+                    //recordToUpdate.HomeTeamPossessionTime
+                    //recordToUpdate.HomeTeamRedCards
+                    //recordToUpdate.HomeTeamSaves
+                    //recordToUpdate.HomeTeamTotalShots
+                    //recordToUpdate.HomeTeamYellowCards
+                  
+                    //recordToUpdate.HomeTeamRating 
+                    //recordToUpdate.AwayTeamRating 
+
+                    var summary = GetSummaryByMatchId(matchId);
+
+                    int homeGoals = 0;
+                    int awayGoals = 0;
+                  
+                    if (summary != null)
+                    {
+                        using (EFDbContext context = new EFDbContext())
+                        {
+                            homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                            awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                        }
+                    }
+
+            //Home team
+                    decimal shotsFactor = 0;
+
+                    if (matchstat.HomeTeamTotalShots > 2)
+                    {
+                        var percentageOnTarget = (decimal)matchstat.HomeTeamOnGoalShots / (decimal)matchstat.HomeTeamTotalShots * (decimal)100;
+
+                        if (percentageOnTarget >= 0 && percentageOnTarget < 25)
+                        {
+                            shotsFactor = -0.5M;
+                        }
+                        else if (percentageOnTarget > 25 && percentageOnTarget < 50)
+                        {
+                            shotsFactor = -0.3M;
+                        }
+                        else if (percentageOnTarget > 50 && percentageOnTarget < 75)
+                        {
+                            shotsFactor = 0.3M;
+                        }
+                        else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
+                        {
+                            shotsFactor = 0.5M;
+                        }
+                    }
+
+            //TODO - possession
+                    homeCalcRating = homeCalcRating +
+                        (decimal)(awayGoals * -0.5) +
+                        (decimal)(matchstat.HomeTeamCorners * 0.1) +
+                        (decimal)(matchstat.HomeTeamFouls * -0.1) +
+                        (decimal)(matchstat.HomeTeamOffsides * -0.1) +
+                        (decimal)(matchstat.HomeTeamRedCards * -0.5) +
+                        (decimal)(matchstat.HomeTeamSaves * 0.1) +
+                        (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
+                        (decimal)(homeGoals * 0.5) +
+                        shotsFactor;
+
+                    //update playerstat object with updated rating
+                    //matchstat.Rating = Convert.ToByte(calcRating);
+                    //SavePlayerStats(matchstat);
         }
 
         private static byte GetPlayerRating(string playerName, byte goalsConceeded, Guid matchId)

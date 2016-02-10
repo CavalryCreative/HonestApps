@@ -21,6 +21,7 @@ namespace CMS.Infrastructure.Entities
         public byte? HomeTeamYellowCards { get; set; }
         public byte? HomeTeamRedCards { get; set; }
         public byte? HomeTeamSaves { get; set; }
+        public byte HomeTeamRating { get; set; }
         public byte? AwayTeamTotalShots { get; set; }
         public byte? AwayTeamOnGoalShots { get; set; }
         public byte? AwayTeamFouls { get; set; }
@@ -30,5 +31,6 @@ namespace CMS.Infrastructure.Entities
         public byte? AwayTeamYellowCards { get; set; }
         public byte? AwayTeamRedCards { get; set; }
         public byte? AwayTeamSaves { get; set; }
+        public byte AwayTeamRating { get; set; }
     }
 }
