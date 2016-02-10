@@ -251,6 +251,18 @@
     <Compile Include="EntitiesMigrations\201602092033157_UpdatePlayerStats.Designer.cs">
       <DependentUpon>201602092033157_UpdatePlayerStats.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201602101316242_UpdateComment1.cs" />
+    <Compile Include="EntitiesMigrations\201602101316242_UpdateComment1.Designer.cs">
+      <DependentUpon>201602101316242_UpdateComment1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201602101341176_UpdateComment2.cs" />
+    <Compile Include="EntitiesMigrations\201602101341176_UpdateComment2.Designer.cs">
+      <DependentUpon>201602101341176_UpdateComment2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201602101533374_UpdateComment3.cs" />
+    <Compile Include="EntitiesMigrations\201602101533374_UpdateComment3.Designer.cs">
+      <DependentUpon>201602101533374_UpdateComment3.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -420,6 +432,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201602092033157_UpdatePlayerStats.resx">
       <DependentUpon>201602092033157_UpdatePlayerStats.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602101316242_UpdateComment1.resx">
+      <DependentUpon>201602101316242_UpdateComment1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602101341176_UpdateComment2.resx">
+      <DependentUpon>201602101341176_UpdateComment2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201602101533374_UpdateComment3.resx">
+      <DependentUpon>201602101533374_UpdateComment3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>
