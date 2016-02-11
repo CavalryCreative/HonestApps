@@ -1048,6 +1048,7 @@ namespace CMS.Infrastructure.Entities
                     recordToUpdate.UpdatedByUserId = updatedRecord.UpdatedByUserId;
                     recordToUpdate.HomeTeamRating = updatedRecord.HomeTeamRating;
                     recordToUpdate.AwayTeamRating = updatedRecord.AwayTeamRating;
+                    recordToUpdate.MatchRating = updatedRecord.MatchRating;
 
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                     Id = updatedRecord.Id;
@@ -2482,8 +2483,6 @@ namespace CMS.Infrastructure.Entities
                 }
             }
 
-            //TODO - set default value for team ratings to 3
-
             //Get teams
             var homeTeam = GetTeamByAPIId(homeTeamAPIId);
             var awayTeam = GetTeamByAPIId(awayTeamAPIId);
@@ -2494,9 +2493,15 @@ namespace CMS.Infrastructure.Entities
             byte commType = (byte)commentType;
             byte evType = (byte)eventType;
             byte neutralPos = (byte)Perspective.Neutral;
-            byte homeTeamRating = matchStats.HomeTeamRating;
-            byte awayTeamRating = matchStats.AwayTeamRating;
-            
+            byte homeTeamRating = 0;
+            byte awayTeamRating = 0;
+
+            if(matchStats != null)
+            {
+                homeTeamRating = matchStats.HomeTeamRating;
+                awayTeamRating = matchStats.AwayTeamRating;       
+            }
+         
             IList<string> homeComments = new List<string>();
             IList<string> awayComments = new List<string>();
           
@@ -2537,9 +2542,26 @@ namespace CMS.Infrastructure.Entities
                     }
                 }
             }
-        
-            homeTeamComment = awayComment;
-            awayTeamComment = homeComment;
+
+            if (awayComments != null)
+            {
+                index = random.Next(awayComments.Count);
+                awayComment = awayComments[index];
+
+                //Replace text placeholders                
+                foreach (KeyValuePair<string, string> kvp in placeholders)
+                {
+                    string strToReplace = "{%" + kvp.Key + "%}";
+
+                    if (awayComment.Contains(strToReplace))
+                    {
+                        awayComment = awayComment.Replace(strToReplace, kvp.Value);
+                    }
+                }
+            }
+
+            homeTeamComment = homeComment;
+            awayTeamComment = awayComment;
         }
 
         private static void GenerateMatchComment
@@ -2583,56 +2605,19 @@ namespace CMS.Infrastructure.Entities
             byte evType = (byte)eventType;
             byte neutralPos = (byte)Perspective.Neutral;
             byte matchRating = 0;
-            byte homeTeamRating = matchStats.HomeTeamRating;
-            byte awayTeamRating = matchStats.AwayTeamRating;
+            byte homeTeamRating = 0;
+            byte awayTeamRating = 0;
 
-            //decimal shotsFactor = 0;
-
-            //Home
-            switch (homeTeamRating)
+            if (matchStats != null)
             {
-                case 1:
-
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
-                case 4:
-
-                    break;
-                case 5:
-
-                    break;
-                default:
-                    break;
+                homeTeamRating = matchStats.HomeTeamRating;
+                awayTeamRating = matchStats.AwayTeamRating;
             }
-           
-            //decimal shotsFactor = 0;
 
-            //if (matchstat.HomeTeamTotalShots > 2)
-            //{
-            //    var percentageOnTarget = (decimal)matchstat.HomeTeamOnGoalShots / (decimal)matchstat.HomeTeamTotalShots * (decimal)100;
+            decimal calcRating = ((decimal)homeTeamRating + (decimal)awayTeamRating) / 2M;
+            calcRating = calcRating + (((decimal)homeGoals + (decimal)awayGoals) * 0.2M);
 
-            //    if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
-            //    {
-            //        shotsFactor = -0.5M;
-            //    }
-            //    else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
-            //    {
-            //        shotsFactor = -0.3M;
-            //    }
-            //    else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
-            //    {
-            //        shotsFactor = 0.3M;
-            //    }
-            //    else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
-            //    {
-            //        shotsFactor = 0.5M;
-            //    }
-            //}
+            matchRating = Convert.ToByte(calcRating);
 
             IList<string> comments = new List<string>();
             
@@ -2689,6 +2674,10 @@ namespace CMS.Infrastructure.Entities
          
             homeTeamComment = homeComment;
             awayTeamComment = awayComment;
+
+            //update matchstat object with updated rating
+            if (matchStats != null)
+                SaveMatchStats(matchStats);
         }
         
         private static void GetPlayerAndTeamFromComment(string comment, char firstsep, char secondsep, out string player, out string team)
