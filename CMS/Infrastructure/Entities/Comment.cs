@@ -14,6 +14,7 @@ namespace CMS.Infrastructure.Entities
         public Guid Id { get; set; }
         public string Text { get; set; }
         public byte MatchRating { get; set; }
+        public byte TeamRating { get; set; }
         public byte PlayerRating { get; set; }
         public byte CommentType { get; set; }
         public byte EventType { get; set; }
@@ -32,7 +33,7 @@ namespace CMS.Infrastructure.Entities
     {
         Team = 1,
         Player = 2,
-        Game = 3,
+        Match = 3,
         Rivals = 4
     }
 
@@ -43,25 +44,27 @@ namespace CMS.Infrastructure.Entities
         AttemptMissedHighAndWide = 3,
         AttemptMissesToRightOrLeft = 4,
         AttemptMissesJustABitTooHigh = 5,
-        AttemptSaved = 6,
-        FreeKick = 7,     
-        YellowCard = 8,
-        RedCard = 9,
-        Corner = 10,
-        Delay = 11,
-        DelayEnds = 12,
-        FirstHalfBegins = 13,
-        FirstHalfEnds = 14,
-        Foul = 15,
-        Goal = 16,
-        LineupsAnnounced = 17,
-        MatchEnds = 18,
-        Offside = 19,
-        HitsTheBar = 20,
-        HitsThePost = 21,
-        SecondHalfBegins = 22,
-        Substitution = 23,
-        Handball = 24
+        AttemptMissed = 6,
+        AttemptSaved = 7,
+        FreeKick = 8,     
+        YellowCard = 9,
+        RedCard = 10,
+        Corner = 11,
+        Delay = 12,
+        DelayEnds = 13,
+        FirstHalfBegins = 14,
+        FirstHalfEnds = 15,
+        Foul = 16,
+        Goal = 17,
+        LineupsAnnounced = 18,
+        MatchEnds = 19,
+        Offside = 20,
+        HitsTheBar = 21,
+        HitsThePost = 22,
+        SecondHalfBegins = 23,
+        Substitution = 24,
+        Handball = 25,
+        General = 26
     }
 
     public enum Position

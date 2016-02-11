@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="honestappsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="HonestAppsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="BroadcastFeeds">
           <Key>
             <PropertyRef Name="Id" />
@@ -41,8 +41,12 @@
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Text" Type="varchar" MaxLength="500" />
           <Property Name="MatchRating" Type="tinyint" Nullable="false" />
-          <Property Name="TeamComment" Type="bit" Nullable="false" />
-          <Property Name="PlayerComment" Type="bit" Nullable="false" />
+          <Property Name="PlayerRating" Type="tinyint" Nullable="false" />
+          <Property Name="CommentType" Type="tinyint" Nullable="false" />
+          <Property Name="EventType" Type="tinyint" Nullable="false" />
+          <Property Name="Perspective" Type="tinyint" Nullable="false" />
+          <Property Name="Position" Type="tinyint" Nullable="false" />
+          <Property Name="TeamRating" Type="tinyint" Nullable="false" />
         </EntityType>
         <EntityType Name="Events">
           <Key>
@@ -188,6 +192,7 @@
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+          <Property Name="Rating" Type="tinyint" Nullable="false" />
         </EntityType>
         <EntityType Name="Rivals">
           <Key>
@@ -245,6 +250,8 @@
           <Property Name="Deleted" Type="bit" />
           <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
           <Property Name="DateUpdated" Type="datetime" />
+          <Property Name="HomeTeamRating" Type="tinyint" Nullable="false" />
+          <Property Name="AwayTeamRating" Type="tinyint" Nullable="false" />
         </EntityType>
         <EntityType Name="Substitutions">
           <Key>
@@ -533,7 +540,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="honestappsModelStoreContainer">
+        <EntityContainer Name="HonestAppsModelStoreContainer">
           <EntitySet Name="BroadcastFeeds" EntityType="Self.BroadcastFeeds" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Cards" EntityType="Self.Cards" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comments" EntityType="Self.Comments" Schema="dbo" store:Type="Tables" />
@@ -617,10 +624,20 @@
             <End Role="TeamPlayers" EntitySet="TeamPlayers" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="honestappsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="HonestAppsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="BroadcastFeed">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Message" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="IPAddress" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DateAdded" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
         <EntityType Name="Card">
           <Key>
             <PropertyRef Name="Id" />
@@ -642,6 +659,20 @@
           <Property Name="Summary_Id1" Type="Guid" />
           <NavigationProperty Name="Summary" Relationship="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id" FromRole="Cards" ToRole="Summaries" />
           <NavigationProperty Name="Summary1" Relationship="Self.FK_dbo_Cards_dbo_Summaries_Summary_Id1" FromRole="Cards" ToRole="Summaries" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="Text" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="MatchRating" Type="Byte" Nullable="false" />
+          <Property Name="PlayerRating" Type="Byte" Nullable="false" />
+          <Property Name="CommentType" Type="Byte" Nullable="false" />
+          <Property Name="EventType" Type="Byte" Nullable="false" />
+          <Property Name="Perspective" Type="Byte" Nullable="false" />
+          <Property Name="Position" Type="Byte" Nullable="false" />
+          <Property Name="TeamRating" Type="Byte" Nullable="false" />
         </EntityType>
         <EntityType Name="Event">
           <Key>
@@ -683,8 +714,8 @@
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Summary" Relationship="Self.FK_dbo_Goals_dbo_Summaries_SummaryId" FromRole="Goals" ToRole="Summaries" />
           <Property Name="APIId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Summary" Relationship="Self.FK_dbo_Goals_dbo_Summaries_SummaryId" FromRole="Goals" ToRole="Summaries" />
         </EntityType>
         <EntityType Name="Lineup">
           <Key>
@@ -801,6 +832,7 @@
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+          <Property Name="Rating" Type="Byte" Nullable="false" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_PlayerStats_dbo_Matches_MatchId" FromRole="PlayerStats" ToRole="Matches" />
           <NavigationProperty Name="Player" Relationship="Self.FK_dbo_PlayerStats_dbo_Players_PlayerId" FromRole="PlayerStats" ToRole="Players" />
         </EntityType>
@@ -861,6 +893,8 @@
           <Property Name="Deleted" Type="Boolean" />
           <Property Name="UpdatedByUserId" Type="Guid" />
           <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+          <Property Name="HomeTeamRating" Type="Byte" Nullable="false" />
+          <Property Name="AwayTeamRating" Type="Byte" Nullable="false" />
           <NavigationProperty Name="Match" Relationship="Self.FK_dbo_Stats_dbo_Matches_MatchId" FromRole="Stats" ToRole="Matches" />
         </EntityType>
         <EntityType Name="Substitution">
@@ -1129,7 +1163,9 @@
           <End Role="Teams" Type="Self.Team" Multiplicity="*" />
         </Association>
         <EntityContainer Name="HonestAppsEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BroadcastFeeds" EntityType="Self.BroadcastFeed" />
           <EntitySet Name="Cards" EntityType="Self.Card" />
+          <EntitySet Name="Comments" EntityType="Self.Comment" />
           <EntitySet Name="Events" EntityType="Self.Event" />
           <EntitySet Name="Goals" EntityType="Self.Goal" />
           <EntitySet Name="Lineups" EntityType="Self.Lineup" />
@@ -1204,36 +1240,25 @@
             <End Role="Players" EntitySet="Players" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
-          <EntitySet Name="BroadcastFeeds" EntityType="honestappsModel.BroadcastFeed" />
-          <EntitySet Name="Comments" EntityType="honestappsModel.Comment" />
         </EntityContainer>
-        <EntityType Name="BroadcastFeed">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Message" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="IPAddress" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="DateAdded" Type="DateTime" Nullable="false" Precision="3" />
-        </EntityType>
-        <EntityType Name="Comment">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="Text" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="MatchRating" Type="Byte" Nullable="false" />
-          <Property Name="TeamComment" Type="Boolean" Nullable="false" />
-          <Property Name="PlayerComment" Type="Boolean" Nullable="false" />
-        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="honestappsModelStoreContainer" CdmEntityContainer="HonestAppsEntities">
+        <EntityContainerMapping StorageEntityContainer="HonestAppsModelStoreContainer" CdmEntityContainer="HonestAppsEntities">
+          <EntitySetMapping Name="BroadcastFeeds">
+            <EntityTypeMapping TypeName="HonestAppsModel.BroadcastFeed">
+              <MappingFragment StoreEntitySet="BroadcastFeeds">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Cards">
-            <EntityTypeMapping TypeName="honestappsModel.Card">
+            <EntityTypeMapping TypeName="HonestAppsModel.Card">
               <MappingFragment StoreEntitySet="Cards">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
@@ -1253,8 +1278,23 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Comments">
+            <EntityTypeMapping TypeName="HonestAppsModel.Comment">
+              <MappingFragment StoreEntitySet="Comments">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="MatchRating" ColumnName="MatchRating" />
+                <ScalarProperty Name="PlayerRating" ColumnName="PlayerRating" />
+                <ScalarProperty Name="CommentType" ColumnName="CommentType" />
+                <ScalarProperty Name="EventType" ColumnName="EventType" />
+                <ScalarProperty Name="Perspective" ColumnName="Perspective" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="TeamRating" ColumnName="TeamRating" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Events">
-            <EntityTypeMapping TypeName="honestappsModel.Event">
+            <EntityTypeMapping TypeName="HonestAppsModel.Event">
               <MappingFragment StoreEntitySet="Events">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1276,9 +1316,8 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Goals">
-            <EntityTypeMapping TypeName="honestappsModel.Goal">
+            <EntityTypeMapping TypeName="HonestAppsModel.Goal">
               <MappingFragment StoreEntitySet="Goals">
-                <ScalarProperty Name="APIId" ColumnName="APIId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
                 <ScalarProperty Name="IsHomeTeam" ColumnName="IsHomeTeam" />
@@ -1293,11 +1332,12 @@
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Lineups">
-            <EntityTypeMapping TypeName="honestappsModel.Lineup">
+            <EntityTypeMapping TypeName="HonestAppsModel.Lineup">
               <MappingFragment StoreEntitySet="Lineups">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
@@ -1316,7 +1356,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Matches">
-            <EntityTypeMapping TypeName="honestappsModel.Match">
+            <EntityTypeMapping TypeName="HonestAppsModel.Match">
               <MappingFragment StoreEntitySet="Matches">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
@@ -1344,7 +1384,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="MatchesTodays">
-            <EntityTypeMapping TypeName="honestappsModel.MatchesToday">
+            <EntityTypeMapping TypeName="HonestAppsModel.MatchesToday">
               <MappingFragment StoreEntitySet="MatchesTodays">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
@@ -1359,7 +1399,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Players">
-            <EntityTypeMapping TypeName="honestappsModel.Player">
+            <EntityTypeMapping TypeName="HonestAppsModel.Player">
               <MappingFragment StoreEntitySet="Players">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="SquadNumber" ColumnName="SquadNumber" />
@@ -1376,7 +1416,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PlayerStats">
-            <EntityTypeMapping TypeName="honestappsModel.PlayerStat">
+            <EntityTypeMapping TypeName="HonestAppsModel.PlayerStat">
               <MappingFragment StoreEntitySet="PlayerStats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="PlayerId" ColumnName="PlayerId" />
@@ -1402,11 +1442,12 @@
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="Rating" ColumnName="Rating" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Rivals">
-            <EntityTypeMapping TypeName="honestappsModel.Rival">
+            <EntityTypeMapping TypeName="HonestAppsModel.Rival">
               <MappingFragment StoreEntitySet="Rivals">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="TeamId" ColumnName="TeamId" />
@@ -1420,7 +1461,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="SiteExceptions">
-            <EntityTypeMapping TypeName="honestappsModel.SiteException">
+            <EntityTypeMapping TypeName="HonestAppsModel.SiteException">
               <MappingFragment StoreEntitySet="SiteExceptions">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="HResult" ColumnName="HResult" />
@@ -1434,7 +1475,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Stats">
-            <EntityTypeMapping TypeName="honestappsModel.Stat">
+            <EntityTypeMapping TypeName="HonestAppsModel.Stat">
               <MappingFragment StoreEntitySet="Stats">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1462,11 +1503,13 @@
                 <ScalarProperty Name="Deleted" ColumnName="Deleted" />
                 <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
                 <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="HomeTeamRating" ColumnName="HomeTeamRating" />
+                <ScalarProperty Name="AwayTeamRating" ColumnName="AwayTeamRating" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Substitutions">
-            <EntityTypeMapping TypeName="honestappsModel.Substitution">
+            <EntityTypeMapping TypeName="HonestAppsModel.Substitution">
               <MappingFragment StoreEntitySet="Substitutions">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1488,7 +1531,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Summaries">
-            <EntityTypeMapping TypeName="honestappsModel.Summary">
+            <EntityTypeMapping TypeName="HonestAppsModel.Summary">
               <MappingFragment StoreEntitySet="Summaries">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchId" ColumnName="MatchId" />
@@ -1504,7 +1547,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Teams">
-            <EntityTypeMapping TypeName="honestappsModel.Team">
+            <EntityTypeMapping TypeName="HonestAppsModel.Team">
               <MappingFragment StoreEntitySet="Teams">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
@@ -1520,7 +1563,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="UpdateHistories">
-            <EntityTypeMapping TypeName="honestappsModel.UpdateHistory">
+            <EntityTypeMapping TypeName="HonestAppsModel.UpdateHistory">
               <MappingFragment StoreEntitySet="UpdateHistories">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="MatchAPIId" ColumnName="MatchAPIId" />
@@ -1536,7 +1579,7 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="TeamPlayers" TypeName="honestappsModel.TeamPlayers" StoreEntitySet="TeamPlayers">
+          <AssociationSetMapping Name="TeamPlayers" TypeName="HonestAppsModel.TeamPlayers" StoreEntitySet="TeamPlayers">
             <EndProperty Name="Players">
               <ScalarProperty Name="Id" ColumnName="Player_Id" />
             </EndProperty>
@@ -1544,27 +1587,6 @@
               <ScalarProperty Name="Id" ColumnName="Team_Id" />
             </EndProperty>
           </AssociationSetMapping>
-          <EntitySetMapping Name="BroadcastFeeds">
-            <EntityTypeMapping TypeName="honestappsModel.BroadcastFeed">
-              <MappingFragment StoreEntitySet="BroadcastFeeds">
-                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
-                <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
-                <ScalarProperty Name="Message" ColumnName="Message" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Comments">
-            <EntityTypeMapping TypeName="honestappsModel.Comment">
-              <MappingFragment StoreEntitySet="Comments">
-                <ScalarProperty Name="PlayerComment" ColumnName="PlayerComment" />
-                <ScalarProperty Name="TeamComment" ColumnName="TeamComment" />
-                <ScalarProperty Name="MatchRating" ColumnName="MatchRating" />
-                <ScalarProperty Name="Text" ColumnName="Text" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

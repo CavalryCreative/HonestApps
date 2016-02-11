@@ -32,5 +32,6 @@ namespace CMS.Infrastructure.Entities
         public byte? AwayTeamRedCards { get; set; }
         public byte? AwayTeamSaves { get; set; }
         public byte AwayTeamRating { get; set; }
+        public byte MatchRating { get; set; }
     }
 }

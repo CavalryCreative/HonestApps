@@ -857,7 +857,7 @@ namespace CMS.Infrastructure.Entities
                                 byte homeRating = 0;
                                 byte awayRating = 0;
 
-                                GetMatchRating(match.Id, out homeRating, out awayRating);
+                                GetTeamRatings(match.Id, out homeRating, out awayRating);
 
                                 commEvent.HomeTeamMatchRating = homeRating;
                                 commEvent.AwayTeamMatchRating = awayRating;
@@ -1558,7 +1558,7 @@ namespace CMS.Infrastructure.Entities
             return matchesToday;
         }
 
-        private static void GetMatchRating(Guid matchId, out byte homeRating, out byte awayRating)
+        private static void GetTeamRatings(Guid matchId, out byte homeRating, out byte awayRating)
         {
             //Todo - set match rating for both teams
             homeRating = 0;
@@ -1568,29 +1568,6 @@ namespace CMS.Infrastructure.Entities
 
                     decimal homeCalcRating = matchstat.HomeTeamRating;
                     decimal awayCalcRating = matchstat.AwayTeamRating;
-
-                    //recordToUpdate.AwayTeamCorners +0.1
-                    //recordToUpdate.AwayTeamFouls -0.1
-                    //recordToUpdate.AwayTeamOffsides -0.1
-                    //recordToUpdate.AwayTeamOnGoalShots
-                    //recordToUpdate.AwayTeamPossessionTime 
-                    //recordToUpdate.AwayTeamRedCards -0.5
-                    //recordToUpdate.AwayTeamSaves +0.1
-                    //recordToUpdate.AwayTeamTotalShots 
-                    //recordToUpdate.AwayTeamYellowCards -0.2
-                 
-                    //recordToUpdate.HomeTeamCorners
-                    //recordToUpdate.HomeTeamFouls
-                    //recordToUpdate.HomeTeamOffsides 
-                    //recordToUpdate.HomeTeamOnGoalShots
-                    //recordToUpdate.HomeTeamPossessionTime
-                    //recordToUpdate.HomeTeamRedCards
-                    //recordToUpdate.HomeTeamSaves
-                    //recordToUpdate.HomeTeamTotalShots
-                    //recordToUpdate.HomeTeamYellowCards
-                  
-                    //recordToUpdate.HomeTeamRating 
-                    //recordToUpdate.AwayTeamRating 
 
                     var summary = GetSummaryByMatchId(matchId);
 
@@ -1606,22 +1583,22 @@ namespace CMS.Infrastructure.Entities
                         }
                     }
 
-            //Home team
+            #region Home team
                     decimal shotsFactor = 0;
 
                     if (matchstat.HomeTeamTotalShots > 2)
                     {
                         var percentageOnTarget = (decimal)matchstat.HomeTeamOnGoalShots / (decimal)matchstat.HomeTeamTotalShots * (decimal)100;
 
-                        if (percentageOnTarget >= 0 && percentageOnTarget < 25)
+                        if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
                         {
                             shotsFactor = -0.5M;
                         }
-                        else if (percentageOnTarget > 25 && percentageOnTarget < 50)
+                        else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
                         {
                             shotsFactor = -0.3M;
                         }
-                        else if (percentageOnTarget > 50 && percentageOnTarget < 75)
+                        else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
                         {
                             shotsFactor = 0.3M;
                         }
@@ -1631,7 +1608,37 @@ namespace CMS.Infrastructure.Entities
                         }
                     }
 
-            //TODO - possession
+            //Possession
+            byte possession = 0;
+            decimal possessionFactor = 0;
+
+            if (!string.IsNullOrWhiteSpace(matchstat.HomeTeamPossessionTime))
+            {
+                var possStr = matchstat.HomeTeamPossessionTime.Remove(matchstat.HomeTeamPossessionTime.Trim().Length - 1, 1);
+
+                Byte.TryParse(possStr, out possession);
+            }
+
+            if (possession > 0)
+            {
+                if (possession >= 0 && possession <= 25)
+                {
+                    possessionFactor = -0.5M;
+                }
+                else if (possession > 25 && possession <= 50)
+                {
+                    possessionFactor = -0.3M;
+                }
+                else if (possession > 50 && possession <= 75)
+                {
+                    possessionFactor = 0.3M;
+                }
+                else if (possession > 75 && possession <= 100)
+                {
+                    possessionFactor = 0.5M;
+                }
+            }
+                        
                     homeCalcRating = homeCalcRating +
                         (decimal)(awayGoals * -0.5) +
                         (decimal)(matchstat.HomeTeamCorners * 0.1) +
@@ -1641,11 +1648,87 @@ namespace CMS.Infrastructure.Entities
                         (decimal)(matchstat.HomeTeamSaves * 0.1) +
                         (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
                         (decimal)(homeGoals * 0.5) +
-                        shotsFactor;
+                        shotsFactor +
+                        possessionFactor;
 
                     //update playerstat object with updated rating
-                    //matchstat.Rating = Convert.ToByte(calcRating);
-                    //SavePlayerStats(matchstat);
+                    matchstat.HomeTeamRating = Convert.ToByte(homeCalcRating);
+            #endregion
+
+            #region Away team
+
+                    shotsFactor = 0;
+
+                    if (matchstat.AwayTeamTotalShots > 2)
+                    {
+                        var percentageOnTarget = (decimal)matchstat.AwayTeamOnGoalShots / (decimal)matchstat.AwayTeamTotalShots * (decimal)100;
+
+                        if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
+                        {
+                            shotsFactor = -0.5M;
+                        }
+                        else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
+                        {
+                            shotsFactor = -0.3M;
+                        }
+                        else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
+                        {
+                            shotsFactor = 0.3M;
+                        }
+                        else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
+                        {
+                            shotsFactor = 0.5M;
+                        }
+                    }
+
+                    //Possession
+                    possession = 0;
+                    possessionFactor = 0;
+
+                    if (!string.IsNullOrWhiteSpace(matchstat.AwayTeamPossessionTime))
+                    {
+                        var possStr = matchstat.AwayTeamPossessionTime.Remove(matchstat.AwayTeamPossessionTime.Trim().Length - 1, 1);
+
+                        Byte.TryParse(possStr, out possession);
+                    }
+
+                    if (possession > 0)
+                    {
+                        if (possession >= 0 && possession <= 25)
+                        {
+                            possessionFactor = -0.5M;
+                        }
+                        else if (possession > 25 && possession <= 50)
+                        {
+                            possessionFactor = -0.3M;
+                        }
+                        else if (possession > 50 && possession <= 75)
+                        {
+                            possessionFactor = 0.3M;
+                        }
+                        else if (possession > 75 && possession <= 100)
+                        {
+                            possessionFactor = 0.5M;
+                        }
+                    }
+
+                    awayCalcRating = awayCalcRating +
+                        (decimal)(awayGoals * -0.5) +
+                        (decimal)(matchstat.HomeTeamCorners * 0.1) +
+                        (decimal)(matchstat.HomeTeamFouls * -0.1) +
+                        (decimal)(matchstat.HomeTeamOffsides * -0.1) +
+                        (decimal)(matchstat.HomeTeamRedCards * -0.5) +
+                        (decimal)(matchstat.HomeTeamSaves * 0.1) +
+                        (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
+                        (decimal)(homeGoals * 0.5) +
+                        shotsFactor +
+                        possessionFactor;
+
+                    //update playerstat object with updated rating
+                    matchstat.AwayTeamRating = Convert.ToByte(awayCalcRating);
+            #endregion
+
+            SaveMatchStats(matchstat);
         }
 
         private static byte GetPlayerRating(string playerName, byte goalsConceeded, Guid matchId)
@@ -1730,15 +1813,15 @@ namespace CMS.Infrastructure.Entities
                             {
                                 var percentageOnTarget = (decimal)plstat.ShotsOnGoal / (decimal)plstat.TotalShots * (decimal)100;
 
-                                if (percentageOnTarget >= 0 && percentageOnTarget < 25)
+                                if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
                                 {
                                     shotsFactor = -0.3M;
                                 }
-                                else if (percentageOnTarget > 25 && percentageOnTarget < 50)
+                                else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
                                 {
                                     shotsFactor = -0.1M;
                                 }
-                                else if (percentageOnTarget > 50 && percentageOnTarget < 75)
+                                else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
                                 {
                                     shotsFactor = 0.1M;
                                 }
@@ -1784,15 +1867,15 @@ namespace CMS.Infrastructure.Entities
                             {
                                 var percentageOnTarget = (decimal)plstat.ShotsOnGoal / (decimal)plstat.TotalShots * (decimal)100;
 
-                                if (percentageOnTarget >= 0 && percentageOnTarget < 25)
+                                if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
                                 {
                                     shotsFactor = -0.5M;
                                 }
-                                else if (percentageOnTarget > 25 && percentageOnTarget < 50)
+                                else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
                                 {
                                     shotsFactor = -0.3M;
                                 }
-                                else if (percentageOnTarget > 50 && percentageOnTarget < 75)
+                                else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
                                 {
                                     shotsFactor = 0.3M;
                                 }
@@ -1876,86 +1959,315 @@ namespace CMS.Infrastructure.Entities
            else if (feedComment.StartsWith("Attempt missed."))//Player
            {
                //TODO - distinguish between different misses
-               feedComment = feedComment.Replace("Attempt missed.", "").Trim();
+                feedComment = feedComment.Replace("Attempt missed.", "").Trim();
 
+               if (feedComment.Contains("is too high"))
+               {
+                   GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.AttemptMissedTooHigh,
+                       out homeTeamComment,
+                       out awayTeamComment);
+               }
+               else if (feedComment.Contains("is high and wide"))
+               {
+                   GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.AttemptMissedHighAndWide,
+                       out homeTeamComment,
+                       out awayTeamComment);
+               }
+               else if (feedComment.Contains("misses to the"))
+               {
+                   GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.AttemptMissesToRightOrLeft,
+                       out homeTeamComment,
+                       out awayTeamComment);
+               }
+               else if (feedComment.Contains("just a bit too high"))
+               {
+                   GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.AttemptMissesJustABitTooHigh,
+                       out homeTeamComment,
+                       out awayTeamComment);
+               }
+               else
+               {
+                   GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.AttemptBlocked,
+                       out homeTeamComment,
+                       out awayTeamComment);
+               }
            }
             else if (feedComment.StartsWith("Attempt saved."))//Player attacker/GK
             {
                 feedComment = feedComment.Replace("Attempt saved.", "").Trim();
 
-                //GetPlayerAndTeamFromComment(feedComment, out playerName, out teamName);
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.AttemptSaved,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
            else if (feedComment.Contains("is shown the yellow card."))//Player
             {
-                
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.YellowCard,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
            else if (feedComment.Contains("is shown the red card."))//Player
             {
-                
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.RedCard,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
            else if (feedComment.StartsWith("Corner, Team. Conceded by"))//Player or Match
             {
-                
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       true,
+                       CommentType.Player,
+                       EventType.Corner,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
             else if (feedComment.StartsWith("Delay in match"))//Match
             {
-               
+               GenerateMatchComment(
+                   matchId, 
+                   homeTeamAPIId, 
+                   awayTeamAPIId, 
+                   feedComment,
+                   CommentType.Match, 
+                   EventType.Delay, 
+                   out homeTeamComment,
+                   out awayTeamComment);
             }
            else if (feedComment.StartsWith("Delay over"))//Match
             {
-                
+                GenerateMatchComment(
+                   matchId,
+                   homeTeamAPIId,
+                   awayTeamAPIId,
+                   feedComment,
+                   CommentType.Match,
+                   EventType.DelayEnds,
+                   out homeTeamComment,
+                   out awayTeamComment);
             }
-           else if (feedComment.StartsWith("First Half begins."))//Match or team
+           else if (feedComment.StartsWith("First Half begins."))//Team
             {
-               
+                GenerateTeamComment(
+                   matchId,
+                   homeTeamAPIId,
+                   awayTeamAPIId,
+                   feedComment,
+                   CommentType.Team,
+                   EventType.FirstHalfBegins,
+                   out homeTeamComment,
+                   out awayTeamComment);
             }
-           else if (feedComment.StartsWith("First Half ends"))//Match
+           else if (feedComment.StartsWith("First Half ends"))//Team
             {
-               
+                GenerateTeamComment(
+                   matchId,
+                   homeTeamAPIId,
+                   awayTeamAPIId,
+                   feedComment,
+                   CommentType.Team,
+                   EventType.FirstHalfBegins,
+                   out homeTeamComment,
+                   out awayTeamComment);
             }
            else if (feedComment.StartsWith("Foul by"))//Player
             {
-               
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        true,
+                        CommentType.Player,
+                        EventType.Foul,
+                        out homeTeamComment,
+                        out awayTeamComment);
             }
            else if (feedComment.StartsWith("Goal!"))//Player or Match or team
             {
-                
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       true,
+                       CommentType.Player,
+                       EventType.Goal,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Lineups announced"))//Match or team
+           else if (feedComment.StartsWith("Lineups announced"))//Team
             {
-               
+                GenerateTeamComment(
+                    matchId,
+                    homeTeamAPIId,
+                    awayTeamAPIId,
+                    feedComment,
+                    CommentType.Team,
+                    EventType.FirstHalfBegins,
+                    out homeTeamComment,
+                    out awayTeamComment);
             }
            else if (feedComment.StartsWith("Offside"))//Player
             {
-                
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.Offside,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
            else if (feedComment.Contains("hits the bar"))//Player
             {
-               
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        false,
+                        CommentType.Player,
+                        EventType.HitsTheBar,
+                        out homeTeamComment,
+                        out awayTeamComment);
             }
            else if (feedComment.Contains("hits the post"))//Player
             {
-                
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        false,
+                        CommentType.Player,
+                        EventType.HitsThePost,
+                        out homeTeamComment,
+                        out awayTeamComment);
             }
            else if (feedComment.StartsWith("Second half begins."))//Match
             {
-               
+                GenerateMatchComment(
+                    matchId,
+                    homeTeamAPIId,
+                    awayTeamAPIId,
+                    feedComment,
+                    CommentType.Match,
+                    EventType.SecondHalfBegins,
+                    out homeTeamComment,
+                    out awayTeamComment);
             }
            else if (feedComment.StartsWith("Substitution"))//Player/Match/Team
             {
-                
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        true,
+                        CommentType.Player,
+                        EventType.Substitution,
+                        out homeTeamComment,
+                        out awayTeamComment);
             }
             else if (feedComment.StartsWith("Hand ball by"))//Player
             {
-                
+                GeneratePlayerComment(
+                       matchId,
+                       homeTeamAPIId,
+                       awayTeamAPIId,
+                       feedComment,
+                       false,
+                       CommentType.Player,
+                       EventType.Handball,
+                       out homeTeamComment,
+                       out awayTeamComment);
             }
            else if (feedComment.Contains("wins a free kick"))//Player
            {
-              
+               GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        true,
+                        CommentType.Player,
+                        EventType.FreeKick,
+                        out homeTeamComment,
+                        out awayTeamComment);
            }
-           else//Match/Team
+           else//Match/Team - Match
            {
-              
+               GenerateMatchComment(
+                    matchId,
+                    homeTeamAPIId,
+                    awayTeamAPIId,
+                    feedComment,
+                    CommentType.Match,
+                    EventType.General,
+                    out homeTeamComment,
+                    out awayTeamComment);
            }
         }
 
@@ -2143,41 +2455,240 @@ namespace CMS.Infrastructure.Entities
 
         private static void GenerateTeamComment
             (
-            string playerTeam, 
-            byte teamRating,
-            string homeTeam,
-            string awayTeam, 
+            Guid matchId,
+            int homeTeamAPIId,
+            int awayTeamAPIId,
+            string feedComment,
             CommentType commentType, 
             EventType eventType, 
             out string homeTeamComment, 
             out string awayTeamComment
             )
         {
-            int commType = (int)commentType;
-            int evType = (int)eventType;
+            homeTeamComment = string.Empty;
+            awayTeamComment = string.Empty;
+          
+            var summary = GetSummaryByMatchId(matchId);
 
-            using (EFDbContext context = new EFDbContext())
+            int homeGoals = 0;
+            int awayGoals = 0;
+          
+            if (summary != null)
             {
-                //homeTeamComment = context.Comment.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
-                //awayTeamComment = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                using (EFDbContext context = new EFDbContext())
+                {
+                    homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                    awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                }
             }
 
-            homeTeamComment = "";
-            awayTeamComment = "";
+            //TODO - set default value for team ratings to 3
+
+            //Get teams
+            var homeTeam = GetTeamByAPIId(homeTeamAPIId);
+            var awayTeam = GetTeamByAPIId(awayTeamAPIId);
+
+            //Get team ratings
+            var matchStats = GetMatchStatsByAPIId(matchId);
+
+            byte commType = (byte)commentType;
+            byte evType = (byte)eventType;
+            byte neutralPos = (byte)Perspective.Neutral;
+            byte homeTeamRating = matchStats.HomeTeamRating;
+            byte awayTeamRating = matchStats.AwayTeamRating;
+            
+            IList<string> homeComments = new List<string>();
+            IList<string> awayComments = new List<string>();
+          
+            using (EFDbContext context = new EFDbContext())
+            {
+                homeComments = context.Comment
+                .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == neutralPos) && (x.TeamRating == homeTeamRating))
+                    .Select(x => x.Text).ToList();
+
+                awayComments = context.Comment
+                .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == neutralPos) && (x.TeamRating == awayTeamRating))
+                    .Select(x => x.Text).ToList();
+            }
+
+            var random = new Random();
+            int index = 0;
+            string homeComment = string.Empty;
+            string awayComment = string.Empty;
+
+            Dictionary<string, string> placeholders = new Dictionary<string, string>();
+
+            placeholders.Add("HOMETEAM", homeTeam.Name);
+            placeholders.Add("AWAYTEAM", awayTeam.Name);
+
+            if (homeComments != null)
+            {
+                index = random.Next(homeComments.Count);
+                homeComment = homeComments[index];
+
+                //Replace text placeholders                
+                foreach (KeyValuePair<string, string> kvp in placeholders)
+                {
+                    string strToReplace = "{%" + kvp.Key + "%}";
+
+                    if (homeComment.Contains(strToReplace))
+                    {
+                        homeComment = homeComment.Replace(strToReplace, kvp.Value);
+                    }
+                }
+            }
+        
+            homeTeamComment = awayComment;
+            awayTeamComment = homeComment;
         }
 
         private static void GenerateMatchComment
             (
-            string playerName, 
-            string playerTeam, 
-            string playerPosition, 
+            Guid matchId,
+            int homeTeamAPIId,
+            int awayTeamAPIId,
+            string feedComment,
             CommentType commentType, 
             EventType eventType, 
             out string homeTeamComment, 
             out string awayTeamComment)
         {
-            homeTeamComment = "";
-            awayTeamComment = "";
+            homeTeamComment = string.Empty;
+            awayTeamComment = string.Empty;
+
+            var summary = GetSummaryByMatchId(matchId);
+
+            int homeGoals = 0;
+            int awayGoals = 0;
+
+            if (summary != null)
+            {
+                using (EFDbContext context = new EFDbContext())
+                {
+                    homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                    awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                }
+            }
+
+            //TODO - calculate match rating based on team ratings/goals
+
+            //Get teams
+            var homeTeam = GetTeamByAPIId(homeTeamAPIId);
+            var awayTeam = GetTeamByAPIId(awayTeamAPIId);
+
+            //Get team ratings
+            var matchStats = GetMatchStatsByAPIId(matchId);
+
+            byte commType = (byte)commentType;
+            byte evType = (byte)eventType;
+            byte neutralPos = (byte)Perspective.Neutral;
+            byte matchRating = 0;
+            byte homeTeamRating = matchStats.HomeTeamRating;
+            byte awayTeamRating = matchStats.AwayTeamRating;
+
+            //decimal shotsFactor = 0;
+
+            //Home
+            switch (homeTeamRating)
+            {
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+
+                    break;
+                default:
+                    break;
+            }
+           
+            //decimal shotsFactor = 0;
+
+            //if (matchstat.HomeTeamTotalShots > 2)
+            //{
+            //    var percentageOnTarget = (decimal)matchstat.HomeTeamOnGoalShots / (decimal)matchstat.HomeTeamTotalShots * (decimal)100;
+
+            //    if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
+            //    {
+            //        shotsFactor = -0.5M;
+            //    }
+            //    else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
+            //    {
+            //        shotsFactor = -0.3M;
+            //    }
+            //    else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
+            //    {
+            //        shotsFactor = 0.3M;
+            //    }
+            //    else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
+            //    {
+            //        shotsFactor = 0.5M;
+            //    }
+            //}
+
+            IList<string> comments = new List<string>();
+            
+            using (EFDbContext context = new EFDbContext())
+            {          
+                comments = context.Comment
+                    .Where(x => (x.CommentType == commType) && (x.EventType == evType) && (x.Perspective == neutralPos) && (x.MatchRating == matchRating))
+                    .Select(x => x.Text).ToList();
+            }
+
+            var random = new Random();
+            int index = 0;
+            string homeComment = string.Empty;
+            string awayComment = string.Empty;
+
+            Dictionary<string, string> placeholders = new Dictionary<string, string>();
+
+            placeholders.Add("HOMETEAM", homeTeam.Name);
+            placeholders.Add("AWAYTEAM", awayTeam.Name);
+
+            if (comments != null)
+            {
+                index = random.Next(comments.Count);
+                homeComment = comments[index];
+
+                //Replace text placeholders                
+                foreach (KeyValuePair<string, string> kvp in placeholders)
+                {
+                    string strToReplace = "{%" + kvp.Key + "%}";
+
+                    if (homeComment.Contains(strToReplace))
+                    {
+                        homeComment = homeComment.Replace(strToReplace, kvp.Value);
+                    }
+                }
+            }
+
+            if (comments != null)
+            {
+                index = random.Next(comments.Count);
+                awayComment = comments[index];
+
+                //Replace text placeholders
+                foreach (KeyValuePair<string, string> kvp in placeholders)
+                {
+                    string strToReplace = "{%" + kvp.Key + "%}";
+
+                    if (awayComment.Contains(strToReplace))
+                    {
+                        awayComment = awayComment.Replace(strToReplace, kvp.Value);
+                    }
+                }
+            }
+         
+            homeTeamComment = homeComment;
+            awayTeamComment = awayComment;
         }
         
         private static void GetPlayerAndTeamFromComment(string comment, char firstsep, char secondsep, out string player, out string team)

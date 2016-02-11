@@ -17,7 +17,11 @@ namespace FeedData
         public System.Guid Id { get; set; }
         public string Text { get; set; }
         public byte MatchRating { get; set; }
-        public bool TeamComment { get; set; }
-        public bool PlayerComment { get; set; }
+        public byte PlayerRating { get; set; }
+        public byte CommentType { get; set; }
+        public byte EventType { get; set; }
+        public byte Perspective { get; set; }
+        public byte Position { get; set; }
+        public byte TeamRating { get; set; }
     }
 }
