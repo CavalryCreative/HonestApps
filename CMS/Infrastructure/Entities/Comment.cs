@@ -64,7 +64,8 @@ namespace CMS.Infrastructure.Entities
         SecondHalfBegins = 23,
         Substitution = 24,
         Handball = 25,
-        General = 26
+        General = 26,
+        SecondHalfEnds = 27,
     }
 
     public enum Position

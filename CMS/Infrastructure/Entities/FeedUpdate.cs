@@ -67,7 +67,7 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
-            //GetAllCommentaries(); TODO - uncomment
+            GetAllCommentaries();
             BroadcastFeed();
 
             SaveBroadcastFeed("", GetIPAddress());
@@ -914,7 +914,6 @@ namespace CMS.Infrastructure.Entities
 
                     GetComment(matchDetails.Id, matchDetails.HomeTeamAPIId, matchDetails.AwayTeamAPIId, evt.Comment, out homeTeamComment, out awayTeamComment);
 
-                    //TODO - generate home/away comment based on match rating
                     feedEvent.EventComment = evt.Comment;
                     feedEvent.Score = evt.Score;
                     feedEvent.Minute = evt.Minute;
@@ -1456,13 +1455,37 @@ namespace CMS.Infrastructure.Entities
             return player;
         }
 
-        private static PlayerStat GetPlayerStatsByIdAndMatch(Guid Id, Guid matchId)
+        private static Player GetPlayerByNameAndTeam(string name, string teamName)
+        {
+            IList<Player> players = new List<Player>();
+            Team team = new Team();
+            string lastname = string.Empty;
+
+            string[] allnames = name.Split(' ');
+            int count = allnames.Count();
+
+            if (count > 0)
+            {
+                lastname = allnames[count - 1];
+
+                using (EFDbContext context = new EFDbContext())
+                {
+                    team = context.Teams.Where(x => x.Name.ToLower().Trim() == teamName.ToLower().Trim()).FirstOrDefault();
+                    players = team.Players.Where(x => x.Name.Any(y => x.Name.Contains(lastname))).ToList();
+                }
+
+            }
+           
+            return players.FirstOrDefault();
+        }
+
+        private static PlayerStat GetPlayerStatsByIdAndMatch(Guid playerId, Guid matchId)
         {
             PlayerStat playerStat = new PlayerStat();
 
             using (EFDbContext context = new EFDbContext())
             {
-                playerStat = context.PlayerStats.Where(x => (x.Id == Id) && (x.MatchId == matchId)).FirstOrDefault();
+                playerStat = context.PlayerStats.Where(x => (x.PlayerId == playerId) && (x.MatchId == matchId)).FirstOrDefault();
             }
 
             return playerStat;
@@ -1482,7 +1505,6 @@ namespace CMS.Infrastructure.Entities
 
         private static Summary GetSummaryByMatchId(Guid id)
         {
-            //TODO - add summaries to already added matches
             Summary summary = new Summary();
 
             using (EFDbContext context = new EFDbContext())
@@ -1561,7 +1583,6 @@ namespace CMS.Infrastructure.Entities
 
         private static void GetTeamRatings(Guid matchId, out byte homeRating, out byte awayRating)
         {
-            //Todo - set match rating for both teams
             homeRating = 0;
             awayRating = 0;
 
@@ -1732,16 +1753,12 @@ namespace CMS.Infrastructure.Entities
             SaveMatchStats(matchstat);
         }
 
-        private static byte GetPlayerRating(string playerName, byte goalsConceeded, Guid matchId)
+        private static byte GetPlayerRating(Player player, byte goalsConceeded, Guid matchId)
         {
-            //Todo - set player rating
-            Player player = new Player();
             byte playerRating = 0;
 
-            if (!string.IsNullOrWhiteSpace(playerName))
+            if (player != null)
             {
-                player = GetPlayerByName(playerName);
-
                 var plstat = GetPlayerStatsByIdAndMatch(player.Id, matchId);
                 
                 if (plstat != null)
@@ -1906,7 +1923,11 @@ namespace CMS.Infrastructure.Entities
                     }
 
                     //update playerstat object with updated rating
-                    plstat.Rating = Convert.ToByte(calcRating);
+                    if (calcRating <= 0)
+                        plstat.Rating = 0;
+                    else
+                        plstat.Rating = Convert.ToByte(calcRating);
+
                     SavePlayerStats(plstat);
                 }
             }
@@ -1959,7 +1980,6 @@ namespace CMS.Infrastructure.Entities
            }
            else if (feedComment.StartsWith("Attempt missed."))//Player
            {
-               //TODO - distinguish between different misses
                 feedComment = feedComment.Replace("Attempt missed.", "").Trim();
 
                if (feedComment.Contains("is too high"))
@@ -2023,7 +2043,7 @@ namespace CMS.Infrastructure.Entities
                        feedComment,
                        false,
                        CommentType.Player,
-                       EventType.AttemptBlocked,
+                       EventType.AttemptMissed,
                        out homeTeamComment,
                        out awayTeamComment);
                }
@@ -2069,9 +2089,11 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Corner, Team. Conceded by"))//Player or Match
+           else if (feedComment.StartsWith("Corner,"))//Player or Match
             {
-                GeneratePlayerComment(
+               feedComment = feedComment.Replace("Corner, ", "").Trim();
+ 
+               GeneratePlayerComment(
                        matchId,
                        homeTeamAPIId,
                        awayTeamAPIId,
@@ -2106,9 +2128,9 @@ namespace CMS.Infrastructure.Entities
                    out homeTeamComment,
                    out awayTeamComment);
             }
-           else if (feedComment.StartsWith("First Half begins."))//Team
+           else if (feedComment.StartsWith("First Half begins"))//Team
             {
-                GenerateTeamComment(
+               GenerateTeamComment(
                    matchId,
                    homeTeamAPIId,
                    awayTeamAPIId,
@@ -2120,24 +2142,42 @@ namespace CMS.Infrastructure.Entities
             }
            else if (feedComment.StartsWith("First Half ends"))//Team
             {
+                feedComment = feedComment.Replace("First Half ends,", "").Trim();
+
                 GenerateTeamComment(
                    matchId,
                    homeTeamAPIId,
                    awayTeamAPIId,
                    feedComment,
                    CommentType.Team,
-                   EventType.FirstHalfBegins,
+                   EventType.FirstHalfEnds,
                    out homeTeamComment,
                    out awayTeamComment);
             }
+           else if (feedComment.StartsWith("Second Half ends"))//Team
+           {
+               feedComment = feedComment.Replace("Second Half ends,", "").Trim();
+
+               GenerateTeamComment(
+                  matchId,
+                  homeTeamAPIId,
+                  awayTeamAPIId,
+                  feedComment,
+                  CommentType.Team,
+                  EventType.SecondHalfEnds,
+                  out homeTeamComment,
+                  out awayTeamComment);
+           }
            else if (feedComment.StartsWith("Foul by"))//Player
             {
-                GeneratePlayerComment(
+                feedComment = feedComment.Replace("Foul by ", "").Trim();
+ 
+               GeneratePlayerComment(
                         matchId,
                         homeTeamAPIId,
                         awayTeamAPIId,
                         feedComment,
-                        true,
+                        false,
                         CommentType.Player,
                         EventType.Foul,
                         out homeTeamComment,
@@ -2145,7 +2185,9 @@ namespace CMS.Infrastructure.Entities
             }
            else if (feedComment.StartsWith("Goal!"))//Player or Match or team
             {
-                GeneratePlayerComment(
+                feedComment = feedComment.Replace("Goal! ", "").Trim();
+ 
+               GeneratePlayerComment(
                        matchId,
                        homeTeamAPIId,
                        awayTeamAPIId,
@@ -2156,7 +2198,7 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Lineups announced"))//Team
+           else if (feedComment.StartsWith("Lineups are announced"))//Team
             {
                 GenerateTeamComment(
                     matchId,
@@ -2164,13 +2206,15 @@ namespace CMS.Infrastructure.Entities
                     awayTeamAPIId,
                     feedComment,
                     CommentType.Team,
-                    EventType.FirstHalfBegins,
+                    EventType.LineupsAnnounced,
                     out homeTeamComment,
                     out awayTeamComment);
             }
            else if (feedComment.StartsWith("Offside"))//Player
             {
-                GeneratePlayerComment(
+                feedComment = feedComment.Replace("Offside, ", "").Trim();
+ 
+               GeneratePlayerComment(
                        matchId,
                        homeTeamAPIId,
                        awayTeamAPIId,
@@ -2194,7 +2238,7 @@ namespace CMS.Infrastructure.Entities
                         out homeTeamComment,
                         out awayTeamComment);
             }
-           else if (feedComment.Contains("hits the post"))//Player
+           else if ((feedComment.Contains("hits the left post") || feedComment.Contains("hits the right post")))//Player
             {
                 GeneratePlayerComment(
                         matchId,
@@ -2207,9 +2251,11 @@ namespace CMS.Infrastructure.Entities
                         out homeTeamComment,
                         out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Second half begins."))//Match
+           else if (feedComment.StartsWith("Second Half begins"))//Match
             {
-                GenerateMatchComment(
+                feedComment = feedComment.Replace("Second Half begins", "").Trim();
+ 
+               GenerateMatchComment(
                     matchId,
                     homeTeamAPIId,
                     awayTeamAPIId,
@@ -2219,9 +2265,25 @@ namespace CMS.Infrastructure.Entities
                     out homeTeamComment,
                     out awayTeamComment);
             }
+           else if (feedComment.StartsWith("Match ends,"))//Match
+           {
+               feedComment = feedComment.Replace("Match ends,", "").Trim();
+
+               GenerateMatchComment(
+                    matchId,
+                    homeTeamAPIId,
+                    awayTeamAPIId,
+                    feedComment,
+                    CommentType.Match,
+                    EventType.MatchEnds,
+                    out homeTeamComment,
+                    out awayTeamComment);
+           }
            else if (feedComment.StartsWith("Substitution"))//Player/Match/Team
             {
-                GeneratePlayerComment(
+                feedComment = feedComment.Replace("Substitution, ", "").Trim();
+ 
+               GeneratePlayerComment(
                         matchId,
                         homeTeamAPIId,
                         awayTeamAPIId,
@@ -2234,6 +2296,8 @@ namespace CMS.Infrastructure.Entities
             }
             else if (feedComment.StartsWith("Hand ball by"))//Player
             {
+                feedComment = feedComment.Replace("Hand ball by ", "").Trim();
+
                 GeneratePlayerComment(
                        matchId,
                        homeTeamAPIId,
@@ -2291,6 +2355,7 @@ namespace CMS.Infrastructure.Entities
             string comment = string.Empty;
             string playerName = string.Empty;
             string teamName = string.Empty;
+            string score = string.Empty;
 
             var summary = GetSummaryByMatchId(matchId);
 
@@ -2312,41 +2377,46 @@ namespace CMS.Infrastructure.Entities
             var awayTeam = GetTeamByAPIId(awayTeamAPIId);
 
             //Get player and team from comment
-            GetPlayerAndTeamFromComment(feedComment, '(', ')', out playerName, out teamName);
+            GetPlayerAndTeamFromComment(eventType, feedComment, out playerName, out teamName, out score);
 
             var player = GetPlayerByName(playerName);
 
+            if (player == null)
+            {
+                player = GetPlayerByNameAndTeam(playerName, teamName);
+            }
+
             //Get player position
             var position = string.Empty;
+            byte playerRating = 0;
+            Position pos = Position.All;
 
             if (player != null)
             {
                 position = player.Position;
+            
+                switch (position)
+                {
+                    case "G":
+                        pos = Position.Goalkeeper;
+                        break;
+
+                    case "D":
+                        pos = Position.Defender;
+                        break;
+
+                    case "M":
+                        pos = Position.Midfielder;
+                        break;
+
+                    case "F":
+                        pos = Position.Forward;
+                        break;
+                }
+
+                //Get player rating
+                playerRating = GetPlayerRating(player, goalsConceeded, matchId);
             }
-
-            Position pos = Position.All;
-
-            switch (position)
-            {
-                case "G":
-                    pos = Position.Goalkeeper;
-                    break;
-
-                case "D":
-                    pos = Position.Defender;
-                    break;
-
-                case "M":
-                    pos = Position.Midfielder;
-                    break;
-
-                case "F":
-                    pos = Position.Forward;
-                    break;
-            }
-
-            //Get player rating
-            byte playerRating = GetPlayerRating(playerName, goalsConceeded, matchId);
 
             byte commType = (byte)commentType;
             byte evType = (byte)eventType;
@@ -2393,40 +2463,46 @@ namespace CMS.Infrastructure.Entities
 
             if (positiveComments != null)
             {
-                index = random.Next(positiveComments.Count);
-                posComment = positiveComments[index];
-
-                //Replace text placeholders                
-                foreach (KeyValuePair<string, string> kvp in placeholders)
+                if (positiveComments.Count > 0)
                 {
-                    string strToReplace = "{%" + kvp.Key + "%}";
+                    index = random.Next(positiveComments.Count);
+                    posComment = positiveComments[index];
 
-                    if (posComment.Contains(strToReplace))
+                    //Replace text placeholders                
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
                     {
-                        posComment = posComment.Replace(strToReplace, kvp.Value);
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (posComment.Contains(strToReplace))
+                        {
+                            posComment = posComment.Replace(strToReplace, kvp.Value);
+                        }
                     }
-                }
+                }     
             }            
 
             if (negativeComments != null)
             {
-                index = random.Next(negativeComments.Count);
-                negComment = negativeComments[index];
-
-                //Replace text placeholders
-                foreach (KeyValuePair<string, string> kvp in placeholders)
+                if (negativeComments.Count > 0)
                 {
-                    string strToReplace = "{%" + kvp.Key + "%}";
+                    index = random.Next(negativeComments.Count);
+                    negComment = negativeComments[index];
 
-                    if (negComment.Contains(strToReplace))
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
                     {
-                        negComment = negComment.Replace(strToReplace, kvp.Value);
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (negComment.Contains(strToReplace))
+                        {
+                            negComment = negComment.Replace(strToReplace, kvp.Value);
+                        }
                     }
-                }
+                }         
             }
 
             //Assign comment
-            if (teamName.Trim().ToLower() == homeTeam.Name) //Does comment relate to home team
+            if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower()) //Does comment relate to home team
             {
                 if (isPositiveEvent == true)
                 {
@@ -2528,34 +2604,40 @@ namespace CMS.Infrastructure.Entities
 
             if (homeComments != null)
             {
-                index = random.Next(homeComments.Count);
-                homeComment = homeComments[index];
-
-                //Replace text placeholders                
-                foreach (KeyValuePair<string, string> kvp in placeholders)
+                if (homeComments.Count > 0)
                 {
-                    string strToReplace = "{%" + kvp.Key + "%}";
+                    index = random.Next(homeComments.Count);
+                    homeComment = homeComments[index];
 
-                    if (homeComment.Contains(strToReplace))
+                    //Replace text placeholders                
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
                     {
-                        homeComment = homeComment.Replace(strToReplace, kvp.Value);
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (homeComment.Contains(strToReplace))
+                        {
+                            homeComment = homeComment.Replace(strToReplace, kvp.Value);
+                        }
                     }
-                }
+                }     
             }
 
             if (awayComments != null)
             {
-                index = random.Next(awayComments.Count);
-                awayComment = awayComments[index];
+                if (awayComments.Count > 0)
+                {             
+                    index = random.Next(awayComments.Count);
+                    awayComment = awayComments[index];
 
-                //Replace text placeholders                
-                foreach (KeyValuePair<string, string> kvp in placeholders)
-                {
-                    string strToReplace = "{%" + kvp.Key + "%}";
-
-                    if (awayComment.Contains(strToReplace))
+                    //Replace text placeholders                
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
                     {
-                        awayComment = awayComment.Replace(strToReplace, kvp.Value);
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (awayComment.Contains(strToReplace))
+                        {
+                            awayComment = awayComment.Replace(strToReplace, kvp.Value);
+                        }
                     }
                 }
             }
@@ -2591,8 +2673,6 @@ namespace CMS.Infrastructure.Entities
                     awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
                 }
             }
-
-            //TODO - calculate match rating based on team ratings/goals
 
             //Get teams
             var homeTeam = GetTeamByAPIId(homeTeamAPIId);
@@ -2640,36 +2720,36 @@ namespace CMS.Infrastructure.Entities
 
             if (comments != null)
             {
-                index = random.Next(comments.Count);
-                homeComment = comments[index];
-
-                //Replace text placeholders                
-                foreach (KeyValuePair<string, string> kvp in placeholders)
+                if (comments.Count > 0)
                 {
-                    string strToReplace = "{%" + kvp.Key + "%}";
+                    index = random.Next(comments.Count);
+                    homeComment = comments[index];
 
-                    if (homeComment.Contains(strToReplace))
+                    //Replace text placeholders                
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
                     {
-                        homeComment = homeComment.Replace(strToReplace, kvp.Value);
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (homeComment.Contains(strToReplace))
+                        {
+                            homeComment = homeComment.Replace(strToReplace, kvp.Value);
+                        }
                     }
-                }
-            }
 
-            if (comments != null)
-            {
-                index = random.Next(comments.Count);
-                awayComment = comments[index];
+                    index = random.Next(comments.Count);
+                    awayComment = comments[index];
 
-                //Replace text placeholders
-                foreach (KeyValuePair<string, string> kvp in placeholders)
-                {
-                    string strToReplace = "{%" + kvp.Key + "%}";
-
-                    if (awayComment.Contains(strToReplace))
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
                     {
-                        awayComment = awayComment.Replace(strToReplace, kvp.Value);
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (awayComment.Contains(strToReplace))
+                        {
+                            awayComment = awayComment.Replace(strToReplace, kvp.Value);
+                        }
                     }
-                }
+                }      
             }
          
             homeTeamComment = homeComment;
@@ -2680,15 +2760,114 @@ namespace CMS.Infrastructure.Entities
                 SaveMatchStats(matchStats);
         }
         
-        private static void GetPlayerAndTeamFromComment(string comment, char firstsep, char secondsep, out string player, out string team)
+        private static void GetPlayerAndTeamFromComment(EventType eventType, string comment, out string player, out string team, out string score)
         {
-            var arr = comment.Split(firstsep);
+            player = string.Empty;
+            team = string.Empty;
+            score = string.Empty;
 
-            player = arr[0];
+            string[] arr;
+            string[] arr2;
+            string[] arr3;
 
-            var arr2 = arr[1].Split(secondsep);
+            try
+            {
+                switch (eventType)
+                {
+                    case EventType.AttemptBlocked:              
+                    case EventType.AttemptMissedTooHigh:                  
+                    case EventType.AttemptMissedHighAndWide:                    
+                    case EventType.AttemptMissesToRightOrLeft:                  
+                    case EventType.AttemptMissesJustABitTooHigh:                  
+                    case EventType.AttemptMissed:                    
+                    case EventType.AttemptSaved:
+                    case EventType.FreeKick:
+                    case EventType.YellowCard:
+                    case EventType.RedCard:
+                    case EventType.HitsTheBar:
+                    case EventType.HitsThePost:
+                    case EventType.Foul:
+                    case EventType.Handball:
+                        //Attempt blocked. Adam Lallana (Liverpool) left footed shot from the centre of the box is blocked. Assisted by Nathaniel Clyne.
+                        //Adam Lallana (Liverpool) wins a free kick in the attacking half.
+                        //Foul by Alberto Moreno (Liverpool).
 
-            team = arr2[0];
+                        arr = comment.Split('(');
+                        player = arr[0].Trim();
+
+                        arr2 = arr[1].Split(')');
+                        team = arr2[0].Trim();
+
+                        break;               
+                    case EventType.Corner:
+                        //Corner,  Crystal Palace. Conceded by Brendan Galloway.
+
+                        arr = comment.Split('.');
+                        team = arr[0].Trim();
+
+                        break;
+                    case EventType.Delay:
+                    case EventType.DelayEnds:
+                    case EventType.FirstHalfBegins:              
+                    case EventType.LineupsAnnounced:
+                    case EventType.General:
+                        //Don't need to return anything
+
+                        break;                
+                    case EventType.Goal:
+                        //Goal!  Everton 1, Crystal Palace 1. Romelu Lukaku (Everton) right footed shot from very close range to the centre of the goal. Assisted by Gareth Barry.
+                        arr = comment.Split('.');
+                        score = arr[0].Trim();
+
+                        //TODO - add assist
+                        arr2 = arr[1].Split('(');
+                        player = arr2[0].Trim();
+
+                        arr3 = arr2[1].Split(')');
+                        team = arr3[0].Trim();
+
+                        break;
+                    case EventType.FirstHalfEnds:
+                    case EventType.SecondHalfBegins:
+                    case EventType.MatchEnds:
+                        //Match ends, Newcastle United 2, Liverpool 0.
+
+                        arr = comment.Split('.');
+                        score = arr[0].Trim();
+
+                        break;
+                    case EventType.Offside:
+                        //Offside, Crystal Palace. James McArthur tries a through ball, but Yannick Bolasie is caught offside.
+
+                            arr = comment.Split('.');
+                            team = arr[0].Trim();
+
+                            arr2 = arr[1].Split(',');
+                            player = arr2[1].Trim();
+
+                            player = player.Replace("but", string.Empty);
+                            player = player.Replace("is caught offside.", string.Empty).Trim();
+                   
+                        break;           
+                    case EventType.Substitution:
+                        //Substitution, Crystal Palace. Dwight Gayle replaces Connor Wickham.
+
+                            arr = comment.Split('.');
+                            team = arr[0].Trim();
+                            player = arr[1].Trim();
+
+                            int index = player.IndexOf("replaces");
+                            player = player.Substring(0, index - 1).Trim();
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                SaveException(ex, string.Format("GetPlayerAndTeamFromComment, Comment: {0}", comment));
+            }
         }
 
         public string GetIPAddress()
