@@ -119,8 +119,8 @@ namespace FeedData
                         {
                             int matchAPIId = -1;
 
-                            try
-                            {
+                            //try
+                            //{
                                 Match match = new Match();
 
                                 match.APIId = item.APIId;
@@ -182,12 +182,13 @@ namespace FeedData
                                 SaveUpdateHistory(history);
 
                                 matchAPIId = match.APIId;
-                            }
-                            catch (Exception ex)
-                            {
-                                //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                SaveException(ex, string.Format("SaveMatch - FeedData, MatchAPIId: {0}", matchAPIId.ToString()));
-                            }                                   
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                            //    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                            //    SaveException(ex, string.Format("SaveMatch - FeedData, MatchAPIId: {0}", matchAPIId.ToString()));
+                            //}                                   
                         }
                         else
                         {
@@ -208,8 +209,8 @@ namespace FeedData
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
-                retMsg = "Error: " + ex.Message;
+                    Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    SaveException(ex, string.Format("SaveMatch - FeedData"));
             }
 
             return matchesToday;
