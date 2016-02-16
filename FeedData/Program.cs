@@ -209,7 +209,7 @@ namespace FeedData
             }
             catch (Exception ex)
             {
-                    Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}, Stack Trace: {2}", ex.InnerException.ToString(), ex.Message, ex.StackTrace));
                     SaveException(ex, string.Format("SaveMatch - FeedData"));
             }
 
@@ -439,11 +439,11 @@ namespace FeedData
                 {
                     //Create record
                     record.HResult = exception.HResult.ToString();
-                    record.InnerException = exception.InnerException.ToString();
-                    record.Message = exception.Message;
+                    record.InnerException = record.InnerException != null ? exception.InnerException.ToString() : string.Empty;
+                    record.Message = string.Format("Additional Info:{0}, Exception: {1} ", additionalInfo, exception.Message);
                     record.Source = exception.Source;
-                    record.StackTrace = string.Format("Additional Info: {0}, Stack Trace: {1}", additionalInfo, exception.StackTrace);
-                    record.TargetSite = exception.TargetSite.ToString();
+                    record.StackTrace = record.StackTrace != null ? string.Format("Stack Trace: {0}", exception.StackTrace.ToString()) : string.Empty;
+                    record.TargetSite = record.TargetSite != null ? exception.TargetSite.ToString() : string.Empty;
                     record.DateAdded = DateTime.Now;
 
                     context.SiteExceptions.Add(record);
