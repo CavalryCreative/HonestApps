@@ -40,8 +40,8 @@ namespace CMS.Infrastructure.Entities
 
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
-            //TODO change back to 120
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120000));
+        
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -482,7 +482,7 @@ namespace CMS.Infrastructure.Entities
                     jPath = "commentaries.[0].comm_match_summary.localteam.goals.player";
 
                     var goals = token.SelectTokens(jPath);
-                    int APIId;
+                    int APIId = 0;
                     Byte numberByte;
                     bool isValid;
 
@@ -490,7 +490,14 @@ namespace CMS.Infrastructure.Entities
                     {
                         JObject obj = JObject.Parse(s);
 
-                        isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.id").ToString(), out APIId);
+                        try
+                        {
+                            isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.id").ToString(), out APIId);
+                        }
+                        catch
+                        {
+                            isValid = false;
+                        }                     
 
                         if (isValid)//Just one record
                         {
@@ -617,7 +624,15 @@ namespace CMS.Infrastructure.Entities
                      {
                            JObject obj = JObject.Parse(s);
 
-                             isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.id").ToString(), out APIId);
+                           try 
+                           {
+                               //Check if only one record exists
+                               isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.id").ToString(), out APIId);
+                           }
+                           catch 
+                           {
+                               isValid = false;
+                           }
 
                              if (isValid)
                              {
@@ -724,7 +739,7 @@ namespace CMS.Infrastructure.Entities
                                              }
                                          }
                                      }
-                                 }//
+                                 }
                              }
                     }
                      catch (Exception ex)
@@ -916,14 +931,21 @@ namespace CMS.Infrastructure.Entities
                         int lastUpdateId = GetLatestEventId(match.Id);
 
                         JObject feed = JObject.Parse(s);
-                        string id = feed.SelectToken("commentaries.[0].comm_commentaries.comment.id").ToString();
-                        int eventId;
+                        string id = string.Empty;
+                        int eventId = 0;
 
-                        isValid = Int32.TryParse(id, out eventId);
+                        try
+                        {
+                            isValid = Int32.TryParse(feed.SelectToken("commentaries.[0].comm_commentaries.comment.id").ToString(), out eventId);
+                        }
+                        catch
+                        {
+                            isValid = false;
+                        }                       
 
                         if (isValid)
                         {
-                            if (eventId > lastUpdateId)
+                            if (eventId >= lastUpdateId)
                             {
                                 Event commEvent = new Event();
 
@@ -1631,9 +1653,10 @@ namespace CMS.Infrastructure.Entities
                 using (EFDbContext context = new EFDbContext())
                 {
                     team = context.Teams.Where(x => x.Name.ToLower().Trim() == teamName.ToLower().Trim()).FirstOrDefault();
-                    players = team.Players.Where(x => x.Name.Any(y => x.Name.Contains(lastname))).ToList();
-                }
 
+                    if (team != null)
+                        players = team.Players.Where(x => x.Name.Any(y => x.Name.Contains(lastname))).ToList();
+                }
             }
            
             return players.FirstOrDefault();
@@ -1835,7 +1858,7 @@ namespace CMS.Infrastructure.Entities
 
                     if (homeCalcRating <= 0)
                     {
-                        matchstat.HomeTeamRating = 0;
+                        matchstat.HomeTeamRating = 1;
                     }
                     else
                     {
@@ -1917,7 +1940,7 @@ namespace CMS.Infrastructure.Entities
 
             if (awayCalcRating <= 0)
             {
-                matchstat.AwayTeamRating = 0;
+                matchstat.AwayTeamRating = 1;
             }
             else
             {
@@ -2102,7 +2125,7 @@ namespace CMS.Infrastructure.Entities
 
                     //update playerstat object with updated rating
                     if (calcRating <= 0)
-                        plstat.Rating = 0;
+                        plstat.Rating = 1;
                     else
                         plstat.Rating = Convert.ToByte(calcRating);
 
@@ -2825,17 +2848,18 @@ namespace CMS.Infrastructure.Entities
                     }
                 }
             }
-            //TODO - remove when real comments added
+
+            homeTeamComment = homeComment;
+            awayTeamComment = awayComment;
+
+            //TODO - remove when real comments added, uncomment above
             //homeTeamComment = string.Format("Team - EventType: {0}, CommentType: {1}, HomeTeamRating: {2}, TeamName: [3}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), homeTeamRating.ToString(), homeTeam.Name);
             //awayTeamComment = string.Format("Team - EventType: {0}, CommentType: {1}, AwayTeamRating: {2}, TeamName: [3}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), awayTeamRating.ToString(), awayTeam.Name);
 
             homeTeamComment = "Team home team - Perspective: Neutral";
-            awayTeamComment = "Team away team - Perspective: Neutral";
-
-            homeTeamComment = homeComment;
-            awayTeamComment = awayComment;
+            awayTeamComment = "Team away team - Perspective: Neutral";   
         }
 
         private static void GenerateMatchComment
@@ -2889,7 +2913,10 @@ namespace CMS.Infrastructure.Entities
             decimal calcRating = ((decimal)homeTeamRating + (decimal)awayTeamRating) / 2M;
             calcRating = calcRating + (((decimal)homeGoals + (decimal)awayGoals) * 0.2M);
 
-            matchRating = Convert.ToByte(calcRating);
+            if (calcRating <= 0)
+                matchRating = 1;
+            else
+                matchRating = Convert.ToByte(calcRating);
 
             IList<string> comments = new List<string>();
             
@@ -2944,6 +2971,9 @@ namespace CMS.Infrastructure.Entities
                 }      
             }
 
+            homeTeamComment = homeComment;
+            awayTeamComment = awayComment;
+
             //TODO - remove when real comments added
             //homeTeamComment = string.Format("Match - EventType: {0}, CommentType: {1}, HomeTeamRating: {2}, TeamName: [3}, MatchRating: {4}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), homeTeamRating.ToString(), homeTeam.Name, matchRating.ToString());
@@ -2952,9 +2982,6 @@ namespace CMS.Infrastructure.Entities
 
             homeTeamComment = "Match home team - Perspective: Neutral";
             awayTeamComment = "Match away team - Perspective: Neutral";
-
-            homeTeamComment = homeComment;
-            awayTeamComment = awayComment;
 
             //update matchstat object with updated rating
             if (matchStats != null)
