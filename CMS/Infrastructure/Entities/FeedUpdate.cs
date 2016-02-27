@@ -40,8 +40,8 @@ namespace CMS.Infrastructure.Entities
 
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
-        
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));
+      
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -394,8 +394,8 @@ namespace CMS.Infrastructure.Entities
 
                         y = token.SelectTokens(jPath);
 
-                         try
-                                    {
+                        try
+                        {
                         foreach (var childToken in y.Children())
                         {
                             var jeff = childToken.Children();
@@ -451,6 +451,16 @@ namespace CMS.Infrastructure.Entities
                                     lineup.PlayerId = awaySubPlayer.Id;
 
                                     SavePlayerToMatchLineup(lineup);
+
+                                    UpdateHistory history = new UpdateHistory();
+
+                                    history.Active = true;
+                                    history.Deleted = false;
+                                    history.MatchDetails = true;
+                                    history.MatchAPIId = matchId;
+                                    history.Lineups = true;
+
+                                    SaveUpdateHistory(history);
                                 }
                             }
                         }
@@ -463,14 +473,6 @@ namespace CMS.Infrastructure.Entities
                         //System.Diagnostics.Debug.WriteLine("Away players subs complete");
 
                         #endregion
-
-                        UpdateHistory history = new UpdateHistory();
-
-                        history.MatchDetails = true;
-                        history.MatchAPIId = matchId;
-                        history.Lineups = true;
-                       
-                        SaveUpdateHistory(history);
                     }
 
                     #endregion
@@ -501,15 +503,27 @@ namespace CMS.Infrastructure.Entities
 
                         if (isValid)//Just one record
                         {
-                            //Check if goal exists
-                            Goal goalExists = new Goal();
+                            string minute = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.minute").ToString();
 
-                            goalExists = GetGoalByAPIId(APIId);
+                            Goal homeGoal = new Goal();
+
+                            if (homeGoal.Penalty == true)
+                            {
+                                minute = minute.Trim().Remove(0, 4);
+                            }
+
+                            isValid = Byte.TryParse(minute, out numberByte);
+
+                            if (isValid)
+                                homeGoal.Minute = numberByte;
+                            else
+                                homeGoal.Minute = 0;
+
+                            //Check if goal exists                       
+                            var goalExists = GetGoalByAPIId(APIId, homeGoal.Minute);
 
                             if (goalExists == null)
                             {
-                                Goal homeGoal = new Goal();
-
                                 homeGoal.APIId = APIId;
                                 homeGoal.SummaryId = summary.Id;
                                 homeGoal.IsHomeTeam = true;
@@ -529,20 +543,6 @@ namespace CMS.Infrastructure.Entities
                                 homeGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.owngoal").ToString() == "False" ? false : true;
                                 homeGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.penalty").ToString() == "False" ? false : true;
 
-                                string minute = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.minute").ToString();
-
-                                if (homeGoal.Penalty == true)
-                                {
-                                    minute = minute.Trim().Remove(0, 4);
-                                }
-
-                                isValid = Byte.TryParse(minute, out numberByte);
-
-                                if (isValid)
-                                    homeGoal.Minute = numberByte;
-                                else
-                                    homeGoal.Minute = 0;
-
                                 retMsg = SaveGoal(homeGoal);
                             }
                         }
@@ -558,15 +558,29 @@ namespace CMS.Infrastructure.Entities
 
                                     if (isValid)
                                     {
-                                        //Check if goal exists
-                                        Goal goalExists = new Goal();
+                                        Goal homeGoal = new Goal();
 
-                                        goalExists = GetGoalByAPIId(APIId);
+                                        string minute = evt["minute"];
+                                        homeGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
+                                        homeGoal.Penalty = evt["penalty"] == "False" ? false : true;                                           
+
+                                        if (homeGoal.Penalty == true)
+                                        {
+                                            minute = minute.Trim().Remove(0, 4);
+                                        }
+
+                                        isValid = Byte.TryParse(minute, out numberByte);
+
+                                        if (isValid)
+                                            homeGoal.Minute = numberByte;
+                                        else
+                                            homeGoal.Minute = 0;
+
+                                        //Check if goal exists
+                                        var goalExists = GetGoalByAPIId(APIId, homeGoal.Minute);
 
                                         if (goalExists == null)
-                                        {
-                                            Goal homeGoal = new Goal();
-
+                                        {                                           
                                             homeGoal.APIId = APIId;
                                             homeGoal.SummaryId = summary.Id;
                                             homeGoal.IsHomeTeam = true;
@@ -582,23 +596,6 @@ namespace CMS.Infrastructure.Entities
                                                 homeGoal.PlayerName = player.Name;
                                                 homeGoal.APIPlayerId = 0;
                                             }
-
-                                            homeGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
-                                            homeGoal.Penalty = evt["penalty"] == "False" ? false : true;
-
-                                            string minute = evt["minute"];
-
-                                            if (homeGoal.Penalty == true)
-                                            {
-                                                minute = minute.Trim().Remove(0, 4);
-                                            }
-
-                                            isValid = Byte.TryParse(evt["minute"], out numberByte);
-
-                                            if (isValid)
-                                                homeGoal.Minute = numberByte;
-                                            else
-                                                homeGoal.Minute = 0;
 
                                             retMsg = SaveGoal(homeGoal);
                                         }
@@ -636,15 +633,30 @@ namespace CMS.Infrastructure.Entities
 
                              if (isValid)
                              {
-                                 //Check if goal exists
-                                 Goal goalExists = new Goal();
+                                 Goal awayGoal = new Goal();
 
-                                 goalExists = GetGoalByAPIId(APIId);
+                                 awayGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.owngoal").ToString() == "False" ? false : true;
+                                 awayGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.penalty").ToString() == "False" ? false : true;
+
+                                 string minute = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.minute").ToString();
+
+                                 if (awayGoal.Penalty == true)
+                                 {
+                                     minute = minute.Trim().Remove(0, 4);
+                                 }
+
+                                 isValid = Byte.TryParse(minute, out numberByte);
+
+                                 if (isValid)
+                                     awayGoal.Minute = numberByte;
+                                 else
+                                     awayGoal.Minute = 0;
+
+                                 //Check if goal exists
+                                 var goalExists = GetGoalByAPIId(APIId, awayGoal.Minute);
 
                                  if (goalExists == null)
                                  {
-                                     Goal awayGoal = new Goal();
-
                                      awayGoal.APIId = APIId;
                                      awayGoal.SummaryId = summary.Id;
                                      awayGoal.IsHomeTeam = false;
@@ -661,23 +673,6 @@ namespace CMS.Infrastructure.Entities
                                          awayGoal.APIPlayerId = 0;
                                      }
 
-                                     awayGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.owngoal").ToString() == "False" ? false : true;
-                                     awayGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.penalty").ToString() == "False" ? false : true;
-
-                                     string minute = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.minute").ToString();
-
-                                     if (awayGoal.Penalty == true)
-                                     {
-                                         minute = minute.Trim().Remove(0, 4);
-                                     }
-
-                                     isValid = Byte.TryParse(minute, out numberByte);
-
-                                     if (isValid)
-                                         awayGoal.Minute = numberByte;
-                                     else
-                                         awayGoal.Minute = 0;
-
                                      retMsg = SaveGoal(awayGoal);
                                  }
                              }
@@ -693,15 +688,26 @@ namespace CMS.Infrastructure.Entities
 
                                          if (isValid)
                                          {
-                                             //Check if goal exists
-                                             Goal goalExists = new Goal();
+                                             string minute = evt["minute"];
+                                             Goal awayGoal = new Goal();
 
-                                             goalExists = GetGoalByAPIId(APIId);
-
-                                             if (goalExists == null)
+                                             if (awayGoal.Penalty == true)
                                              {
-                                                 Goal awayGoal = new Goal();
+                                                 minute = minute.Trim().Remove(0, 4);
+                                             }
 
+                                             isValid = Byte.TryParse(minute, out numberByte);
+
+                                             if (isValid)
+                                                 awayGoal.Minute = numberByte;
+                                             else
+                                                 awayGoal.Minute = 0;
+
+                                             //Check if goal exists   
+                                             var goalExists = GetGoalByAPIId(APIId, awayGoal.Minute);
+                                                                           
+                                             if (goalExists == null)
+                                             {                                              
                                                  awayGoal.APIId = APIId;
                                                  awayGoal.SummaryId = summary.Id;
                                                  awayGoal.IsHomeTeam = false;
@@ -719,21 +725,7 @@ namespace CMS.Infrastructure.Entities
                                                  }
 
                                                  awayGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
-                                                 awayGoal.Penalty = evt["penalty"] == "False" ? false : true;
-
-                                                 string minute = evt["minute"];
-
-                                                 if (awayGoal.Penalty == true)
-                                                 {
-                                                     minute = minute.Trim().Remove(0, 4);
-                                                 }
-
-                                                 isValid = Byte.TryParse(minute, out numberByte);
-
-                                                 if (isValid)
-                                                     awayGoal.Minute = numberByte;
-                                                 else
-                                                     awayGoal.Minute = 0;
+                                                 awayGoal.Penalty = evt["penalty"] == "False" ? false : true;                                                
 
                                                  retMsg = SaveGoal(awayGoal);
                                              }
@@ -963,9 +955,11 @@ namespace CMS.Infrastructure.Entities
                                 commEvent.Important = important == "True" ? true : false;
                                 commEvent.Goal = isgoal == "True" ? true : false;
 
-                                if (!string.IsNullOrWhiteSpace(minute))
-                                    commEvent.Minute = Convert.ToByte(minute);
+                                byte min = 0;
 
+                                isValid = Byte.TryParse(minute, out min);
+
+                                commEvent.Minute = min;
                                 commEvent.Comment = comment;
                                 commEvent.APIId = eventId;
                                 commEvent.MatchId = match.Id;
@@ -989,7 +983,7 @@ namespace CMS.Infrastructure.Entities
                             var events = token.SelectTokens(jPath);
 
                             foreach (var childToken in events.Children())
-                            {                               
+                            {
                                 var jeff = childToken.Children();
 
                                 foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
@@ -997,11 +991,11 @@ namespace CMS.Infrastructure.Entities
                                     try
                                     {
                                         id = evt["id"];
-                                      
-                                         isValid = Int32.TryParse(id, out eventId);
+
+                                        isValid = Int32.TryParse(id, out eventId);
 
                                         //Check if event exists                           
-                                         if (!isValid)
+                                        if (!isValid)
                                             eventId = 0;
 
                                         if (eventId <= lastUpdateId)
@@ -1049,7 +1043,8 @@ namespace CMS.Infrastructure.Entities
                                         SaveException(ex, string.Format("SaveEvent, MatchId: ", match.Id.ToString()));
                                     }
                                 }
-                            }//
+                                }
+                            //}//
                         }
                    
                     //System.Diagnostics.Debug.WriteLine("Events complete");
@@ -1259,7 +1254,7 @@ namespace CMS.Infrastructure.Entities
                 }
 
                 //Update record
-                var recordToUpdate = context.Goals.Where(x => x.APIId == updatedRecord.APIId).FirstOrDefault();
+                var recordToUpdate = context.Goals.Where(x => x.APIId == updatedRecord.APIId && x.Minute == updatedRecord.Minute).FirstOrDefault();
 
                 if (recordToUpdate != null)
                 {
@@ -1601,13 +1596,13 @@ namespace CMS.Infrastructure.Entities
             return hist;
         }
 
-        private static Goal GetGoalByAPIId(int id)
+        private static Goal GetGoalByAPIId(int id, byte minute)
         {
             Goal goal = new Goal();
 
             using (EFDbContext context = new EFDbContext())
             {
-                goal = context.Goals.Where(x => (x.APIId == id)).FirstOrDefault();
+                goal = context.Goals.Where(x => (x.APIId == id) && (x.Minute == minute)).FirstOrDefault();
             }
 
             return goal;
@@ -1769,188 +1764,202 @@ namespace CMS.Infrastructure.Entities
             homeRating = 0;
             awayRating = 0;
 
-                var matchstat = GetMatchStatsByAPIId(matchId);
+            var matchstat = GetMatchStatsByAPIId(matchId);
 
-                    decimal homeCalcRating = matchstat.HomeTeamRating;
-                    decimal awayCalcRating = matchstat.AwayTeamRating;
-
-                    var summary = GetSummaryByMatchId(matchId);
-
-                    int homeGoals = 0;
-                    int awayGoals = 0;
-                  
-                    if (summary != null)
-                    {
-                        using (EFDbContext context = new EFDbContext())
-                        {
-                            homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
-                            awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
-                        }
-                    }
-
-            #region Home team
-                    decimal shotsFactor = 0;
-
-                    if (matchstat.HomeTeamTotalShots > 2)
-                    {
-                        var percentageOnTarget = (decimal)matchstat.HomeTeamOnGoalShots / (decimal)matchstat.HomeTeamTotalShots * (decimal)100;
-
-                        if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
-                        {
-                            shotsFactor = -0.5M;
-                        }
-                        else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
-                        {
-                            shotsFactor = -0.3M;
-                        }
-                        else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
-                        {
-                            shotsFactor = 0.3M;
-                        }
-                        else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
-                        {
-                            shotsFactor = 0.5M;
-                        }
-                    }
-
-            //Possession
-            byte possession = 0;
-            decimal possessionFactor = 0;
-
-            if (!string.IsNullOrWhiteSpace(matchstat.HomeTeamPossessionTime))
+            if (matchstat != null)
             {
-                var possStr = matchstat.HomeTeamPossessionTime.Remove(matchstat.HomeTeamPossessionTime.Trim().Length - 1, 1);
+                decimal homeCalcRating = matchstat.HomeTeamRating;
+                decimal awayCalcRating = matchstat.AwayTeamRating;
 
-                Byte.TryParse(possStr, out possession);
-            }
+                var summary = GetSummaryByMatchId(matchId);
 
-            if (possession > 0)
-            {
-                if (possession >= 0 && possession <= 25)
+                int homeGoals = 0;
+                int awayGoals = 0;
+
+                if (summary != null)
                 {
-                    possessionFactor = -0.5M;
+                    using (EFDbContext context = new EFDbContext())
+                    {
+                        homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                        awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                    }
                 }
-                else if (possession > 25 && possession <= 50)
+
+                #region Home team
+                decimal shotsFactor = 0;
+
+                if (matchstat.HomeTeamTotalShots > 2)
                 {
-                    possessionFactor = -0.3M;
+                    var percentageOnTarget = (decimal)matchstat.HomeTeamOnGoalShots / (decimal)matchstat.HomeTeamTotalShots * (decimal)100;
+
+                    if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
+                    {
+                        shotsFactor = -0.5M;
+                    }
+                    else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
+                    {
+                        shotsFactor = -0.3M;
+                    }
+                    else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
+                    {
+                        shotsFactor = 0.3M;
+                    }
+                    else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
+                    {
+                        shotsFactor = 0.5M;
+                    }
                 }
-                else if (possession > 50 && possession <= 75)
+
+                //Possession
+                byte possession = 0;
+                decimal possessionFactor = 0;
+
+                if (!string.IsNullOrWhiteSpace(matchstat.HomeTeamPossessionTime))
                 {
-                    possessionFactor = 0.3M;
+                    var possStr = matchstat.HomeTeamPossessionTime.Remove(matchstat.HomeTeamPossessionTime.Trim().Length - 1, 1);
+
+                    Byte.TryParse(possStr, out possession);
                 }
-                else if (possession > 75 && possession <= 100)
+
+                if (possession > 0)
                 {
-                    possessionFactor = 0.5M;
+                    if (possession >= 0 && possession <= 25)
+                    {
+                        possessionFactor = -0.5M;
+                    }
+                    else if (possession > 25 && possession <= 50)
+                    {
+                        possessionFactor = -0.3M;
+                    }
+                    else if (possession > 50 && possession <= 75)
+                    {
+                        possessionFactor = 0.3M;
+                    }
+                    else if (possession > 75 && possession <= 100)
+                    {
+                        possessionFactor = 0.5M;
+                    }
                 }
-            }
-                        
-                    homeCalcRating = homeCalcRating +
-                        (decimal)(awayGoals * -0.5) +
-                        (decimal)(matchstat.HomeTeamCorners * 0.1) +
-                        (decimal)(matchstat.HomeTeamFouls * -0.1) +
-                        (decimal)(matchstat.HomeTeamOffsides * -0.1) +
-                        (decimal)(matchstat.HomeTeamRedCards * -0.5) +
-                        (decimal)(matchstat.HomeTeamSaves * 0.1) +
-                        (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
-                        (decimal)(homeGoals * 0.5) +
-                        shotsFactor +
-                        possessionFactor;
 
-                    if (homeCalcRating <= 0)
+                homeCalcRating = homeCalcRating +
+                    (decimal)(awayGoals * -0.5) +
+                    (decimal)(matchstat.HomeTeamCorners * 0.1) +
+                    (decimal)(matchstat.HomeTeamFouls * -0.1) +
+                    (decimal)(matchstat.HomeTeamOffsides * -0.1) +
+                    (decimal)(matchstat.HomeTeamRedCards * -0.5) +
+                    (decimal)(matchstat.HomeTeamSaves * 0.1) +
+                    (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
+                    (decimal)(homeGoals * 0.5) +
+                    shotsFactor +
+                    possessionFactor;
+
+                if (homeCalcRating <= 0)
+                {
+                    matchstat.HomeTeamRating = 1;
+                }
+                else
+                {
+                    matchstat.HomeTeamRating = Convert.ToByte(homeCalcRating);
+                }
+
+                homeRating = matchstat.HomeTeamRating;
+
+                #endregion
+
+                #region Away team
+
+                shotsFactor = 0;
+
+                if (matchstat.AwayTeamTotalShots > 2)
+                {
+                    var percentageOnTarget = (decimal)matchstat.AwayTeamOnGoalShots / (decimal)matchstat.AwayTeamTotalShots * (decimal)100;
+
+                    if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
                     {
-                        matchstat.HomeTeamRating = 1;
+                        shotsFactor = -0.5M;
                     }
-                    else
+                    else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
                     {
-                        matchstat.HomeTeamRating = Convert.ToByte(homeCalcRating);
+                        shotsFactor = -0.3M;
                     }
-
-                    homeRating = matchstat.HomeTeamRating;
-
-            #endregion
-
-            #region Away team
-
-                    shotsFactor = 0;
-
-                    if (matchstat.AwayTeamTotalShots > 2)
+                    else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
                     {
-                        var percentageOnTarget = (decimal)matchstat.AwayTeamOnGoalShots / (decimal)matchstat.AwayTeamTotalShots * (decimal)100;
-
-                        if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
-                        {
-                            shotsFactor = -0.5M;
-                        }
-                        else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
-                        {
-                            shotsFactor = -0.3M;
-                        }
-                        else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
-                        {
-                            shotsFactor = 0.3M;
-                        }
-                        else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
-                        {
-                            shotsFactor = 0.5M;
-                        }
+                        shotsFactor = 0.3M;
                     }
-
-                    //Possession
-                    possession = 0;
-                    possessionFactor = 0;
-
-                    if (!string.IsNullOrWhiteSpace(matchstat.AwayTeamPossessionTime))
+                    else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
                     {
-                        var possStr = matchstat.AwayTeamPossessionTime.Remove(matchstat.AwayTeamPossessionTime.Trim().Length - 1, 1);
-
-                        Byte.TryParse(possStr, out possession);
+                        shotsFactor = 0.5M;
                     }
+                }
 
-                    if (possession > 0)
+                //Possession
+                possession = 0;
+                possessionFactor = 0;
+
+                if (!string.IsNullOrWhiteSpace(matchstat.AwayTeamPossessionTime))
+                {
+                    var possStr = matchstat.AwayTeamPossessionTime.Remove(matchstat.AwayTeamPossessionTime.Trim().Length - 1, 1);
+
+                    Byte.TryParse(possStr, out possession);
+                }
+
+                if (possession > 0)
+                {
+                    if (possession >= 0 && possession <= 25)
                     {
-                        if (possession >= 0 && possession <= 25)
-                        {
-                            possessionFactor = -0.5M;
-                        }
-                        else if (possession > 25 && possession <= 50)
-                        {
-                            possessionFactor = -0.3M;
-                        }
-                        else if (possession > 50 && possession <= 75)
-                        {
-                            possessionFactor = 0.3M;
-                        }
-                        else if (possession > 75 && possession <= 100)
-                        {
-                            possessionFactor = 0.5M;
-                        }
+                        possessionFactor = -0.5M;
                     }
+                    else if (possession > 25 && possession <= 50)
+                    {
+                        possessionFactor = -0.3M;
+                    }
+                    else if (possession > 50 && possession <= 75)
+                    {
+                        possessionFactor = 0.3M;
+                    }
+                    else if (possession > 75 && possession <= 100)
+                    {
+                        possessionFactor = 0.5M;
+                    }
+                }
 
-                    awayCalcRating = awayCalcRating +
-                        (decimal)(awayGoals * -0.5) +
-                        (decimal)(matchstat.HomeTeamCorners * 0.1) +
-                        (decimal)(matchstat.HomeTeamFouls * -0.1) +
-                        (decimal)(matchstat.HomeTeamOffsides * -0.1) +
-                        (decimal)(matchstat.HomeTeamRedCards * -0.5) +
-                        (decimal)(matchstat.HomeTeamSaves * 0.1) +
-                        (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
-                        (decimal)(homeGoals * 0.5) +
-                        shotsFactor +
-                        possessionFactor;
+                awayCalcRating = awayCalcRating +
+                    (decimal)(awayGoals * -0.5) +
+                    (decimal)(matchstat.HomeTeamCorners * 0.1) +
+                    (decimal)(matchstat.HomeTeamFouls * -0.1) +
+                    (decimal)(matchstat.HomeTeamOffsides * -0.1) +
+                    (decimal)(matchstat.HomeTeamRedCards * -0.5) +
+                    (decimal)(matchstat.HomeTeamSaves * 0.1) +
+                    (decimal)(matchstat.HomeTeamYellowCards * -0.2) +
+                    (decimal)(homeGoals * 0.5) +
+                    shotsFactor +
+                    possessionFactor;
 
-            if (awayCalcRating <= 0)
-            {
-                matchstat.AwayTeamRating = 1;
+                if (awayCalcRating <= 0)
+                {
+                    matchstat.AwayTeamRating = 1;
+                }
+                else
+                {
+                    matchstat.AwayTeamRating = Convert.ToByte(awayCalcRating);
+                }
+
+                awayRating = matchstat.AwayTeamRating;
+
+                #endregion
             }
             else
             {
-                matchstat.AwayTeamRating = Convert.ToByte(awayCalcRating);             
+                matchstat = new Stat();
+                matchstat.MatchId = matchId;
+                matchstat.HomeTeamRating = 3;
+                matchstat.AwayTeamRating = 3;
+
+                homeRating = 3;
+                awayRating = 3;
             }
-
-            awayRating = matchstat.AwayTeamRating;    
-
-            #endregion
-                    //update playerstat object with updated rating
+                  
+            //update playerstat object with updated rating
             SaveMatchStats(matchstat);
         }
 
