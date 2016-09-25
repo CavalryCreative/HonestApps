@@ -106,20 +106,24 @@ namespace CMS.Infrastructure.Entities
             string retMsg = string.Empty;
 
             //Fixtures
-            //http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date=17.10.2015&to_date=27.10.2015
+            //http://football-api.com/api/?Action=fixtures&APIKey=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85&comp_id=1204&from_date=17.10.2015&to_date=27.10.2015
+            //http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683&comp_id=1204&from_date=25.09.2016&to_date=26.09.2016
 
             //Today live match events - brings back same feed as above
+            //http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683&comp_id=1204
             //http://football-api.com/api/?Action=today&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204
 
             //Commentaries
             //http://football-api.com/api/?Action=commentaries&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&match_id=2136144
+            //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683
 
             //Standings
             //http://football-api.com/api/?Action=standings&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204
 
             try
             {
-                string uri = "http://football-api.com/api/?Action=commentaries&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&match_id=" + matchId.ToString();  // <-- this returns formatted json
+                //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683
+                string uri = "http://api.football-api.com/2.0/commentaries/" + matchId.ToString()  + "? Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683";  // <-- this returns formatted json
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity

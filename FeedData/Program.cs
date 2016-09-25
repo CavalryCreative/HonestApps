@@ -79,7 +79,9 @@ namespace FeedData
 
             try
             {
-                string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
+                //
+                //string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
+                string uri = string.Format("http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -95,13 +97,13 @@ namespace FeedData
                     var postTitles = from p in obj["matches"]
                                      select new
                                      {
-                                         MatchDate = (string)p["match_formatted_date"],
-                                         APIId = (int)p["match_id"],
-                                         Time = (string)p["match_time"],
-                                         HomeTeamAPIId = (int)p["match_localteam_id"],
-                                         HomeTeam = (string)p["match_localteam_name"],
-                                         AwayTeamAPIId = (int)p["match_visitorteam_id"],
-                                         AwayTeam = (string)p["match_visitorteam_name"]
+                                         MatchDate = (string)p["formatted_date"],
+                                         APIId = (int)p["id"],
+                                         Time = (string)p["time"],
+                                         HomeTeamAPIId = (int)p["localteam_id"],
+                                         HomeTeam = (string)p["localteam_name"],
+                                         AwayTeamAPIId = (int)p["visitorteam_id"],
+                                         AwayTeam = (string)p["visitorteam_name"]
                                      };
 
                     foreach (var item in postTitles)
