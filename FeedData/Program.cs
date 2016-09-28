@@ -82,159 +82,125 @@ namespace FeedData
 
             try
             {
-                //
                 //string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
-                string uri = string.Format("http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);
+                string uri = string.Format("http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);
 
-                //var webRequest = (HttpWebRequest)WebRequest.Create(uri);
-                //webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
-                //var webResponse = (HttpWebResponse)webRequest.GetResponse();
+                var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+                webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
+                var webResponse = (HttpWebResponse)webRequest.GetResponse();
 
-                //if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
-                //{
-                    string body = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\FeedData\fixtures.txt");
+                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
+                {
+                    //Test
+                    //string body = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\FeedData\fixtures.txt");
 
-                    //var reader = new StreamReader(webResponse.GetResponseStream());
-                    //string s = reader.ReadToEnd();
+                    var reader = new StreamReader(webResponse.GetResponseStream());
+                    string s = reader.ReadToEnd();
 
-                    //JObject obj = JObject.Parse(body);
-
-                    //var postTitles = from p in obj["matches"]
-                    //                 select new
-                    //                 {
-                    //                     MatchDate = (string)p["formatted_date"],
-                    //                     APIId = (int)p["id"],
-                    //                     Time = (string)p["time"],
-                    //                     HomeTeamAPIId = (int)p["localteam_id"],
-                    //                     HomeTeam = (string)p["localteam_name"],
-                    //                     AwayTeamAPIId = (int)p["visitorteam_id"],
-                    //                     AwayTeam = (string)p["visitorteam_name"]
-                    //                 };
-
-                    JArray a = JArray.Parse(body);
+                    JArray a = JArray.Parse(s);
 
                     foreach (var item in a)
                     {
+                        //Check if Update History Match details is true/false
+                        var updateHistory = GetUpdateHistoryByMatchAPIId(Convert.ToInt32(item["id"]));
+                        bool matchDetailsAdded = false;
 
+                        if (updateHistory != null)
+                        {
+                            matchDetailsAdded = updateHistory.MatchDetails;
+                        }
+
+                        if (matchDetailsAdded == false)
+                        {
+                            int matchAPIId = -1;
+
+                            try
+                            {
+                                Match match = new Match();
+
+                                match.APIId = Convert.ToInt32(item["id"]);
+                                match.Date = Convert.ToDateTime(string.Format("{0} {1}", item["formatted_date"].ToString().Replace('.', '/'), item["time"].ToString()));
+                                match.EndDate = match.Date.Value.AddHours(2);
+                                match.Active = DateTime.Now <= match.EndDate ? true : false;
+                                match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
+                                //change this when live
+                                //match.IsLive = true;
+                                match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
+                                match.Time = item["time"].ToString();
+
+                                if (match.IsLive)
+                                    matchesToday.Add(match.APIId, match.Time);
+
+                                var homeTeam = GetTeamByAPIId((int)item["localteam_id"]);
+                                var awayTeam = GetTeamByAPIId((int)item["visitorteam_id"]);
+
+                                if (homeTeam != null)
+                                {
+                                    //match.HomeTeamId = homeTeam.Id;
+                                    match.Stadium = homeTeam.Stadium;
+                                }
+
+                                if (awayTeam != null)
+                                    //match.AwayTeamId = awayTeam.Id;
+
+                                    match.HomeTeamAPIId = (int)item["localteam_id"];
+                                match.AwayTeamAPIId = (int)item["visitorteam_id"];
+
+                                string Id;
+                                string actionMessage;
+
+                                retMsg = SaveMatch(match);
+
+                                ReturnId(retMsg, out actionMessage, out Id);
+
+                                if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                {
+                                    match.Id = new Guid(Id);
+                                }
+
+                                //Add summary
+                                Summary summary = new Summary();
+
+                                summary.MatchId = match.Id;
+                                summary.HomeTeam = homeTeam.Id;
+                                summary.AwayTeam = awayTeam.Id;
+
+                                SaveMatchSummary(summary);
+
+                                //Add update history
+                                UpdateHistory history = new UpdateHistory();
+
+                                history.MatchAPIId = match.APIId;
+                                history.MatchDetails = true;
+                                history.Id = System.Guid.Empty;
+
+                                SaveUpdateHistory(history);
+
+                                matchAPIId = match.APIId;
+                            }
+                            catch (Exception ex)
+                            {
+                                //Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                SaveException(ex, string.Format("SaveMatch - FeedData, MatchAPIId: {0}", matchAPIId.ToString()));
+                            }
+                        }
+                        else
+                        {
+                            var retMatch = GetMatchByAPIId(Convert.ToInt32(item["id"]));
+
+                            if (retMatch != null)
+                            {
+                                if (DateTime.Now.ToShortDateString() == retMatch.Date.Value.ToShortDateString())
+                                    matchesToday.Add(retMatch.APIId, retMatch.Time);
+                            }
+                        }
                     }
-
-                    //foreach (JObject o in a.Children<JObject>())
-                    //{
-                    //    foreach (JProperty p in o.Properties())
-                    //    {
-                    //        //string name = p.Name;
-                    //        //string value = (string)p.Value;
-                    //        //Console.WriteLine(name + " -- " + value);
-
-                    //    }
-                    //}
-
-                    //foreach (var item in postTitles)
-                    //{
-                    //    //Check if Update History Match details is true/false
-                    //    var updateHistory = GetUpdateHistoryByMatchAPIId(item.APIId);
-                    //    bool matchDetailsAdded = false;
-
-                    //    if (updateHistory != null)
-                    //    {
-                    //        matchDetailsAdded = updateHistory.MatchDetails;
-                    //    }
-
-                    //    if (matchDetailsAdded == false)
-                    //    {
-                    //        int matchAPIId = -1;
-
-                    //        //try
-                    //        //{
-                    //            Match match = new Match();
-
-                    //            match.APIId = item.APIId;
-                    //            match.Date = Convert.ToDateTime(string.Format("{0} {1}", item.MatchDate.Replace('.', '/'), item.Time));
-                    //            match.EndDate = match.Date.Value.AddHours(2);
-                    //            match.Active = DateTime.Now <= match.EndDate ? true : false;
-                    //            match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-                    //            //change this when live
-                    //            //match.IsLive = true;
-                    //            match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
-                    //            match.Time = item.Time;
-
-                    //            if (match.IsLive)
-                    //                matchesToday.Add(match.APIId, match.Time);
-
-                    //            var homeTeam = GetTeamByAPIId(item.HomeTeamAPIId);
-                    //            var awayTeam = GetTeamByAPIId(item.AwayTeamAPIId);
-
-                    //            if (homeTeam != null)
-                    //            {
-                    //                //match.HomeTeamId = homeTeam.Id;
-                    //                match.Stadium = homeTeam.Stadium;
-                    //            }
-
-                    //            if (awayTeam != null)
-                    //                //match.AwayTeamId = awayTeam.Id;
-
-                    //            match.HomeTeamAPIId = item.HomeTeamAPIId;
-                    //            match.AwayTeamAPIId = item.AwayTeamAPIId;
-
-                    //            string Id;
-                    //            string actionMessage;
-
-                    //            retMsg = SaveMatch(match);
-
-                    //            ReturnId(retMsg, out actionMessage, out Id);
-
-                    //            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
-                    //            {
-                    //                match.Id = new Guid(Id);
-                    //            }
-
-                    //            //Add summary
-                    //            Summary summary = new Summary();
-
-                    //            summary.MatchId = match.Id;
-                    //            summary.HomeTeam = homeTeam.Id;
-                    //            summary.AwayTeam = awayTeam.Id;
-
-                    //            SaveMatchSummary(summary);
-
-                    //            //Add update history
-                    //            UpdateHistory history = new UpdateHistory();
-
-                    //            history.MatchAPIId = match.APIId;
-                    //            history.MatchDetails = true;
-                    //            history.Id = System.Guid.Empty;
-
-                    //            SaveUpdateHistory(history);
-
-                    //            matchAPIId = match.APIId;
-                    //        //}
-                    //        //catch (Exception ex)
-                    //        //{
-                    //        //    Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                    //        //    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                    //        //    SaveException(ex, string.Format("SaveMatch - FeedData, MatchAPIId: {0}", matchAPIId.ToString()));
-                    //        //}                                   
-                    //    }
-                    //    else
-                    //    {
-                    //        var retMatch = GetMatchByAPIId(item.APIId);
-
-                    //        if (retMatch != null)
-                    //        {
-                    //            if (DateTime.Now.ToShortDateString() == retMatch.Date.Value.ToShortDateString())
-                    //                matchesToday.Add(retMatch.APIId, retMatch.Time);
-                    //        }
-                    //    }
-                    //}
-                //}
-                //else
-                //{
-                //    retMsg = "Error: " + string.Format("Status code == {0}, Content length == {1}", webResponse.StatusCode, webResponse.ContentLength);
-                //}
+                }
             }
             catch (Exception ex)
             {
-                    Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}, Stack Trace: {2}", ex.InnerException.ToString(), ex.Message, ex.StackTrace));
+                    //Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}, Stack Trace: {2}", ex.InnerException.ToString(), ex.Message, ex.StackTrace));
                     SaveException(ex, string.Format("SaveMatch - FeedData"));
             }
 
