@@ -71,7 +71,7 @@ namespace CMS.Infrastructure.Entities
             GetAllCommentaries();
             BroadcastFeed();
 
-            SaveBroadcastFeed("", GetIPAddress());
+            //SaveBroadcastFeed("", GetIPAddress());
         }
         
         public void BroadcastFeed()
@@ -156,14 +156,14 @@ namespace CMS.Infrastructure.Entities
                         lineupsAdded = updateHistory.Lineups;
                     }
 
-                    #region Lineups
+                    #region LineupsC:\Cavalry\GitHub\HonestApps\FeedData\packages.config
 
                     if (lineupsAdded == false)
                     {
                         #region Home Team
 
                         //jPath = "commentaries.[0].comm_match_teams.localteam.player";
-                    jPath = "commentaries.[0].comm_match_teams.localteam.player";
+                    jPath = "lineup.localteam";
 
                     var y = token.SelectTokens(jPath);
 
