@@ -127,16 +127,19 @@ namespace CMS.Infrastructure.Entities
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
-                var webResponse = (HttpWebResponse)webRequest.GetResponse();
+                //var webResponse = (HttpWebResponse)webRequest.GetResponse();
 
-                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
-                {
-                    var reader = new StreamReader(webResponse.GetResponseStream());
-                    string s = reader.ReadToEnd();
+                //if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
+                //{
+                //    var reader = new StreamReader(webResponse.GetResponseStream());
+                //string s = reader.ReadToEnd();
 
-                    JToken token = JObject.Parse(s);
+                //Test
+                string s = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\CMS\MatchId2058953.txt");
 
-                    var match = GetMatchByAPIId(matchId);
+                JToken token = JObject.Parse(s);
+
+                var match = GetMatchByAPIId(matchId);
 
                     var homeTeam = GetTeamByAPIId(match.HomeTeamAPIId);
                     var awayTeam = GetTeamByAPIId(match.AwayTeamAPIId);
@@ -159,9 +162,10 @@ namespace CMS.Infrastructure.Entities
                     {
                         #region Home Team
 
-                        jPath = "commentaries.[0].comm_match_teams.localteam.player";
+                        //jPath = "commentaries.[0].comm_match_teams.localteam.player";
+                    jPath = "commentaries.[0].comm_match_teams.localteam.player";
 
-                        var y = token.SelectTokens(jPath);
+                    var y = token.SelectTokens(jPath);
 
                         string Id;
                         string actionMessage;
@@ -1053,11 +1057,11 @@ namespace CMS.Infrastructure.Entities
                    
                     //System.Diagnostics.Debug.WriteLine("Events complete");
                     #endregion
-                }
-                else
-                {
-                    retMsg = "Error: " + string.Format("Status code == {0}, Content length == {1}", webResponse.StatusCode, webResponse.ContentLength);
-                }
+                //}
+                //else
+                //{
+                //    retMsg = "Error: " + string.Format("Status code == {0}, Content length == {1}", webResponse.StatusCode, webResponse.ContentLength);
+                //}
             }
             catch (Exception ex)
             {
