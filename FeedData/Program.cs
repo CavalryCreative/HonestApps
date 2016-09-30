@@ -143,7 +143,7 @@ namespace FeedData
                                 if (awayTeam != null)
                                     //match.AwayTeamId = awayTeam.Id;
 
-                                    match.HomeTeamAPIId = (int)item["localteam_id"];
+                                match.HomeTeamAPIId = (int)item["localteam_id"];
                                 match.AwayTeamAPIId = (int)item["visitorteam_id"];
 
                                 string Id;
