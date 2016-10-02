@@ -20,6 +20,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -279,6 +280,14 @@
     <Compile Include="EntitiesMigrations\201602111926126_UpdateStat1.Designer.cs">
       <DependentUpon>201602111926126_UpdateStat1.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201610021632576_LineupAddPosition.cs" />
+    <Compile Include="EntitiesMigrations\201610021632576_LineupAddPosition.Designer.cs">
+      <DependentUpon>201610021632576_LineupAddPosition.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201610021635142_LineupAddPosition2.cs" />
+    <Compile Include="EntitiesMigrations\201610021635142_LineupAddPosition2.Designer.cs">
+      <DependentUpon>201610021635142_LineupAddPosition2.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -469,6 +478,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201602111926126_UpdateStat1.resx">
       <DependentUpon>201602111926126_UpdateStat1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201610021632576_LineupAddPosition.resx">
+      <DependentUpon>201610021632576_LineupAddPosition.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201610021635142_LineupAddPosition2.resx">
+      <DependentUpon>201610021635142_LineupAddPosition2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
       <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>

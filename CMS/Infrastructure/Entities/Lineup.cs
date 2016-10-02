@@ -15,5 +15,6 @@ namespace CMS.Infrastructure.Entities
         public Guid PlayerId { get; set; }
         public bool IsHomePlayer { get; set; }
         public bool IsSub { get; set; }
+        public string Position { get; set; }
     }
 }

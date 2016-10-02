@@ -27,6 +27,7 @@ namespace FeedData
         public Nullable<System.Guid> Match_Id { get; set; }
         public Nullable<System.Guid> Team_Id { get; set; }
         public System.Guid PlayerId { get; set; }
+        public string Position { get; set; }
     
         public virtual Match Match { get; set; }
         public virtual Team Team { get; set; }

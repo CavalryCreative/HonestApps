@@ -44,7 +44,8 @@ namespace CMS.Infrastructure.Concrete
                 modelBuilder.Configurations.Add(new SiteExceptionMap());
                 modelBuilder.Configurations.Add(new BroadcastFeedMap());
                 modelBuilder.Configurations.Add(new CommentMap());
-            }
+            modelBuilder.Configurations.Add(new LineupMap());
+        }
         }
 
         public class TeamMap : EntityTypeConfiguration<Team>
@@ -115,7 +116,15 @@ namespace CMS.Infrastructure.Concrete
             }
         }
 
-        public class SubstitutionMap : EntityTypeConfiguration<Substitution>
+    public class LineupMap : EntityTypeConfiguration<Lineup>
+    {
+        public LineupMap()
+        {
+            Property(p => p.Position).HasMaxLength(100).IsUnicode(false);
+        }
+    }
+
+    public class SubstitutionMap : EntityTypeConfiguration<Substitution>
         {
             public SubstitutionMap()
             {

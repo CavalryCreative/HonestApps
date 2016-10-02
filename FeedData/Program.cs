@@ -47,23 +47,23 @@ namespace FeedData
 
         private static void GetFixtures()
         {
-            ////Clear today matches table
-            //DeleteMatchesToday();
+            //Clear today matches table
+            DeleteMatchesToday();
 
-            //IDictionary<int, string> matchesToday = new Dictionary<int, string>();
+            IDictionary<int, string> matchesToday = new Dictionary<int, string>();
 
-            //matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
 
-            //foreach (var kvp in matchesToday)
-            //{
-            //    MatchesToday match = new MatchesToday();
-            //    match.APIId = kvp.Key;
-            //    match.KickOffTime = kvp.Value;
+            foreach (var kvp in matchesToday)
+            {
+                MatchesToday match = new MatchesToday();
+                match.APIId = kvp.Key;
+                match.KickOffTime = kvp.Value;
 
-            //    SaveMatchToday(match);
-            //}
+                SaveMatchToday(match);
+            }
 
-            GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+            //GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
         }
 
         private static IDictionary<int, string> GetFixtures(DateTime startDate, DateTime endDate)

@@ -42,6 +42,7 @@ namespace FeedData
         public Nullable<System.DateTime> DateUpdated { get; set; }
         public byte HomeTeamRating { get; set; }
         public byte AwayTeamRating { get; set; }
+        public byte MatchRating { get; set; }
     
         public virtual Match Match { get; set; }
     }
