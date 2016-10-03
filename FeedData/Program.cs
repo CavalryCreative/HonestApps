@@ -41,7 +41,8 @@ namespace FeedData
             //    Console.WriteLine("Hangfire Server started. Press any key to exit...");
             //    Console.ReadKey();
             //}
-           
+
+            UpdatePlayers();
             GetFixtures();
         }
 
@@ -64,6 +65,31 @@ namespace FeedData
             }
 
             //GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+        }
+
+        private static void UpdatePlayers()
+        {
+            IList<Team> teams = GetAllTeams();
+
+            foreach (var team in teams)
+            {
+                string uri = string.Format("http://api.football-api.com/2.0/team/{0}?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683", team.APIId.ToString());
+
+                var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+                webRequest.Method = "GET";
+                var webResponse = (HttpWebResponse)webRequest.GetResponse();
+
+                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
+                {
+                    var reader = new StreamReader(webResponse.GetResponseStream());
+                    string s = reader.ReadToEnd();
+
+                    JToken token = JObject.Parse(s);
+                    string jPath = "squad";
+
+                    var y = token.SelectTokens(jPath);
+                }
+            }
         }
 
         private static IDictionary<int, string> GetFixtures(DateTime startDate, DateTime endDate)
@@ -395,6 +421,36 @@ namespace FeedData
             }
         }
 
+        private static string SavePlayer(Player updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            HonestAppsEntities context = new HonestAppsEntities();
+
+            if (updatedRecord != null)
+            {
+                //Create record
+                updatedRecord.Id = Guid.NewGuid();
+                updatedRecord.Active = true;
+                updatedRecord.Deleted = false;
+                updatedRecord.DateAdded = DateTime.Now;
+                updatedRecord.DateUpdated = DateTime.Now;
+
+                context.Players.Add(updatedRecord);
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}", Res.Resources.RecordAdded);
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
         private static string DeleteMatchesToday()
         {
             HonestAppsEntities context = new HonestAppsEntities();
@@ -463,6 +519,13 @@ namespace FeedData
             HonestAppsEntities context = new HonestAppsEntities();
 
             return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
+        }
+
+        private static IList<Team> GetAllTeams()
+        {
+            HonestAppsEntities context = new HonestAppsEntities();
+
+            return context.Teams.ToList();
         }
 
         private static Match GetMatchByAPIId(int id)
