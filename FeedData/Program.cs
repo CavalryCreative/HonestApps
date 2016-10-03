@@ -175,6 +175,11 @@ namespace FeedData
 
                 if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
                 {
+                    if (webResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        return matchesToday;
+                    }
+                    
                     //Test
                     //string body = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\FeedData\fixtures.txt");
 
