@@ -88,6 +88,64 @@ namespace FeedData
                     string jPath = "squad";
 
                     var y = token.SelectTokens(jPath);
+
+                    string Id;
+                    string actionMessage;
+                    string retMsg = string.Empty;
+                    Byte squadNumberByte;
+                    int playerAPIId;
+                    bool result;
+
+                    try
+                    {
+                        foreach (var childToken in y.Children())
+                        {
+                            var jeff = childToken.Children();
+
+                            Player player = new Player();
+
+                            var playerId = childToken.SelectToken("id").ToString();
+                            var playerName = childToken.SelectToken("name").ToString();
+                            var playerNumber = childToken.SelectToken("number").ToString();
+                            var playerPos = childToken.SelectToken("position").ToString();
+
+                            result = Int32.TryParse(playerId, out playerAPIId);
+
+                            //Check if player exists                           
+                            if (result)
+                                player = GetPlayerByAPIId(playerAPIId);
+
+                            if (player == null)
+                            {
+                                player = new Player();
+
+                                result = Byte.TryParse(playerNumber, out squadNumberByte);
+
+                                if (result)
+                                    player.SquadNumber = squadNumberByte;
+                                else
+                                    player.SquadNumber = 0;
+
+                                player.Name = playerName;
+                                player.Position = playerPos;
+                                player.Id = System.Guid.Empty;
+                                player.APIPlayerId = playerAPIId;
+
+                                retMsg = SavePlayer(player, team.Id);
+
+                                ReturnId(retMsg, out actionMessage, out Id);
+
+                                if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                {
+                                    player.Id = new Guid(Id);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SaveException(ex, string.Format("SavePlayer - FeedData"));
+                    }
                 }
             }
         }
@@ -421,7 +479,7 @@ namespace FeedData
             }
         }
 
-        private static string SavePlayer(Player updatedRecord)
+        private static string SavePlayer(Player updatedRecord, Guid teamId)
         {
             Guid Id = Guid.Empty;
 
@@ -429,26 +487,39 @@ namespace FeedData
 
             if (updatedRecord != null)
             {
-                //Create record
-                updatedRecord.Id = Guid.NewGuid();
-                updatedRecord.Active = true;
-                updatedRecord.Deleted = false;
-                updatedRecord.DateAdded = DateTime.Now;
-                updatedRecord.DateUpdated = DateTime.Now;
+                //Update record
+                var recordToUpdate = context.Teams.Find(teamId);
 
-                context.Players.Add(updatedRecord);
+                if (recordToUpdate == null)
+                {
+                    return Res.Resources.NotFound;
+                }
+
+                if (updatedRecord.Id == System.Guid.Empty)
+                {
+                    //Create record
+                    updatedRecord.Id = Guid.NewGuid();
+                    updatedRecord.Active = true;
+                    updatedRecord.Deleted = false;
+                    updatedRecord.DateAdded = DateTime.Now;
+                    updatedRecord.DateUpdated = DateTime.Now;
+
+                    //recordToUpdate.Players.Clear();
+                    recordToUpdate.Players.Add(updatedRecord);
+                    Id = updatedRecord.Id;
+                }
             }
 
-            try
-            {
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
 
-                return string.Format("{0}", Res.Resources.RecordAdded);
-            }
-            catch (Exception e)
-            {
-                return string.Format("Error: {0}", e.InnerException.ToString());
-            }
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
         }
 
         private static string DeleteMatchesToday()
@@ -506,6 +577,13 @@ namespace FeedData
         #endregion
 
         #region Get
+
+        private static Player GetPlayerByAPIId(int id)
+        {
+            HonestAppsEntities context = new HonestAppsEntities();
+
+            return context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
+        }
 
         private static UpdateHistory GetUpdateHistoryByMatchAPIId(int id)
         {
