@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.IO;
-using Newtonsoft.Json;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 using Res = Resources;
-using Hangfire;
-using System.Web;
 
 namespace FeedData
 {
@@ -42,7 +38,7 @@ namespace FeedData
             //    Console.ReadKey();
             //}
 
-            UpdatePlayers();
+            //UpdatePlayers();
             GetFixtures();
         }
 
@@ -53,7 +49,7 @@ namespace FeedData
 
             IDictionary<int, string> matchesToday = new Dictionary<int, string>();
 
-            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
+            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(14));
 
             foreach (var kvp in matchesToday)
             {
@@ -208,7 +204,12 @@ namespace FeedData
                                 Match match = new Match();
 
                                 match.APIId = Convert.ToInt32(item["id"]);
-                                match.Date = Convert.ToDateTime(string.Format("{0} {1}", item["formatted_date"].ToString().Replace('.', '/'), item["time"].ToString()));
+
+                                string matchDate = string.Format("{0} {1}", item["formatted_date"].ToString().Replace('.', '/'), item["time"].ToString());
+
+                                CultureInfo culture = new CultureInfo("en-US");
+
+                                match.Date = DateTime.Parse(matchDate, culture, System.Globalization.DateTimeStyles.AssumeLocal);
                                 match.EndDate = match.Date.Value.AddHours(2);
                                 match.Active = DateTime.Now <= match.EndDate ? true : false;
                                 match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
