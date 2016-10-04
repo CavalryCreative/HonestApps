@@ -108,7 +108,12 @@ namespace CMS
 
             efSiteException.Save(siteException);
 
-            PingServer();
+            var todayMatches = FeedUpdate.GetLiveMatches();
+
+            if (todayMatches.Count > 0)
+            {
+                PingServer();
+            }
 
             //HangfireBootstrapper.Instance.Stop();
         }

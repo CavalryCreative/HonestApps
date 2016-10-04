@@ -38,7 +38,7 @@ namespace FeedData
             //    Console.ReadKey();
             //}
 
-            //UpdatePlayers();
+            UpdatePlayers();
             GetFixtures();
         }
 
@@ -157,13 +157,28 @@ namespace FeedData
             string[] startArr = startDateStr.Split('/');
             string[] endArr = endDateStr.Split('/');
 
-            string formatStart = string.Format("{0}.{1}.{2}", startArr[0], startArr[1], startArr[2]);
-            string formatEnd = string.Format("{0}.{1}.{2}", endArr[0], endArr[1], endArr[2]);
+            CultureInfo culture = new CultureInfo("en-US");
+
+            string formatStart = string.Empty;
+            string formatEnd = string.Empty;
+
+            if (culture.Name == "en-US")
+            {
+                formatStart = string.Format("{0}.{1}.{2}", startArr[1], startArr[0], startArr[2]);
+                formatEnd = string.Format("{0}.{1}.{2}", endArr[1], endArr[0], endArr[2]);
+            }
+            else
+            {
+                formatStart = string.Format("{0}.{1}.{2}", startArr[0], startArr[1], startArr[2]);
+                formatEnd = string.Format("{0}.{1}.{2}", endArr[0], endArr[1], endArr[2]);
+            }
+       
+            string uri = string.Empty;
 
             try
             {
                 //string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
-                string uri = string.Format("http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);
+                uri = string.Format("http://api.football-api.com/2.0/matches?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -183,6 +198,8 @@ namespace FeedData
                     string s = reader.ReadToEnd();
 
                     JArray a = JArray.Parse(s);
+
+                    bool pingRequestSent = false;
 
                     foreach (var item in a)
                     {
@@ -207,19 +224,19 @@ namespace FeedData
 
                                 string matchDate = string.Format("{0} {1}", item["formatted_date"].ToString().Replace('.', '/'), item["time"].ToString());
 
-                                CultureInfo culture = new CultureInfo("en-US");
+                                if (culture.Name == "en-US")
+                                {
+                                    string[] matchDateArr = matchDate.Split('/');
 
+                                    matchDate = string.Format("{0}/{1}/{2}", matchDateArr[1], matchDateArr[0], matchDateArr[2]);
+                                }
+    
                                 match.Date = DateTime.Parse(matchDate, culture, System.Globalization.DateTimeStyles.AssumeLocal);
                                 match.EndDate = match.Date.Value.AddHours(2);
                                 match.Active = DateTime.Now <= match.EndDate ? true : false;
-                                match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;
-                                //change this when live
-                                //match.IsLive = true;
-                                match.IsLive = DateTime.Now >= match.Date && DateTime.Now <= match.EndDate ? true : false;
+                                match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;                                                             
                                 match.Time = item["time"].ToString();
-
-                                if (match.IsLive)
-                                    matchesToday.Add(match.APIId, match.Time);
+                                match.IsLive = false;                                
 
                                 var homeTeam = GetTeamByAPIId((int)item["localteam_id"]);
                                 var awayTeam = GetTeamByAPIId((int)item["visitorteam_id"]);
@@ -282,7 +299,28 @@ namespace FeedData
                             if (retMatch != null)
                             {
                                 if (DateTime.Now.ToShortDateString() == retMatch.Date.Value.ToShortDateString())
+                                {
                                     matchesToday.Add(retMatch.APIId, retMatch.Time);
+
+                                    retMatch.IsToday = true;
+
+                                    if (pingRequestSent == false)
+                                    {
+                                        try
+                                        {
+                                            WebClient http = new WebClient();
+                                            string Result = http.DownloadString("http://honest-apps.elasticbeanstalk.com/");
+
+                                            pingRequestSent = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string Message = ex.Message;
+                                        }
+                                    }
+                                }
+
+                                retMsg = SaveMatch(retMatch);
                             }
                         }
                     }
@@ -291,7 +329,7 @@ namespace FeedData
             catch (Exception ex)
             {
                     //Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}, Stack Trace: {2}", ex.InnerException.ToString(), ex.Message, ex.StackTrace));
-                    SaveException(ex, string.Format("SaveMatch - FeedData"));
+                    SaveException(ex, string.Format("SaveMatch - FeedData - {0}", uri));
             }
 
             return matchesToday;
