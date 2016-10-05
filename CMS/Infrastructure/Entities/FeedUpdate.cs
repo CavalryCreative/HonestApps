@@ -515,274 +515,275 @@ namespace CMS.Infrastructure.Entities
                         Byte numberByte;
                         bool isValid;
 
-                        #region Summaries
+                    #region Summaries
 
-                        #region HomeTeam - Goals
+                    #region HomeTeam - Goals
 
-                        //jPath = "commentaries.[0].comm_match_summary.localteam.goals.player";
+                    //jPath = "commentaries.[0].comm_match_summary.localteam.goals.player";
 
-                        //var goals = token.SelectTokens(jPath);
-                        //int APIId = 0;
-                        //Byte numberByte;
-                        //bool isValid;
+                    //var goals = token.SelectTokens(jPath);
+                    //int APIId = 0;
+                    //Byte numberByte;
+                    //bool isValid;
 
-                        //try
-                        //{
-                        //    JObject obj = JObject.Parse(s);
+                    //try
+                    //{
+                    //    JObject obj = JObject.Parse(s);
 
-                        //    try
-                        //    {
-                        //        isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.id").ToString(), out APIId);
-                        //    }
-                        //    catch
-                        //    {
-                        //        isValid = false;
-                        //    }                     
+                    //    try
+                    //    {
+                    //        isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.id").ToString(), out APIId);
+                    //    }
+                    //    catch
+                    //    {
+                    //        isValid = false;
+                    //    }                     
 
-                        //    if (isValid)//Just one record
-                        //    {
-                        //        string minute = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.minute").ToString();
+                    //    if (isValid)//Just one record
+                    //    {
+                    //        string minute = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.minute").ToString();
 
-                        //        Goal homeGoal = new Goal();
+                    //        Goal homeGoal = new Goal();
 
-                        //        if (homeGoal.Penalty == true)
-                        //        {
-                        //            minute = minute.Trim().Remove(0, 4);
-                        //        }
+                    //        if (homeGoal.Penalty == true)
+                    //        {
+                    //            minute = minute.Trim().Remove(0, 4);
+                    //        }
 
-                        //        isValid = Byte.TryParse(minute, out numberByte);
+                    //        isValid = Byte.TryParse(minute, out numberByte);
 
-                        //        if (isValid)
-                        //            homeGoal.Minute = numberByte;
-                        //        else
-                        //            homeGoal.Minute = 0;
+                    //        if (isValid)
+                    //            homeGoal.Minute = numberByte;
+                    //        else
+                    //            homeGoal.Minute = 0;
 
-                        //        //Check if goal exists                       
-                        //        var goalExists = GetGoalByAPIId(APIId, homeGoal.Minute);
+                    //        //Check if goal exists                       
+                    //        var goalExists = GetGoalByAPIId(APIId, homeGoal.Minute);
 
-                        //        if (goalExists == null)
-                        //        {
-                        //            homeGoal.APIId = APIId;
-                        //            homeGoal.SummaryId = summary.Id;
-                        //            homeGoal.IsHomeTeam = true;
-                        //            var player = GetPlayerByName(obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.name").ToString());
+                    //        if (goalExists == null)
+                    //        {
+                    //            homeGoal.APIId = APIId;
+                    //            homeGoal.SummaryId = summary.Id;
+                    //            homeGoal.IsHomeTeam = true;
+                    //            var player = GetPlayerByName(obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.name").ToString());
 
-                        //            if (player != null)
-                        //            {
-                        //                homeGoal.PlayerName = player.Name;
-                        //                homeGoal.APIPlayerId = player.APIPlayerId;
-                        //            }
-                        //            else
-                        //            {
-                        //                homeGoal.PlayerName = player.Name;
-                        //                homeGoal.APIPlayerId = 0;
-                        //            }
+                    //            if (player != null)
+                    //            {
+                    //                homeGoal.PlayerName = player.Name;
+                    //                homeGoal.APIPlayerId = player.APIPlayerId;
+                    //            }
+                    //            else
+                    //            {
+                    //                homeGoal.PlayerName = player.Name;
+                    //                homeGoal.APIPlayerId = 0;
+                    //            }
 
-                        //            homeGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.owngoal").ToString() == "False" ? false : true;
-                        //            homeGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.penalty").ToString() == "False" ? false : true;
+                    //            homeGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.owngoal").ToString() == "False" ? false : true;
+                    //            homeGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.localteam.goals.player.penalty").ToString() == "False" ? false : true;
 
-                        //            retMsg = SaveGoal(homeGoal);
-                        //        }
-                        //    }
-                        //    else
-                        //    {
-                        //        foreach (var childToken in goals.Children())
-                        //        {
-                        //            var jeff = childToken.Children();
+                    //            retMsg = SaveGoal(homeGoal);
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        foreach (var childToken in goals.Children())
+                    //        {
+                    //            var jeff = childToken.Children();
 
-                        //            foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
-                        //            {
-                        //                isValid = Int32.TryParse(evt["id"], out APIId);
+                    //            foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                    //            {
+                    //                isValid = Int32.TryParse(evt["id"], out APIId);
 
-                        //                if (isValid)
-                        //                {
-                        //                    Goal homeGoal = new Goal();
+                    //                if (isValid)
+                    //                {
+                    //                    Goal homeGoal = new Goal();
 
-                        //                    string minute = evt["minute"];
-                        //                    homeGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
-                        //                    homeGoal.Penalty = evt["penalty"] == "False" ? false : true;                                           
+                    //                    string minute = evt["minute"];
+                    //                    homeGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
+                    //                    homeGoal.Penalty = evt["penalty"] == "False" ? false : true;                                           
 
-                        //                    if (homeGoal.Penalty == true)
-                        //                    {
-                        //                        minute = minute.Trim().Remove(0, 4);
-                        //                    }
+                    //                    if (homeGoal.Penalty == true)
+                    //                    {
+                    //                        minute = minute.Trim().Remove(0, 4);
+                    //                    }
 
-                        //                    isValid = Byte.TryParse(minute, out numberByte);
+                    //                    isValid = Byte.TryParse(minute, out numberByte);
 
-                        //                    if (isValid)
-                        //                        homeGoal.Minute = numberByte;
-                        //                    else
-                        //                        homeGoal.Minute = 0;
+                    //                    if (isValid)
+                    //                        homeGoal.Minute = numberByte;
+                    //                    else
+                    //                        homeGoal.Minute = 0;
 
-                        //                    //Check if goal exists
-                        //                    var goalExists = GetGoalByAPIId(APIId, homeGoal.Minute);
+                    //                    //Check if goal exists
+                    //                    var goalExists = GetGoalByAPIId(APIId, homeGoal.Minute);
 
-                        //                    if (goalExists == null)
-                        //                    {                                           
-                        //                        homeGoal.APIId = APIId;
-                        //                        homeGoal.SummaryId = summary.Id;
-                        //                        homeGoal.IsHomeTeam = true;
-                        //                        var player = GetPlayerByName(evt["name"]);
+                    //                    if (goalExists == null)
+                    //                    {                                           
+                    //                        homeGoal.APIId = APIId;
+                    //                        homeGoal.SummaryId = summary.Id;
+                    //                        homeGoal.IsHomeTeam = true;
+                    //                        var player = GetPlayerByName(evt["name"]);
 
-                        //                        if (player != null)
-                        //                        {
-                        //                            homeGoal.PlayerName = player.Name;
-                        //                            homeGoal.APIPlayerId = player.APIPlayerId;
-                        //                        }
-                        //                        else
-                        //                        {
-                        //                            homeGoal.PlayerName = player.Name;
-                        //                            homeGoal.APIPlayerId = 0;
-                        //                        }
+                    //                        if (player != null)
+                    //                        {
+                    //                            homeGoal.PlayerName = player.Name;
+                    //                            homeGoal.APIPlayerId = player.APIPlayerId;
+                    //                        }
+                    //                        else
+                    //                        {
+                    //                            homeGoal.PlayerName = player.Name;
+                    //                            homeGoal.APIPlayerId = 0;
+                    //                        }
 
-                        //                        retMsg = SaveGoal(homeGoal);
-                        //                    }
-                        //                }
-                        //            }
-                        //        }//
-                        //    }
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                        //    SaveException(ex, string.Format("HomeGoal, Match Id: {0} ", matchId.ToString()));
-                        //}
-                        #endregion
+                    //                        retMsg = SaveGoal(homeGoal);
+                    //                    }
+                    //                }
+                    //            }
+                    //        }//
+                    //    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    //    SaveException(ex, string.Format("HomeGoal, Match Id: {0} ", matchId.ToString()));
+                    //}
+                    #endregion
 
-                        #region AwayTeam - Goals
+                    #region AwayTeam - Goals
 
-                        //jPath = "commentaries.[0].comm_match_summary.visitorteam.goals.player";
+                    //jPath = "commentaries.[0].comm_match_summary.visitorteam.goals.player";
 
-                        //goals = token.SelectTokens(jPath);
+                    //goals = token.SelectTokens(jPath);
 
-                        // try
-                        // {
-                        //       JObject obj = JObject.Parse(s);
+                    // try
+                    // {
+                    //       JObject obj = JObject.Parse(s);
 
-                        //       try 
-                        //       {
-                        //           //Check if only one record exists
-                        //           isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.id").ToString(), out APIId);
-                        //       }
-                        //       catch 
-                        //       {
-                        //           isValid = false;
-                        //       }
+                    //       try 
+                    //       {
+                    //           //Check if only one record exists
+                    //           isValid = Int32.TryParse(obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.id").ToString(), out APIId);
+                    //       }
+                    //       catch 
+                    //       {
+                    //           isValid = false;
+                    //       }
 
-                        //         if (isValid)
-                        //         {
-                        //             Goal awayGoal = new Goal();
+                    //         if (isValid)
+                    //         {
+                    //             Goal awayGoal = new Goal();
 
-                        //             awayGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.owngoal").ToString() == "False" ? false : true;
-                        //             awayGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.penalty").ToString() == "False" ? false : true;
+                    //             awayGoal.OwnGoal = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.owngoal").ToString() == "False" ? false : true;
+                    //             awayGoal.Penalty = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.penalty").ToString() == "False" ? false : true;
 
-                        //             string minute = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.minute").ToString();
+                    //             string minute = obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.minute").ToString();
 
-                        //             if (awayGoal.Penalty == true)
-                        //             {
-                        //                 minute = minute.Trim().Remove(0, 4);
-                        //             }
+                    //             if (awayGoal.Penalty == true)
+                    //             {
+                    //                 minute = minute.Trim().Remove(0, 4);
+                    //             }
 
-                        //             isValid = Byte.TryParse(minute, out numberByte);
+                    //             isValid = Byte.TryParse(minute, out numberByte);
 
-                        //             if (isValid)
-                        //                 awayGoal.Minute = numberByte;
-                        //             else
-                        //                 awayGoal.Minute = 0;
+                    //             if (isValid)
+                    //                 awayGoal.Minute = numberByte;
+                    //             else
+                    //                 awayGoal.Minute = 0;
 
-                        //             //Check if goal exists
-                        //             var goalExists = GetGoalByAPIId(APIId, awayGoal.Minute);
+                    //             //Check if goal exists
+                    //             var goalExists = GetGoalByAPIId(APIId, awayGoal.Minute);
 
-                        //             if (goalExists == null)
-                        //             {
-                        //                 awayGoal.APIId = APIId;
-                        //                 awayGoal.SummaryId = summary.Id;
-                        //                 awayGoal.IsHomeTeam = false;
-                        //                 var player = GetPlayerByName(obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.name").ToString());
+                    //             if (goalExists == null)
+                    //             {
+                    //                 awayGoal.APIId = APIId;
+                    //                 awayGoal.SummaryId = summary.Id;
+                    //                 awayGoal.IsHomeTeam = false;
+                    //                 var player = GetPlayerByName(obj.SelectToken("commentaries.[0].comm_match_summary.visitorteam.goals.player.name").ToString());
 
-                        //                 if (player != null)
-                        //                 {
-                        //                     awayGoal.PlayerName = player.Name;
-                        //                     awayGoal.APIPlayerId = player.APIPlayerId;
-                        //                 }
-                        //                 else
-                        //                 {
-                        //                     awayGoal.PlayerName = player.Name;
-                        //                     awayGoal.APIPlayerId = 0;
-                        //                 }
+                    //                 if (player != null)
+                    //                 {
+                    //                     awayGoal.PlayerName = player.Name;
+                    //                     awayGoal.APIPlayerId = player.APIPlayerId;
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     awayGoal.PlayerName = player.Name;
+                    //                     awayGoal.APIPlayerId = 0;
+                    //                 }
 
-                        //                 retMsg = SaveGoal(awayGoal);
-                        //             }
-                        //         }
-                        //         else
-                        //         {
-                        //             foreach (var childToken in goals.Children())
-                        //             {
-                        //                 var jeff = childToken.Children();
+                    //                 retMsg = SaveGoal(awayGoal);
+                    //             }
+                    //         }
+                    //         else
+                    //         {
+                    //             foreach (var childToken in goals.Children())
+                    //             {
+                    //                 var jeff = childToken.Children();
 
-                        //                 foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
-                        //                 {
-                        //                     isValid = Int32.TryParse(evt["id"], out APIId);
+                    //                 foreach (var evt in jeff.Select(x => x.ToObject<Dictionary<string, string>>()))
+                    //                 {
+                    //                     isValid = Int32.TryParse(evt["id"], out APIId);
 
-                        //                     if (isValid)
-                        //                     {
-                        //                         string minute = evt["minute"];
-                        //                         Goal awayGoal = new Goal();
+                    //                     if (isValid)
+                    //                     {
+                    //                         string minute = evt["minute"];
+                    //                         Goal awayGoal = new Goal();
 
-                        //                         if (awayGoal.Penalty == true)
-                        //                         {
-                        //                             minute = minute.Trim().Remove(0, 4);
-                        //                         }
+                    //                         if (awayGoal.Penalty == true)
+                    //                         {
+                    //                             minute = minute.Trim().Remove(0, 4);
+                    //                         }
 
-                        //                         isValid = Byte.TryParse(minute, out numberByte);
+                    //                         isValid = Byte.TryParse(minute, out numberByte);
 
-                        //                         if (isValid)
-                        //                             awayGoal.Minute = numberByte;
-                        //                         else
-                        //                             awayGoal.Minute = 0;
+                    //                         if (isValid)
+                    //                             awayGoal.Minute = numberByte;
+                    //                         else
+                    //                             awayGoal.Minute = 0;
 
-                        //                         //Check if goal exists   
-                        //                         var goalExists = GetGoalByAPIId(APIId, awayGoal.Minute);
+                    //                         //Check if goal exists   
+                    //                         var goalExists = GetGoalByAPIId(APIId, awayGoal.Minute);
 
-                        //                         if (goalExists == null)
-                        //                         {                                              
-                        //                             awayGoal.APIId = APIId;
-                        //                             awayGoal.SummaryId = summary.Id;
-                        //                             awayGoal.IsHomeTeam = false;
-                        //                             var player = GetPlayerByName(evt["name"]);
+                    //                         if (goalExists == null)
+                    //                         {                                              
+                    //                             awayGoal.APIId = APIId;
+                    //                             awayGoal.SummaryId = summary.Id;
+                    //                             awayGoal.IsHomeTeam = false;
+                    //                             var player = GetPlayerByName(evt["name"]);
 
-                        //                             if (player != null)
-                        //                             {
-                        //                                 awayGoal.PlayerName = player.Name;
-                        //                                 awayGoal.APIPlayerId = player.APIPlayerId;
-                        //                             }
-                        //                             else
-                        //                             {
-                        //                                 awayGoal.PlayerName = player.Name;
-                        //                                 awayGoal.APIPlayerId = 0;
-                        //                             }
+                    //                             if (player != null)
+                    //                             {
+                    //                                 awayGoal.PlayerName = player.Name;
+                    //                                 awayGoal.APIPlayerId = player.APIPlayerId;
+                    //                             }
+                    //                             else
+                    //                             {
+                    //                                 awayGoal.PlayerName = player.Name;
+                    //                                 awayGoal.APIPlayerId = 0;
+                    //                             }
 
-                        //                             awayGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
-                        //                             awayGoal.Penalty = evt["penalty"] == "False" ? false : true;                                                
+                    //                             awayGoal.OwnGoal = evt["owngoal"] == "False" ? false : true;
+                    //                             awayGoal.Penalty = evt["penalty"] == "False" ? false : true;                                                
 
-                        //                             retMsg = SaveGoal(awayGoal);
-                        //                         }
-                        //                     }
-                        //                 }
-                        //             }
-                        //         }
-                        //}
-                        // catch (Exception ex)
-                        // {
-                        //     //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                        //     SaveException(ex, string.Format("HomeGoal, Match Id: {0} ", matchId.ToString()));
-                        // }
-                        #endregion
+                    //                             retMsg = SaveGoal(awayGoal);
+                    //                         }
+                    //                     }
+                    //                 }
+                    //             }
+                    //         }
+                    //}
+                    // catch (Exception ex)
+                    // {
+                    //     //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                    //     SaveException(ex, string.Format("HomeGoal, Match Id: {0} ", matchId.ToString()));
+                    // }
+                    #endregion
 
-                        #endregion
+                    #endregion
 
-                        #region Match Stats
-                        try
+                    #region Match Stats
+
+                    try
                         {
                             Stat stat = new Stat();
                             stat.MatchId = match.Id;
@@ -794,30 +795,47 @@ namespace CMS.Infrastructure.Entities
 
                             JObject obj = JObject.Parse(s);
 
-                            if (obj.SelectToken("match_stats.localteam.corners") != null)
+                            jPath = "match_stats.localteam";
+
+                            var homeMatchStatsToken = token.SelectTokens(jPath);
+
+                            if (homeMatchStatsToken != null)
                             {
-                                stat.HomeTeamCorners = Convert.ToByte(obj.SelectToken("match_stats.localteam.corners").ToString());
-                                stat.HomeTeamOffsides = Convert.ToByte(obj.SelectToken("match_stats.localteam.offsides").ToString());
-                                stat.HomeTeamPossessionTime = obj.SelectToken("match_stats.localteam.possestiontime").ToString();
-                                stat.HomeTeamSaves = Convert.ToByte(obj.SelectToken("match_stats.localteam.saves").ToString());
-                                stat.HomeTeamOnGoalShots = Convert.ToByte(obj.SelectToken("match_stats.localteam.shots_ongoal").ToString());
-                                stat.HomeTeamTotalShots = Convert.ToByte(obj.SelectToken("match_stats.localteam.shots_total").ToString());
-                                stat.HomeTeamFouls = Convert.ToByte(obj.SelectToken("match_stats.localteam.fouls").ToString());
-                                stat.HomeTeamRedCards = Convert.ToByte(obj.SelectToken("match_stats.localteam.redcards").ToString());
-                                stat.HomeTeamYellowCards = Convert.ToByte(obj.SelectToken("match_stats.localteam.yellowcards").ToString());
+                                foreach (var statToken in homeMatchStatsToken.Children())
+                                {
+                                    stat.HomeTeamCorners = Convert.ToByte(statToken.SelectToken("corners").ToString());
+                                    stat.HomeTeamOffsides = Convert.ToByte(statToken.SelectToken("offsides").ToString());
+                                    stat.HomeTeamPossessionTime = statToken.SelectToken("possesiontime").ToString();
+                                    stat.HomeTeamSaves = Convert.ToByte(statToken.SelectToken("saves").ToString());
+                                    stat.HomeTeamOnGoalShots = Convert.ToByte(statToken.SelectToken("shots_ongoal").ToString());
+                                    stat.HomeTeamTotalShots = Convert.ToByte(statToken.SelectToken("shots_total").ToString());
+                                    stat.HomeTeamFouls = Convert.ToByte(statToken.SelectToken("fouls").ToString());
+                                    stat.HomeTeamRedCards = Convert.ToByte(statToken.SelectToken("redcards").ToString());
+                                    stat.HomeTeamYellowCards = Convert.ToByte(statToken.SelectToken("yellowcards").ToString());
+                                }
+                            }                            
 
-                                stat.AwayTeamCorners = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.corners").ToString());
-                                stat.AwayTeamOffsides = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.offsides").ToString());
-                                stat.AwayTeamPossessionTime = obj.SelectToken("match_stats.visitorteam.possestiontime").ToString();
-                                stat.AwayTeamSaves = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.saves").ToString());
-                                stat.AwayTeamOnGoalShots = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.shots_ongoal").ToString());
-                                stat.AwayTeamTotalShots = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.shots_total").ToString());
-                                stat.AwayTeamFouls = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.fouls").ToString());
-                                stat.AwayTeamRedCards = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.redcards").ToString());
-                                stat.AwayTeamYellowCards = Convert.ToByte(obj.SelectToken("match_stats.visitorteam.yellowcards").ToString());
+                            jPath = "match_stats.visitorteam";
 
-                                SaveMatchStats(stat);
+                            var awayMatchStatsToken = token.SelectTokens(jPath);
+
+                            if (awayMatchStatsToken != null)
+                            {
+                                foreach (var statToken in awayMatchStatsToken.Children())
+                                {
+                                    stat.AwayTeamCorners = Convert.ToByte(statToken.SelectToken("corners").ToString());
+                                    stat.AwayTeamOffsides = Convert.ToByte(statToken.SelectToken("offsides").ToString());
+                                    stat.AwayTeamPossessionTime = statToken.SelectToken("possesiontime").ToString();
+                                    stat.AwayTeamSaves = Convert.ToByte(statToken.SelectToken("saves").ToString());
+                                    stat.AwayTeamOnGoalShots = Convert.ToByte(statToken.SelectToken("shots_ongoal").ToString());
+                                    stat.AwayTeamTotalShots = Convert.ToByte(statToken.SelectToken("shots_total").ToString());
+                                    stat.AwayTeamFouls = Convert.ToByte(statToken.SelectToken("fouls").ToString());
+                                    stat.AwayTeamRedCards = Convert.ToByte(statToken.SelectToken("redcards").ToString());
+                                    stat.AwayTeamYellowCards = Convert.ToByte(statToken.SelectToken("yellowcards").ToString());
+                                }
                             }
+
+                            SaveMatchStats(stat);
                         }
                         catch (Exception ex)
                         {
@@ -859,7 +877,7 @@ namespace CMS.Infrastructure.Entities
                                 if (player != null)
                                 {
                                     playerStat.Assists = string.IsNullOrWhiteSpace(statToken.SelectToken("assists").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("assists").ToString());
-                                    playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_commited").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_commited").ToString());
+                                    playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_committed").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_committed").ToString());
                                     playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_drawn").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_drawn"));
                                     playerStat.Goals = string.IsNullOrWhiteSpace(statToken.SelectToken("goals").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("goals").ToString());
                                     playerStat.MatchId = match.Id;
@@ -889,257 +907,328 @@ namespace CMS.Infrastructure.Entities
                             //}
                         }
 
-                        //System.Diagnostics.Debug.WriteLine("Home player stats complete");
+                    //System.Diagnostics.Debug.WriteLine("Home player stats complete");
 
-                        #endregion
+                    #endregion
 
-                        #region Away players
+                    #region Away players
 
-                        jPath = "player_stats.visitorteam.player";
+                    //Home players
+                    jPath = "player_stats.visitorteam.player";
 
-                        playerStats = token.SelectTokens(jPath);
+                    playerStats = token.SelectTokens(jPath);
 
-                        foreach (var statToken in playerStats.Children())
-                        {
-                            var fred = statToken.Children();
+                    foreach (var statToken in playerStats.Children())
+                    {
+                        //var fred = statToken.Children();
 
-                            foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
-                            {
-                                PlayerStat playerStat = new PlayerStat();
+                        //foreach (var evt in fred.Select(x => x.ToObject<Dictionary<string, string>>()))
+                        //{
+                        PlayerStat playerStat = new PlayerStat();
 
-                                isValid = Int32.TryParse(statToken.SelectToken("id").ToString(), out APIId);
-
-                                if (isValid)
-                                {
-                                    playerStat.APIId = APIId;
-
-                                    Player player = new Player();
-                                    player = GetPlayerByAPIId(playerStat.APIId);
-
-                                    if (player != null)
-                                    {
-                                        playerStat.Assists = string.IsNullOrWhiteSpace(statToken.SelectToken("assists").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("assists").ToString());
-                                        playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_commited").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_commited").ToString());
-                                        playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_drawn").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_drawn"));
-                                        playerStat.Goals = string.IsNullOrWhiteSpace(statToken.SelectToken("goals").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("goals").ToString());
-                                        playerStat.MatchId = match.Id;
-                                        playerStat.Offsides = string.IsNullOrWhiteSpace(statToken.SelectToken("offsides").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("offsides").ToString());
-                                        playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(statToken.SelectToken("pen_miss").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("pen_miss").ToString());
-                                        playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(statToken.SelectToken("pen_score").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("pen_score").ToString());
-                                        playerStat.PlayerId = player.Id;
-                                        playerStat.PositionX = string.IsNullOrWhiteSpace(statToken.SelectToken("posx").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("posx").ToString());
-                                        playerStat.PositionY = string.IsNullOrWhiteSpace(statToken.SelectToken("posy").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("posy").ToString());
-                                        playerStat.RedCards = string.IsNullOrWhiteSpace(statToken.SelectToken("redcards").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("redcards").ToString());
-                                        playerStat.Saves = string.IsNullOrWhiteSpace(statToken.SelectToken("saves").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("saves").ToString());
-                                        playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(statToken.SelectToken("shots_on_goal").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("shots_on_goal").ToString());
-                                        playerStat.TotalShots = string.IsNullOrWhiteSpace(statToken.SelectToken("shots_total").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("shots_total").ToString());
-                                        playerStat.YellowCards = string.IsNullOrWhiteSpace(statToken.SelectToken("yellowcards").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("yellowcards").ToString());
-
-                                        try
-                                        {
-                                            SavePlayerStats(playerStat);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                            SaveException(ex, string.Format("SavePlayerStats - Away, PlayerAPIId: ", player.APIPlayerId.ToString()));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        //System.Diagnostics.Debug.WriteLine("Away players stats complete");
-
-                        #endregion
-
-                        #endregion
-
-                        #region Events
-
-                        //Retrieve lastupdateId
-                        int lastUpdateId = GetLatestEventId(match.Id);
-
-                        JObject feed = JObject.Parse(s);
-                        string id = string.Empty;
-                        int eventId = 0;
-
-                        try
-                        {
-                            isValid = Int32.TryParse(feed.SelectToken("comments.id").ToString(), out eventId);
-                        }
-                        catch
-                        {
-                            isValid = false;
-                        }
+                        isValid = Int32.TryParse(statToken.SelectToken("id").ToString(), out APIId);
 
                         if (isValid)
                         {
-                            if (eventId >= lastUpdateId)
+                            playerStat.APIId = APIId;
+
+                            Player player = new Player();
+                            player = GetPlayerByAPIId(playerStat.APIId);
+
+                            if (player != null)
                             {
-                                Event commEvent = new Event();
-
-                                string important = feed.SelectToken("comments.important").ToString();
-                                string isgoal = feed.SelectToken("comments.isgoal").ToString();
-                                string minute = feed.SelectToken("comments.minute").ToString();
-
-                                if (minute.Contains('\''))
-                                {
-                                    minute = minute.Remove(minute.Length - 1, 1);
-                                }
-
-                                string comment = feed.SelectToken("comments.comment").ToString();
-
-                                commEvent.Important = important == "True" ? true : false;
-
-                                if (isgoal == "True")
-                                {
-                                    commEvent.Goal = true;
-
-                                    //Get player and team from comment
-                                    string playerName = string.Empty;
-                                    string teamName = string.Empty;
-                                    string score = string.Empty;
-
-                                    GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
-
-                                    Goal goal = new Goal();
-
-                                    goal.OwnGoal = false; //TODO - find a way of checking if own goal
-                                    goal.Penalty = false; //TODO - find a way of checking if penalty     
-
-                                    isValid = Byte.TryParse(minute, out numberByte);
-
-                                    if (isValid)
-                                        goal.Minute = numberByte;
-                                    else
-                                        goal.Minute = 0;
-
-                                    goal.APIId = APIId;
-                                    goal.SummaryId = summary.Id;
-
-                                    var player = GetPlayerByName(playerName);
-
-                                    if (player != null)
-                                    {
-                                        goal.PlayerName = player.Name;
-                                        goal.APIPlayerId = player.APIPlayerId;
-                                    }
-                                    else
-                                    {
-                                        goal.PlayerName = player.Name;
-                                        goal.APIPlayerId = 0;
-                                    }
-
-                                    if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower())
-                                    {
-                                        goal.IsHomeTeam = true;
-                                    }
-                                    else
-                                    {
-                                        goal.IsHomeTeam = false;
-                                    }
-
-                                    retMsg = SaveGoal(goal);
-                                }
-                                else
-                                {
-                                    commEvent.Goal = false;
-                                }
-
-                                byte min = 0;
-
-                                isValid = Byte.TryParse(minute, out min);
-
-                                commEvent.Minute = min;
-                                commEvent.Comment = comment;
-                                commEvent.APIId = eventId;
-                                commEvent.MatchId = match.Id;
-                                commEvent.Score = GetMatchScore(match.Id, homeTeam.Name, awayTeam.Name);
-
-                                byte homeRating = 0;
-                                byte awayRating = 0;
-
-                                GetTeamRatings(match.Id, out homeRating, out awayRating);
-
-                                commEvent.HomeTeamMatchRating = homeRating;
-                                commEvent.AwayTeamMatchRating = awayRating;
-
-                                SaveEvent(commEvent);
-                            }
-                        }
-                        else
-                        {
-                            jPath = "comments";
-
-                            var events = token.SelectTokens(jPath);
-
-                            foreach (var childToken in events.Children())
-                            {
-                                var jeff = childToken.Children();
-
-                                var evtId = childToken.SelectToken("id").ToString();
-                                var evtImportant = childToken.SelectToken("important").ToString();
-                                var evtIsGoal = childToken.SelectToken("isgoal").ToString();
-                                var evtMinute = childToken.SelectToken("minute").ToString();
-                                var evtComment = childToken.SelectToken("comment").ToString();
+                                playerStat.Assists = string.IsNullOrWhiteSpace(statToken.SelectToken("assists").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("assists").ToString());
+                                playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_committed").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_committed").ToString());
+                                playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_drawn").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_drawn"));
+                                playerStat.Goals = string.IsNullOrWhiteSpace(statToken.SelectToken("goals").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("goals").ToString());
+                                playerStat.MatchId = match.Id;
+                                playerStat.Offsides = string.IsNullOrWhiteSpace(statToken.SelectToken("offsides").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("offsides").ToString());
+                                playerStat.PenaltiesMissed = string.IsNullOrWhiteSpace(statToken.SelectToken("pen_miss").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("pen_miss").ToString());
+                                playerStat.PenaltiesScored = string.IsNullOrWhiteSpace(statToken.SelectToken("pen_score").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("pen_score").ToString());
+                                playerStat.PlayerId = player.Id;
+                                playerStat.PositionX = string.IsNullOrWhiteSpace(statToken.SelectToken("posx").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("posx").ToString());
+                                playerStat.PositionY = string.IsNullOrWhiteSpace(statToken.SelectToken("posy").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("posy").ToString());
+                                playerStat.RedCards = string.IsNullOrWhiteSpace(statToken.SelectToken("redcards").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("redcards").ToString());
+                                playerStat.Saves = string.IsNullOrWhiteSpace(statToken.SelectToken("saves").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("saves").ToString());
+                                playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(statToken.SelectToken("shots_on_goal").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("shots_on_goal").ToString());
+                                playerStat.TotalShots = string.IsNullOrWhiteSpace(statToken.SelectToken("shots_total").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("shots_total").ToString());
+                                playerStat.YellowCards = string.IsNullOrWhiteSpace(statToken.SelectToken("yellowcards").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("yellowcards").ToString());
 
                                 try
                                 {
-                                    isValid = Int32.TryParse(evtId, out eventId);
-
-                                    //Check if event exists                           
-                                    if (!isValid)
-                                        eventId = 0;
-
-                                    if (eventId <= lastUpdateId)
-                                    {
-                                        break;
-                                    }
-
-                                    Event commEvent = new Event();
-
-                                    string important = evtImportant;
-                                    string isgoal = evtIsGoal;
-                                    string minute = evtMinute;
-
-                                    if (minute.Contains('-'))
-                                    {
-                                        minute = "0";
-                                    }
-
-                                    string comment = evtComment;
-
-                                    commEvent.Important = important == "True" ? true : false;
-                                    commEvent.Goal = isgoal == "True" ? true : false;
-                                    commEvent.Minute = !string.IsNullOrWhiteSpace(minute) ? Convert.ToByte(minute) : (byte)0;
-                                    commEvent.Comment = comment;
-                                    commEvent.APIId = eventId;
-                                    commEvent.MatchId = match.Id;
-                                    commEvent.Score = GetMatchScore(match.Id, homeTeam.Name, awayTeam.Name);
-
-                                    byte homeRating = 0;
-                                    byte awayRating = 0;
-
-                                    GetTeamRatings(match.Id, out homeRating, out awayRating);
-
-                                    commEvent.HomeTeamMatchRating = homeRating;
-                                    commEvent.AwayTeamMatchRating = awayRating;
-
-                                    SaveEvent(commEvent);
+                                    SavePlayerStats(playerStat);
                                 }
                                 catch (Exception ex)
                                 {
                                     //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                    SaveException(ex, string.Format("SaveEvent, MatchId: ", match.Id.ToString()));
+                                    SaveException(ex, string.Format("SavePlayerStats - Away, PlayerAPIId: ", player.APIPlayerId.ToString()));
                                 }
                             }
-                            //}//
                         }
+                        //}
+                    }
+
+                    //System.Diagnostics.Debug.WriteLine("Away players stats complete");
+
+                    #endregion
+
+                    #endregion
+
+                    #region Events
+
+                    //Retrieve lastupdateId
+                    int lastUpdateId = GetLatestEventId(match.Id);
+
+                    //    JObject feed = JObject.Parse(s);
+                    //    string id = string.Empty;
+                    //    int eventId = 0;
+
+                    //    try
+                    //    {
+                    //        isValid = Int32.TryParse(feed.SelectToken("comments.id").ToString(), out eventId);
+                    //    }
+                    //    catch
+                    //    {
+                    //        isValid = false;
+                    //    }
+
+                    #region Remove
+                    //if (isValid)
+                    //    {
+                    //        if (eventId >= lastUpdateId)
+                    //        {
+                    //            Event commEvent = new Event();
+
+                    //            string important = feed.SelectToken("comments.important").ToString();
+                    //            string isgoal = feed.SelectToken("comments.isgoal").ToString();
+                    //            string minute = feed.SelectToken("comments.minute").ToString();
+
+                    //            if (minute.Contains('\''))
+                    //            {
+                    //                minute = minute.Remove(minute.Length - 1, 1);
+                    //            }
+
+                    //            string comment = feed.SelectToken("comments.comment").ToString();
+
+                    //            commEvent.Important = important == "True" ? true : false;
+
+                    //            if (isgoal == "True")
+                    //            {
+                    //                commEvent.Goal = true;
+
+                    //                //Get player and team from comment
+                    //                string playerName = string.Empty;
+                    //                string teamName = string.Empty;
+                    //                string score = string.Empty;
+
+                    //                GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
+
+                    //                Goal goal = new Goal();
+
+                    //                goal.OwnGoal = false; //TODO - find a way of checking if own goal
+                    //                goal.Penalty = false; //TODO - find a way of checking if penalty     
+
+                    //                isValid = Byte.TryParse(minute, out numberByte);
+
+                    //                if (isValid)
+                    //                    goal.Minute = numberByte;
+                    //                else
+                    //                    goal.Minute = 0;
+
+                    //                goal.APIId = APIId;
+                    //                goal.SummaryId = summary.Id;
+
+                    //                var player = GetPlayerByName(playerName);
+
+                    //                if (player != null)
+                    //                {
+                    //                    goal.PlayerName = player.Name;
+                    //                    goal.APIPlayerId = player.APIPlayerId;
+                    //                }
+                    //                else
+                    //                {
+                    //                    goal.PlayerName = player.Name;
+                    //                    goal.APIPlayerId = 0;
+                    //                }
+
+                    //                if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower())
+                    //                {
+                    //                    goal.IsHomeTeam = true;
+                    //                }
+                    //                else
+                    //                {
+                    //                    goal.IsHomeTeam = false;
+                    //                }
+
+                    //                retMsg = SaveGoal(goal);
+                    //            }
+                    //            else
+                    //            {
+                    //                commEvent.Goal = false;
+                    //            }
+
+                    //            byte min = 0;
+
+                    //            isValid = Byte.TryParse(minute, out min);
+
+                    //            commEvent.Minute = min;
+                    //            commEvent.Comment = comment;
+                    //            commEvent.APIId = eventId;
+                    //            commEvent.MatchId = match.Id;
+                    //            commEvent.Score = GetMatchScore(match.Id, homeTeam.Name, awayTeam.Name);
+
+                    //            byte homeRating = 0;
+                    //            byte awayRating = 0;
+
+                    //            GetTeamRatings(match.Id, out homeRating, out awayRating);
+
+                    //            commEvent.HomeTeamMatchRating = homeRating;
+                    //            commEvent.AwayTeamMatchRating = awayRating;
+
+                    //            SaveEvent(commEvent);
+                    //        }
+                    //    }
+                    #endregion
+
+                    //else
+                    //    {
+
+                    string id = string.Empty;
+                    int eventId = 0;
+
+                    jPath = "comments";
+
+                    var events = token.SelectTokens(jPath);
+
+                    foreach (var childToken in events.Children())
+                    {
+                        var jeff = childToken.Children();
+
+                        var evtId = childToken.SelectToken("id").ToString();
+                        var evtImportant = childToken.SelectToken("important").ToString();
+                        var evtIsGoal = childToken.SelectToken("isgoal").ToString();
+                        var evtMinute = childToken.SelectToken("minute").ToString();
+                        var evtComment = childToken.SelectToken("comment").ToString();
+
+                        try
+                        {
+                            isValid = Int32.TryParse(evtId, out eventId);
+
+                            //Check if event exists                           
+                            if (!isValid)
+                                eventId = 0;
+
+                            if (eventId <= lastUpdateId)
+                            {
+                                break;
+                            }
+
+                            Event commEvent = new Event();
+
+                            string important = evtImportant;
+                            string isgoal = evtIsGoal;
+                            string minute = evtMinute.Replace("'", "");
+
+                            if (minute.Contains('-'))
+                            {
+                                minute = "0";
+                            }
+                            else if (minute.Contains('+'))
+                            {
+                                string[] minArr = minute.Split('+');
+                                byte minByte0 = Convert.ToByte(minArr[0].ToString());
+                                byte minByte1 = Convert.ToByte(minArr[1].ToString());
+
+                                minute = (minByte0 + minByte1).ToString();
+                            }
+
+                            string comment = evtComment;
+
+                            commEvent.Important = important == "True" ? true : false;
+
+                            if (isgoal == "1")
+                            {
+                                commEvent.Goal = true;
+
+                                //Get player and team from comment
+                                string playerName = string.Empty;
+                                string teamName = string.Empty;
+                                string score = string.Empty;
+
+                                GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
+
+                                Goal goal = new Goal();
+
+                                goal.OwnGoal = false; //TODO - find a way of checking if own goal
+                                goal.Penalty = false; //TODO - find a way of checking if penalty     
+
+                                isValid = Byte.TryParse(minute, out numberByte);
+
+                                if (isValid)
+                                    goal.Minute = numberByte;
+                                else
+                                    goal.Minute = 0;
+
+                                goal.APIId = APIId;
+                                goal.SummaryId = summary.Id;
+
+                                var player = GetPlayerByNameAndTeam(playerName, teamName);
+
+                                if (player != null)
+                                {
+                                    goal.PlayerName = player.Name;
+                                    goal.APIPlayerId = player.APIPlayerId;
+                                }
+                                else
+                                {
+                                    goal.PlayerName = player.Name;
+                                    goal.APIPlayerId = 0;
+                                }
+
+                                if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower())
+                                {
+                                    goal.IsHomeTeam = true;
+                                }
+                                else
+                                {
+                                    goal.IsHomeTeam = false;
+                                }
+
+                                retMsg = SaveGoal(goal);
+                            }
+                            else
+                            {
+                                commEvent.Goal = false;
+                            }
+
+                            commEvent.Minute = !string.IsNullOrWhiteSpace(minute) ? Convert.ToByte(minute) : (byte)0;
+                            commEvent.Comment = comment;
+                            commEvent.APIId = eventId;
+                            commEvent.MatchId = match.Id;
+                            commEvent.Score = GetMatchScore(match.Id, homeTeam.Name, awayTeam.Name);
+
+                            byte homeRating = 0;
+                            byte awayRating = 0;
+
+                            GetTeamRatings(match.Id, out homeRating, out awayRating);
+
+                            commEvent.HomeTeamMatchRating = homeRating;
+                            commEvent.AwayTeamMatchRating = awayRating;
+
+                            SaveEvent(commEvent);
+                        }
+                        catch (Exception ex)
+                        {
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    SaveException(ex, string.Format("SaveEvent, MatchId: ", match.Id.ToString()));
+                        }
+                    }
+                            //}//
+                        //}
 
                         //System.Diagnostics.Debug.WriteLine("Events complete");
                         #endregion
-                    }
+                }
 
                     //}
                     //else
@@ -2713,6 +2802,7 @@ namespace CMS.Infrastructure.Entities
                     case "M":
                     case "CM-L":
                     case "CM-R":
+                    case "CM":
                     case "LM":
                     case "RM":
                         pos = Position.Midfielder;
@@ -2721,7 +2811,13 @@ namespace CMS.Infrastructure.Entities
                     case "F":
                     case "CF-R":
                     case "CF-L":
+                    case "LF":
+                    case "RF":
                         pos = Position.Forward;
+                        break;
+
+                    default:
+                        pos = Position.Midfielder;
                         break;
                 }
 
