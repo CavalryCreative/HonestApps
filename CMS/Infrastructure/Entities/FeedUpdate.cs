@@ -877,7 +877,7 @@ namespace CMS.Infrastructure.Entities
                             if (isValid)
                             {
                                 playerStat.APIId = APIId;
-
+                                //TODO - check if record exists
                                 Player player = new Player();
                                 player = GetPlayerByAPIId(playerStat.APIId);
 
