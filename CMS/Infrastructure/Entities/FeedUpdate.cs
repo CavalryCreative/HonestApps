@@ -36,7 +36,7 @@ namespace CMS.Infrastructure.Entities
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
       
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(12000));
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -63,7 +63,7 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
-            GetAllCommentaries();
+            //GetAllCommentaries();
             BroadcastFeed();
 
             //SaveBroadcastFeed("", GetIPAddress());
@@ -129,22 +129,22 @@ namespace CMS.Infrastructure.Entities
                 //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683
                 string uri = "http://api.football-api.com/2.0/commentaries/" + matchId.ToString()  + "?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683";  // <-- this returns formatted json
 
-                //var webRequest = (HttpWebRequest)WebRequest.Create(uri);
-                //webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
-                //var webResponse = (HttpWebResponse)webRequest.GetResponse();
+                var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+                webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
+                var webResponse = (HttpWebResponse)webRequest.GetResponse();
 
-                //if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
-                //{
-                //    if (webResponse.StatusCode == HttpStatusCode.NotFound)
-                //    {
-                //        return "No commentaries found.";
-                //    }
+                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
+                {
+                    if (webResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        return "No commentaries found.";
+                    }
 
-                //    var reader = new StreamReader(webResponse.GetResponseStream());
-                //    string s = reader.ReadToEnd();
+                    var reader = new StreamReader(webResponse.GetResponseStream());
+                    string s = reader.ReadToEnd();
 
                     //Test
-                    string s = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\CMS\MatchId2058953.txt");
+                    //string s = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\CMS\MatchId2058953.txt");
 
                     JToken token = JObject.Parse(s);
 
@@ -791,7 +791,14 @@ namespace CMS.Infrastructure.Entities
                             var matchStats = GetMatchStatsByAPIId(match.Id);
 
                             if (matchStats != null)
+                            {
                                 stat.Id = matchStats.Id;
+                            }
+                            else
+                            {
+                                stat.HomeTeamRating = 3;
+                                stat.AwayTeamRating = 3;
+                            }  
 
                             JObject obj = JObject.Parse(s);
 
@@ -891,17 +898,17 @@ namespace CMS.Infrastructure.Entities
                                     playerStat.Saves = string.IsNullOrWhiteSpace(statToken.SelectToken("saves").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("saves").ToString());
                                     playerStat.ShotsOnGoal = string.IsNullOrWhiteSpace(statToken.SelectToken("shots_on_goal").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("shots_on_goal").ToString());
                                     playerStat.TotalShots = string.IsNullOrWhiteSpace(statToken.SelectToken("shots_total").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("shots_total").ToString());
-                                    playerStat.YellowCards = string.IsNullOrWhiteSpace(statToken.SelectToken("yellowcards").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("yellowcards").ToString());
-
-                                    try
-                                    {
-                                        SavePlayerStats(playerStat);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                        SaveException(ex, string.Format("SavePlayerStats - Home, PlayerAPIId: ", player.APIPlayerId.ToString()));
-                                    }
+                                    playerStat.YellowCards = string.IsNullOrWhiteSpace(statToken.SelectToken("yellowcards").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("yellowcards").ToString());                                   
+                                }
+                                
+                                try
+                                {
+                                    SavePlayerStats(playerStat);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    SaveException(ex, string.Format("SavePlayerStats - Home, PlayerAPIId: ", player.APIPlayerId.ToString()));
                                 }
                             }
                             //}
@@ -1235,7 +1242,7 @@ namespace CMS.Infrastructure.Entities
                     //{
                     //    retMsg = "Error: " + string.Format("Status code == {0}, Content length == {1}", webResponse.StatusCode, webResponse.ContentLength);
                     //}
-                //}// uncomment
+                }// comment/uncomment
             }
             catch (Exception ex)
             {
@@ -2908,13 +2915,12 @@ namespace CMS.Infrastructure.Entities
                 }         
             }
 
-            //TODO - remove when real comments added
             //posComment = string.Format("Player - EventType: {0}, CommentType: {1}, PlayerPosition: {2}, PlayerRating: {3}, PlayerName: {4}, PlayerTeam: [5}, Perspective: Positive",
             //    eventType.ToString(), commentType.ToString(), position, playerRating.ToString(), playerName, teamName);
             //negComment = string.Format("Player - EventType: {0}, CommentType: {1}, PlayerPosition: {2}, PlayerRating: {3}, PlayerName: {4}, PlayerTeam: [5}, Perspective: Negative",
             //    eventType.ToString(), commentType.ToString(), position, playerRating.ToString(), playerName, teamName);
-            posComment = "Player = positive";
-            negComment = "Player = negative";
+            //posComment = "Player = positive";
+            //negComment = "Player = negative";
 
             //Assign comment
             if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower()) //Does comment relate to home team
@@ -3066,8 +3072,8 @@ namespace CMS.Infrastructure.Entities
             //awayTeamComment = string.Format("Team - EventType: {0}, CommentType: {1}, AwayTeamRating: {2}, TeamName: [3}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), awayTeamRating.ToString(), awayTeam.Name);
 
-            homeTeamComment = "Team home team - Perspective: Neutral";
-            awayTeamComment = "Team away team - Perspective: Neutral";   
+            //homeTeamComment = "Team home team - Perspective: Neutral";
+            //awayTeamComment = "Team away team - Perspective: Neutral";   
         }
 
         private static void GenerateMatchComment
@@ -3188,8 +3194,8 @@ namespace CMS.Infrastructure.Entities
             //awayTeamComment = string.Format("Match - EventType: {0}, CommentType: {1}, AwayTeamRating: {2}, TeamName: [3}, MatchRating: {4}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), awayTeamRating.ToString(), awayTeam.Name, matchRating.ToString());
 
-            homeTeamComment = "Match home team - Perspective: Neutral";
-            awayTeamComment = "Match away team - Perspective: Neutral";
+            //homeTeamComment = "Match home team - Perspective: Neutral";
+            //awayTeamComment = "Match away team - Perspective: Neutral";
 
             //update matchstat object with updated rating
             if (matchStats != null)
