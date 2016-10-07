@@ -2919,8 +2919,8 @@ namespace CMS.Infrastructure.Entities
             //    eventType.ToString(), commentType.ToString(), position, playerRating.ToString(), playerName, teamName);
             //negComment = string.Format("Player - EventType: {0}, CommentType: {1}, PlayerPosition: {2}, PlayerRating: {3}, PlayerName: {4}, PlayerTeam: [5}, Perspective: Negative",
             //    eventType.ToString(), commentType.ToString(), position, playerRating.ToString(), playerName, teamName);
-            //posComment = "Player = positive";
-            //negComment = "Player = negative";
+            posComment = "Player = positive";
+            negComment = "Player = negative";
 
             //Assign comment
             if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower()) //Does comment relate to home team
@@ -3072,8 +3072,8 @@ namespace CMS.Infrastructure.Entities
             //awayTeamComment = string.Format("Team - EventType: {0}, CommentType: {1}, AwayTeamRating: {2}, TeamName: [3}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), awayTeamRating.ToString(), awayTeam.Name);
 
-            //homeTeamComment = "Team home team - Perspective: Neutral";
-            //awayTeamComment = "Team away team - Perspective: Neutral";   
+            homeTeamComment = "Team home team - Perspective: Neutral";
+            awayTeamComment = "Team away team - Perspective: Neutral";   
         }
 
         private static void GenerateMatchComment
@@ -3194,8 +3194,8 @@ namespace CMS.Infrastructure.Entities
             //awayTeamComment = string.Format("Match - EventType: {0}, CommentType: {1}, AwayTeamRating: {2}, TeamName: [3}, MatchRating: {4}, Perspective: Neutral",
             //    eventType.ToString(), commentType.ToString(), awayTeamRating.ToString(), awayTeam.Name, matchRating.ToString());
 
-            //homeTeamComment = "Match home team - Perspective: Neutral";
-            //awayTeamComment = "Match away team - Perspective: Neutral";
+            homeTeamComment = "Match home team - Perspective: Neutral";
+            awayTeamComment = "Match away team - Perspective: Neutral";
 
             //update matchstat object with updated rating
             if (matchStats != null)
