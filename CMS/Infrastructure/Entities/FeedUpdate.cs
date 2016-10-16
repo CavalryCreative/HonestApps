@@ -984,7 +984,7 @@ namespace CMS.Infrastructure.Entities
                     #region Events
 
                     //Retrieve lastupdateId
-                    int lastUpdateId = GetLatestEventId(match.Id);
+                   
 
                     //    JObject feed = JObject.Parse(s);
                     //    string id = string.Empty;
@@ -1107,6 +1107,8 @@ namespace CMS.Infrastructure.Entities
 
                     var events = token.SelectTokens(jPath);
 
+                    string lastUpdate = GetLatestEvent(match.Id);
+
                     foreach (var childToken in events.Children())
                     {
                         var jeff = childToken.Children();
@@ -1117,15 +1119,41 @@ namespace CMS.Infrastructure.Entities
                         var evtMinute = childToken.SelectToken("minute").ToString();
                         var evtComment = childToken.SelectToken("comment").ToString();
 
+                        string compareEvt = (evtComment + evtMinute).Trim();
+
                         try
                         {
-                            isValid = Int32.TryParse(evtId, out eventId);
+                                //isValid = Int32.TryParse(evtId, out eventId);
 
-                            //Check if event exists                           
-                            if (!isValid)
-                                eventId = 0;
+                                ////Check if event exists                           
+                                //if (!isValid)
+                                //    eventId = 0;
 
-                            if (eventId <= lastUpdateId)
+                           string minute = evtMinute.Replace("'", "");
+
+                           if (minute.Contains('-'))
+                           {
+                                minute = "0";
+                           }
+                           else if (minute.Contains('+'))
+                           {
+                                string[] minArr = minute.Split('+');
+                                byte minByte0 = Convert.ToByte(minArr[0].ToString());
+                                byte minByte1 = Convert.ToByte(minArr[1].ToString());
+
+                                minute = (minByte0 + minByte1).ToString();
+                            }
+
+                            byte min;
+
+                            isValid = byte.TryParse(minute, out numberByte);
+
+                            if (isValid)
+                                min = numberByte;
+                            else
+                                min = 0;
+
+                            if (CheckIfCommentAdded(match.Id, evtComment, min))
                             {
                                 break;
                             }
@@ -1134,21 +1162,6 @@ namespace CMS.Infrastructure.Entities
 
                             string important = evtImportant;
                             string isgoal = evtIsGoal;
-                            string minute = evtMinute.Replace("'", "");
-
-                            if (minute.Contains('-'))
-                            {
-                                minute = "0";
-                            }
-                            else if (minute.Contains('+'))
-                            {
-                                string[] minArr = minute.Split('+');
-                                byte minByte0 = Convert.ToByte(minArr[0].ToString());
-                                byte minByte1 = Convert.ToByte(minArr[1].ToString());
-
-                                minute = (minByte0 + minByte1).ToString();
-                            }
-
                             string comment = evtComment;
 
                             commEvent.Important = important == "True" ? true : false;
@@ -1168,14 +1181,7 @@ namespace CMS.Infrastructure.Entities
 
                                 goal.OwnGoal = false; //TODO - find a way of checking if own goal
                                 goal.Penalty = false; //TODO - find a way of checking if penalty     
-
-                                isValid = Byte.TryParse(minute, out numberByte);
-
-                                if (isValid)
-                                    goal.Minute = numberByte;
-                                else
-                                    goal.Minute = 0;
-
+                                goal.Minute = min;
                                 goal.APIId = APIId;
                                 goal.SummaryId = summary.Id;
 
@@ -1208,7 +1214,7 @@ namespace CMS.Infrastructure.Entities
                                 commEvent.Goal = false;
                             }
 
-                            commEvent.Minute = !string.IsNullOrWhiteSpace(minute) ? Convert.ToByte(minute) : (byte)0;
+                            commEvent.Minute = min;
                             commEvent.Comment = comment;
                             commEvent.APIId = eventId;
                             commEvent.MatchId = match.Id;
@@ -1924,13 +1930,46 @@ namespace CMS.Infrastructure.Entities
             return retInt;
         }
 
+        private static bool CheckIfCommentAdded(Guid id, string comment, byte minute)
+        {
+            bool eventAdded = false;
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                var evt = context.Events.Where(x => (x.MatchId == id) 
+                    && (x.Comment.Trim() == comment.Trim()) 
+                    && (x.Minute == minute))
+                    .FirstOrDefault();
+
+                if (evt != null)
+                    eventAdded = true;
+            }
+
+            return eventAdded;
+        }
+
+        private static string GetLatestEvent(Guid id)
+        {
+            string latestEvent = string.Empty;
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                var evt = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.APIId).FirstOrDefault();
+
+                if (evt != null)
+                    latestEvent = evt.Comment + evt.Minute.ToString().Trim();
+            }
+
+            return latestEvent;
+        }
+
         private static IList<Event> GetLatestEvents(Guid id)
         {
             IList<Event> latestEvents = new List<Event>();
 
             using (EFDbContext context = new EFDbContext())
             {
-                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.APIId).Take(5).ToList();
+                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.Minute).Take(5).ToList();
             }
 
             return latestEvents;
@@ -2881,7 +2920,6 @@ namespace CMS.Infrastructure.Entities
             Dictionary<string, string> placeholders = new Dictionary<string, string>();
 
             placeholders.Add("PLAYERNAME", playerName);
-            placeholders.Add("TEAM", teamName);
 
             if (positiveComments != null)
             {
@@ -2931,18 +2969,67 @@ namespace CMS.Infrastructure.Entities
             //posComment = "Player = positive";
             //negComment = "Player = negative";
 
+            placeholders.Clear();
+            placeholders.Add("USERTEAM", teamName);
+
             //Assign comment
             if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower()) //Does comment relate to home team
             {
                 if (isPositiveEvent == true)
                 {
                     homeTeamComment = posComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (homeTeamComment.Contains(strToReplace))
+                        {
+                            homeTeamComment = homeTeamComment.Replace(strToReplace, homeTeam.Name);
+                        }
+                    }
+
                     awayTeamComment = negComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (awayTeamComment.Contains(strToReplace))
+                        {
+                            awayTeamComment = awayTeamComment.Replace(strToReplace, awayTeam.Name);
+                        }
+                    }
                 }
                 else
                 {
                     homeTeamComment = negComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (homeTeamComment.Contains(strToReplace))
+                        {
+                            homeTeamComment = homeTeamComment.Replace(strToReplace, homeTeam.Name);
+                        }
+                    }
+
                     awayTeamComment = posComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (awayTeamComment.Contains(strToReplace))
+                        {
+                            awayTeamComment = awayTeamComment.Replace(strToReplace, awayTeam.Name);
+                        }
+                    }
                 }           
             }
             else
@@ -2950,12 +3037,58 @@ namespace CMS.Infrastructure.Entities
                 if (isPositiveEvent == true)
                 {
                     awayTeamComment = posComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (awayTeamComment.Contains(strToReplace))
+                        {
+                            awayTeamComment = awayTeamComment.Replace(strToReplace, awayTeam.Name);
+                        }
+                    }
+
                     homeTeamComment = negComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (homeTeamComment.Contains(strToReplace))
+                        {
+                            homeTeamComment = homeTeamComment.Replace(strToReplace, homeTeam.Name);
+                        }
+                    }
                 }
                 else
                 {
                     awayTeamComment = negComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (awayTeamComment.Contains(strToReplace))
+                        {
+                            awayTeamComment = awayTeamComment.Replace(strToReplace, awayTeam.Name);
+                        }
+                    }
+
                     homeTeamComment = posComment;
+
+                    //Replace text placeholders
+                    foreach (KeyValuePair<string, string> kvp in placeholders)
+                    {
+                        string strToReplace = "{%" + kvp.Key + "%}";
+
+                        if (homeTeamComment.Contains(strToReplace))
+                        {
+                            homeTeamComment = homeTeamComment.Replace(strToReplace, homeTeam.Name);
+                        }
+                    }
                 }           
             }         
         }
@@ -3029,15 +3162,14 @@ namespace CMS.Infrastructure.Entities
 
             Dictionary<string, string> placeholders = new Dictionary<string, string>();
 
-            placeholders.Add("HOMETEAM", homeTeam.Name);
-            placeholders.Add("AWAYTEAM", awayTeam.Name);
-
             if (homeComments != null)
             {
                 if (homeComments.Count > 0)
                 {
                     index = random.Next(homeComments.Count);
                     homeComment = homeComments[index];
+
+                    placeholders.Add("USERTEAM", homeTeam.Name);
 
                     //Replace text placeholders                
                     foreach (KeyValuePair<string, string> kvp in placeholders)
@@ -3058,6 +3190,9 @@ namespace CMS.Infrastructure.Entities
                 {             
                     index = random.Next(awayComments.Count);
                     awayComment = awayComments[index];
+
+                    placeholders.Clear();
+                    placeholders.Add("AWAYTEAM", awayTeam.Name);
 
                     //Replace text placeholders                
                     foreach (KeyValuePair<string, string> kvp in placeholders)
@@ -3157,15 +3292,14 @@ namespace CMS.Infrastructure.Entities
 
             Dictionary<string, string> placeholders = new Dictionary<string, string>();
 
-            placeholders.Add("HOMETEAM", homeTeam.Name);
-            placeholders.Add("AWAYTEAM", awayTeam.Name);
-
             if (comments != null)
             {
                 if (comments.Count > 0)
                 {
                     index = random.Next(comments.Count);
                     homeComment = comments[index];
+
+                    placeholders.Add("USERTEAM", homeTeam.Name);
 
                     //Replace text placeholders                
                     foreach (KeyValuePair<string, string> kvp in placeholders)
@@ -3180,6 +3314,9 @@ namespace CMS.Infrastructure.Entities
 
                     index = random.Next(comments.Count);
                     awayComment = comments[index];
+
+                    placeholders.Clear();
+                    placeholders.Add("USERTEAM", awayTeam.Name);
 
                     //Replace text placeholders
                     foreach (KeyValuePair<string, string> kvp in placeholders)
