@@ -36,7 +36,7 @@ namespace CMS.Infrastructure.Entities
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
       
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(120));
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -1969,7 +1969,9 @@ namespace CMS.Infrastructure.Entities
 
             using (EFDbContext context = new EFDbContext())
             {
-                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.Minute).Take(5).ToList();
+                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.Minute)
+                    .OrderBy(emp => Guid.NewGuid())
+                    .Take(1).ToList();
             }
 
             return latestEvents;

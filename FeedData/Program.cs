@@ -38,7 +38,7 @@ namespace FeedData
             //    Console.ReadKey();
             //}
 
-            //UpdatePlayers();
+            UpdatePlayers();
             GetFixtures();
         }
 
@@ -157,7 +157,7 @@ namespace FeedData
             string[] startArr = startDateStr.Split('/');
             string[] endArr = endDateStr.Split('/');
 
-            CultureInfo culture = new CultureInfo("en-GB");
+            CultureInfo culture = new CultureInfo("en-US");
 
             string formatStart = string.Empty;
             string formatEnd = string.Empty;
