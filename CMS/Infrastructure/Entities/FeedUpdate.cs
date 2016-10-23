@@ -1276,18 +1276,18 @@ namespace CMS.Infrastructure.Entities
             foreach (var match in todaysMatches)
             {
                 var matchDetails = GetMatchByAPIId(match.APIId);
-                var latestEvents = GetLatestEvents(matchDetails.Id);
+                var latestEvent = GetLatestEvents(matchDetails.Id);
 
-                foreach (var evt in latestEvents)
+                if(latestEvent != null)
                 {
                     dynamic feedEvent = new JObject();
 
-                    GetComment(matchDetails.Id, matchDetails.HomeTeamAPIId, matchDetails.AwayTeamAPIId, evt.Comment, out homeTeamComment, out awayTeamComment);
+                    GetComment(matchDetails.Id, matchDetails.HomeTeamAPIId, matchDetails.AwayTeamAPIId, latestEvent.Comment, out homeTeamComment, out awayTeamComment);
 
-                    feedEvent.EventComment = evt.Comment;
-                    feedEvent.Score = evt.Score;
-                    feedEvent.Minute = evt.Minute;
-                    feedEvent.EventAPIId = evt.APIId;
+                    feedEvent.EventComment = latestEvent.Comment;
+                    feedEvent.Score = latestEvent.Score;
+                    feedEvent.Minute = latestEvent.Minute;
+                    feedEvent.EventAPIId = latestEvent.APIId;
                     feedEvent.MatchAPIId = matchDetails.APIId;
                     feedEvent.HomeComment = homeTeamComment;
                     feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
@@ -1963,15 +1963,15 @@ namespace CMS.Infrastructure.Entities
             return latestEvent;
         }
 
-        private static IList<Event> GetLatestEvents(Guid id)
+        private static Event GetLatestEvents(Guid id)
         {
-            IList<Event> latestEvents = new List<Event>();
+            Event latestEvents = new Event();
 
             using (EFDbContext context = new EFDbContext())
             {
-                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.Minute)
-                    .OrderBy(emp => Guid.NewGuid())
-                    .Take(1).ToList();
+                latestEvents = context.Events.Where(x => (x.MatchId == id)).OrderByDescending(x => x.Minute).FirstOrDefault();
+                    //.OrderBy(emp => Guid.NewGuid())
+                    //.Take(1).ToList();
             }
 
             return latestEvents;
