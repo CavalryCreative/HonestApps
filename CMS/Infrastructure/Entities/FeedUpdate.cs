@@ -1158,7 +1158,9 @@ namespace CMS.Infrastructure.Entities
                                 break;
                             }
 
-                            Event commEvent = new Event();
+                                #region Event
+
+                                Event commEvent = new Event();
 
                             string important = evtImportant;
                             string isgoal = evtIsGoal;
@@ -1229,8 +1231,14 @@ namespace CMS.Infrastructure.Entities
                             commEvent.AwayTeamMatchRating = awayRating;
 
                             SaveEvent(commEvent);
-                        }
-                        catch (Exception ex)
+
+                                #endregion //Events
+
+                                #region Substitutions
+
+                                #endregion //Substitutions cf lineups - jPath = "substitutions.localteam"
+                            }
+                            catch (Exception ex)
                         {
                                     //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
                                     SaveException(ex, string.Format("SaveEvent, MatchId: ", match.Id.ToString()));
@@ -1267,7 +1275,8 @@ namespace CMS.Infrastructure.Entities
 
             dynamic feed = jsonObject;
             feed.Events = new JArray() as dynamic;
-           
+            feed.Lineups = new JArray() as dynamic;
+
             var todaysMatches = GetTodayMatches();
 
             string homeTeamComment = string.Empty;
