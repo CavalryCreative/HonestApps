@@ -1234,7 +1234,45 @@ namespace CMS.Infrastructure.Entities
 
                                 #endregion //Events
 
-                                #region Substitutions
+                                #region Home Substitutions
+
+                                jPath = "substitutions.localteam";
+
+                                var y = token.SelectTokens(jPath);
+
+                                try
+                                {
+                                    foreach (var tkn in y.Children())
+                                    {
+
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    SaveException(ex, string.Format("SavePlayer - Home Sub, Match Id: {0}", matchId.ToString()));
+                                }
+
+                                #endregion
+
+                                #region Away Substitutions
+
+                                jPath = "substitutions.localteam";
+
+                                y = token.SelectTokens(jPath);
+
+                                try
+                                {
+                                    foreach (var tkn in y.Children())
+                                    {
+
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
+                                    SaveException(ex, string.Format("SavePlayer - Home Sub, Match Id: {0}", matchId.ToString()));
+                                }
 
                                 #endregion //Substitutions cf lineups - jPath = "substitutions.localteam"
                             }
