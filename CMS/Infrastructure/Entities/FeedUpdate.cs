@@ -1250,7 +1250,7 @@ namespace CMS.Infrastructure.Entities
                                 catch (Exception ex)
                                 {
                                     //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                    SaveException(ex, string.Format("SavePlayer - Home Sub, Match Id: {0}", matchId.ToString()));
+                                    SaveException(ex, string.Format("SaveSubstitution - Home Sub, Match Id: {0}", matchId.ToString()));
                                 }
 
                                 #endregion
@@ -1271,7 +1271,7 @@ namespace CMS.Infrastructure.Entities
                                 catch (Exception ex)
                                 {
                                     //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                    SaveException(ex, string.Format("SavePlayer - Home Sub, Match Id: {0}", matchId.ToString()));
+                                    SaveException(ex, string.Format("SaveSubstitution - Away Sub, Match Id: {0}", matchId.ToString()));
                                 }
 
                                 #endregion //Substitutions cf lineups - jPath = "substitutions.localteam"
