@@ -1221,17 +1221,25 @@ namespace CMS.Infrastructure.Entities
 
                                         int playerOnAPIId = 0;
                                         int playerOffAPIId = 0;
+                                        byte subMin = 0;
 
                                         Substitution sub = new Substitution();
 
                                         sub.MatchId = match.Id;
 
-                                        var result = Int32.TryParse(playerAwayOnSubId, out playerOnAPIId);
+                                        var result = Byte.TryParse(subMinute, out subMin);
+                                        sub.Minute = subMin;
+
+                                        result = Int32.TryParse(playerAwayOnSubId, out playerOnAPIId);
 
                                         sub.APIPlayerOffId = playerOnAPIId;
 
-                                       //Check if player exists
-                                       Player awaySubPlayerOn = new Player();
+                                        result = Int32.TryParse(playerAwayOffSubId, out playerOffAPIId);
+
+                                        sub.APIPlayerOffId = playerOffAPIId;
+
+                                        //Check if player exists
+                                        Player awaySubPlayerOn = new Player();
 
                                         if (result)
                                             awaySubPlayerOn = GetPlayerByAPIId(playerOnAPIId);
