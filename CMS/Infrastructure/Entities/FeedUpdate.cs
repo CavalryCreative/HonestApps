@@ -1006,12 +1006,6 @@ namespace CMS.Infrastructure.Entities
 
                         try
                         {
-                                //isValid = Int32.TryParse(evtId, out eventId);
-
-                                ////Check if event exists                           
-                                //if (!isValid)
-                                //    eventId = 0;
-
                            string minute = evtMinute.Replace("'", "");
 
                            if (minute.Contains('-'))
@@ -1127,71 +1121,83 @@ namespace CMS.Infrastructure.Entities
                                 {
                                     foreach (var tkn in y.Children())
                                     {
-                                        var playerAwaySubId = childToken.SelectToken("id").ToString();
-                                        var playerAwaySubName = childToken.SelectToken("name").ToString();
-                                        var playerAwaySubNumber = childToken.SelectToken("number").ToString();
-                                        var playerAwaySubPos = childToken.SelectToken("pos").ToString();
+                                        var playerHomeOnSubId = childToken.SelectToken("on_id").ToString();
+                                        var playerHomeOnSubName = childToken.SelectToken("on_name").ToString();
+                                        var playerHomeOffSubId = childToken.SelectToken("off_id").ToString();
+                                        var playerHomeOffSubName = childToken.SelectToken("off_name").ToString();
+                                        var subMinute = childToken.SelectToken("minute").ToString();
 
-                                        var result = Int32.TryParse(playerAwaySubId, out playerAPIId);
+                                        int playerOnAPIId = 0;
+                                        int playerOffAPIId = 0;
+                                        byte subMin = 0;
+
+                                        Substitution sub = new Substitution();
+
+                                        sub.MatchId = match.Id;
+                                        sub.IsHomeTeam = true;
+
+                                        var result = Byte.TryParse(subMinute, out subMin);
+                                        sub.Minute = subMin;
+
+                                        result = Int32.TryParse(playerHomeOnSubId, out playerOnAPIId);
+
+                                        sub.APIPlayerOffId = playerOnAPIId;
+
+                                        result = Int32.TryParse(playerHomeOffSubId, out playerOffAPIId);
+
+                                        sub.APIPlayerOffId = playerOffAPIId;
 
                                         //Check if player exists
-                                        Player awaySubPlayer = new Player();
+                                        Player awaySubPlayerOn = new Player();
 
                                         if (result)
-                                            awaySubPlayer = GetPlayerByAPIId(playerAPIId);
+                                            awaySubPlayerOn = GetPlayerByAPIId(playerOnAPIId);
 
-                                        if (awaySubPlayer == null)
-                                            awaySubPlayer = GetPlayerByName(playerAwaySubName);
+                                        if (awaySubPlayerOn == null)
+                                            awaySubPlayerOn = GetPlayerByName(playerHomeOnSubName);
 
-                                        //Add to Players if not already added
-                                        if (awaySubPlayer == null)
+                                        if (awaySubPlayerOn == null)
                                         {
-                                            awaySubPlayer = new Player();
-
-                                            result = Byte.TryParse(playerAwaySubNumber, out squadNumberByte);
-
-                                            if (result)
-                                                awaySubPlayer.SquadNumber = squadNumberByte;
-                                            else
-                                                awaySubPlayer.SquadNumber = 0;
-
-                                            awaySubPlayer.Name = playerAwaySubName;
-                                            awaySubPlayer.Position = playerAwaySubPos;
-                                            awaySubPlayer.Id = System.Guid.Empty;
-                                            awaySubPlayer.APIPlayerId = playerAPIId;
-
-                                            retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
-
-                                            ReturnId(retMsg, out actionMessage, out Id);
-
-                                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
-                                            {
-                                                awaySubPlayer.Id = new Guid(Id);
-                                            }
+                                            sub.PlayerOnId = Guid.Empty;
+                                            sub.PlayerOn = string.Empty;
+                                        }
+                                        else
+                                        {
+                                            sub.PlayerOnId = awaySubPlayerOn.Id;
+                                            sub.PlayerOn = awaySubPlayerOn.Name;
                                         }
 
-                                        if (awaySubPlayer != null)
+                                        //Check if player exists
+                                        Player awaySubPlayerOff = new Player();
+
+                                        if (result)
+                                            awaySubPlayerOff = GetPlayerByAPIId(playerOnAPIId);
+
+                                        if (awaySubPlayerOff == null)
+                                            awaySubPlayerOff = GetPlayerByName(playerHomeOnSubName);
+
+                                        if (awaySubPlayerOff == null)
                                         {
-                                            //add to Lineups
-                                            Lineup lineup = new Lineup();
+                                            sub.PlayerOffId = Guid.Empty;
+                                            sub.PlayerOff = string.Empty;
+                                        }
+                                        else
+                                        {
+                                            sub.PlayerOffId = awaySubPlayerOn.Id;
+                                            sub.PlayerOff = awaySubPlayerOn.Name;
+                                        }
 
-                                            lineup.IsHomePlayer = false;
-                                            lineup.IsSub = true;
-                                            lineup.MatchAPIId = matchId;
-                                            lineup.PlayerId = awaySubPlayer.Id;
-                                            lineup.Position = playerAwaySubPos;
+                                        //Save substitution
+                                        string actionMessage;
+                                        string Id;
 
-                                            SavePlayerToMatchLineup(lineup);
+                                        retMsg = SaveSubstitution(sub);
 
-                                            UpdateHistory history = new UpdateHistory();
+                                        ReturnId(retMsg, out actionMessage, out Id);
 
-                                            history.Active = true;
-                                            history.Deleted = false;
-                                            history.MatchDetails = true;
-                                            history.MatchAPIId = matchId;
-                                            history.Lineups = true;
-
-                                            SaveUpdateHistory(history);
+                                        if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                        {
+                                            sub.Id = new Guid(Id);
                                         }
                                     }
                                 }
@@ -1226,7 +1232,8 @@ namespace CMS.Infrastructure.Entities
                                         Substitution sub = new Substitution();
 
                                         sub.MatchId = match.Id;
-
+                                        sub.IsHomeTeam = false;
+                                        
                                         var result = Byte.TryParse(subMinute, out subMin);
                                         sub.Minute = subMin;
 
@@ -1249,41 +1256,47 @@ namespace CMS.Infrastructure.Entities
 
                                         if (awaySubPlayerOn == null)
                                         {
+                                            sub.PlayerOnId = Guid.Empty;
+                                            sub.PlayerOn = string.Empty;
+                                        }
+                                        else
+                                        {
+                                            sub.PlayerOnId = awaySubPlayerOn.Id;
+                                            sub.PlayerOn = awaySubPlayerOn.Name;
+                                        }
+
+                                        //Check if player exists
+                                        Player awaySubPlayerOff = new Player();
+
+                                        if (result)
+                                            awaySubPlayerOff = GetPlayerByAPIId(playerOnAPIId);
+
+                                        if (awaySubPlayerOff == null)
+                                            awaySubPlayerOff = GetPlayerByName(playerAwayOnSubName);
+
+                                        if (awaySubPlayerOff == null)
+                                        {
                                             sub.PlayerOffId = Guid.Empty;
                                             sub.PlayerOff = string.Empty;
                                         }
                                         else
                                         {
-                                            sub.PlayerOffId = Guid.Empty;
-                                            sub.PlayerOff = string.Empty;
+                                            sub.PlayerOffId = awaySubPlayerOn.Id;
+                                            sub.PlayerOff = awaySubPlayerOn.Name;
                                         }
 
-                                            //Add to Players if not already added
-                                            if (awaySubPlayerOn == null)
+                                        //Save substitution
+                                        string actionMessage;
+                                        string Id;
+
+                                        retMsg = SaveSubstitution(sub);
+
+                                        ReturnId(retMsg, out actionMessage, out Id);
+
+                                        if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
                                         {
-                                            awaySubPlayer = new Player();
-
-                                            result = Byte.TryParse(playerAwaySubNumber, out squadNumberByte);
-
-                                            if (result)
-                                                awaySubPlayer.SquadNumber = squadNumberByte;
-                                            else
-                                                awaySubPlayer.SquadNumber = 0;
-
-                                            awaySubPlayer.Name = playerAwaySubName;
-                                            awaySubPlayer.Position = playerAwaySubPos;
-                                            awaySubPlayer.Id = System.Guid.Empty;
-                                            awaySubPlayer.APIPlayerId = playerAPIId;
-
-                                            retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
-
-                                            ReturnId(retMsg, out actionMessage, out Id);
-
-                                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
-                                            {
-                                                awaySubPlayer.Id = new Guid(Id);
-                                            }
-                                         }
+                                            sub.Id = new Guid(Id);
+                                        }
                                     }
                                 }
                                 catch (Exception ex)
@@ -1360,7 +1373,9 @@ namespace CMS.Infrastructure.Entities
                     feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
                     feed.Events.Add(feedEvent);
-                }               
+                }   
+                
+                //Lineups 
             }
             
             return feed.ToString();
@@ -1694,6 +1709,42 @@ namespace CMS.Infrastructure.Entities
                     return string.Format("Error: {0}", e.InnerException.ToString());
                 }
             }      
+        }
+
+        private static string SaveSubstitution(Substitution updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                if (updatedRecord != null)
+                {
+                    if (updatedRecord.Id == System.Guid.Empty)
+                    {
+                        //Create record
+                        updatedRecord.Id = Guid.NewGuid();
+                        updatedRecord.Active = true;
+                        updatedRecord.Deleted = false;
+                        updatedRecord.DateAdded = DateTime.Now;
+                        updatedRecord.DateUpdated = DateTime.Now;
+
+                        //recordToUpdate.Players.Clear();
+                        context.Substitutions.Add(updatedRecord);
+                        Id = updatedRecord.Id;
+                    }
+                }
+
+                try
+                {
+                    context.SaveChanges();
+
+                    return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+                }
+                catch (Exception e)
+                {
+                    return string.Format("Error: {0}", e.InnerException.ToString());
+                }
+            }
         }
 
         private static string SavePlayerToMatchLineup(Lineup updatedRecord)
