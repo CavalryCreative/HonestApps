@@ -1306,6 +1306,14 @@ namespace CMS.Infrastructure.Entities
                                 }
 
                                 #endregion //Substitutions cf lineups - jPath = "substitutions.localteam"
+
+                                #region Yellow Cards
+                                //TODO
+                                #endregion
+
+                                #region Red Cards
+                                //TODO
+                                #endregion
                             }
                             catch (Exception ex)
                         {
@@ -1373,9 +1381,13 @@ namespace CMS.Infrastructure.Entities
                     feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
                     feed.Events.Add(feedEvent);
-                }   
-                
+                }
+
                 //Lineups 
+                dynamic lineUp = new JObject();
+
+                lineUp.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
+                lineUp.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
             }
             
             return feed.ToString();
@@ -2103,6 +2115,30 @@ namespace CMS.Infrastructure.Entities
             }
 
             return matchesToday;
+        }
+
+        private static IList<Lineup> GetLineup(int matchId, bool isHomePlayer)
+        {
+            IList<Lineup> lineup = new List<Lineup>();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                lineup = context.Lineups.Where(x => x.MatchAPIId == matchId && x.IsHomePlayer == isHomePlayer).ToList();
+            }
+
+            return lineup;
+        }
+
+        private static IList<Substitution> GetSubstitutions(Guid matchId, bool isHomeTeam)
+        {
+            IList<Substitution> lineup = new List<Substitution>();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                lineup = context.Substitutions.Where(x => x.MatchId == matchId && x.IsHomeTeam == isHomeTeam).ToList();
+            }
+
+            return lineup;
         }
 
         private static void GetTeamRatings(Guid matchId, out byte homeRating, out byte awayRating)
