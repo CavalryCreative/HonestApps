@@ -79,6 +79,15 @@ namespace Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Record exists.
+        /// </summary>
+        public static string RecordExists {
+            get {
+                return ResourceManager.GetString("RecordExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Record found.
         /// </summary>
         public static string RecordFound {

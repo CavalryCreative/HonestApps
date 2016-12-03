@@ -1121,11 +1121,11 @@ namespace CMS.Infrastructure.Entities
                                 {
                                     foreach (var tkn in y.Children())
                                     {
-                                        var playerHomeOnSubId = childToken.SelectToken("on_id").ToString();
-                                        var playerHomeOnSubName = childToken.SelectToken("on_name").ToString();
-                                        var playerHomeOffSubId = childToken.SelectToken("off_id").ToString();
-                                        var playerHomeOffSubName = childToken.SelectToken("off_name").ToString();
-                                        var subMinute = childToken.SelectToken("minute").ToString();
+                                        var playerHomeOnSubId = tkn.SelectToken("on_id").ToString();
+                                        var playerHomeOnSubName = tkn.SelectToken("on_name").ToString();
+                                        var playerHomeOffSubId = tkn.SelectToken("off_id").ToString();
+                                        var playerHomeOffSubName = tkn.SelectToken("off_name").ToString();
+                                        var subMinute = tkn.SelectToken("minute").ToString();
 
                                         int playerOnAPIId = 0;
                                         int playerOffAPIId = 0;
@@ -1141,50 +1141,50 @@ namespace CMS.Infrastructure.Entities
 
                                         result = Int32.TryParse(playerHomeOnSubId, out playerOnAPIId);
 
-                                        sub.APIPlayerOffId = playerOnAPIId;
+                                        sub.APIPlayerOnId = playerOnAPIId;
 
                                         result = Int32.TryParse(playerHomeOffSubId, out playerOffAPIId);
 
                                         sub.APIPlayerOffId = playerOffAPIId;
 
                                         //Check if player exists
-                                        Player awaySubPlayerOn = new Player();
+                                        Player homeSubPlayerOn = new Player();
 
                                         if (result)
-                                            awaySubPlayerOn = GetPlayerByAPIId(playerOnAPIId);
+                                            homeSubPlayerOn = GetPlayerByAPIId(playerOnAPIId);
 
-                                        if (awaySubPlayerOn == null)
-                                            awaySubPlayerOn = GetPlayerByName(playerHomeOnSubName);
+                                        if (homeSubPlayerOn == null)
+                                            homeSubPlayerOn = GetPlayerByName(playerHomeOnSubName);
 
-                                        if (awaySubPlayerOn == null)
+                                        if (homeSubPlayerOn == null)
                                         {
                                             sub.PlayerOnId = Guid.Empty;
                                             sub.PlayerOn = string.Empty;
                                         }
                                         else
                                         {
-                                            sub.PlayerOnId = awaySubPlayerOn.Id;
-                                            sub.PlayerOn = awaySubPlayerOn.Name;
+                                            sub.PlayerOnId = homeSubPlayerOn.Id;
+                                            sub.PlayerOn = homeSubPlayerOn.Name;
                                         }
 
                                         //Check if player exists
-                                        Player awaySubPlayerOff = new Player();
+                                        Player homeSubPlayerOff = new Player();
 
                                         if (result)
-                                            awaySubPlayerOff = GetPlayerByAPIId(playerOnAPIId);
+                                            homeSubPlayerOff = GetPlayerByAPIId(playerOnAPIId);
 
-                                        if (awaySubPlayerOff == null)
-                                            awaySubPlayerOff = GetPlayerByName(playerHomeOnSubName);
+                                        if (homeSubPlayerOff == null)
+                                            homeSubPlayerOff = GetPlayerByName(playerHomeOnSubName);
 
-                                        if (awaySubPlayerOff == null)
+                                        if (homeSubPlayerOff == null)
                                         {
                                             sub.PlayerOffId = Guid.Empty;
                                             sub.PlayerOff = string.Empty;
                                         }
                                         else
                                         {
-                                            sub.PlayerOffId = awaySubPlayerOn.Id;
-                                            sub.PlayerOff = awaySubPlayerOn.Name;
+                                            sub.PlayerOffId = homeSubPlayerOff.Id;
+                                            sub.PlayerOff = homeSubPlayerOff.Name;
                                         }
 
                                         //Save substitution
@@ -1219,11 +1219,11 @@ namespace CMS.Infrastructure.Entities
                                 {
                                     foreach (var tkn in y.Children())
                                     {                                    
-                                        var playerAwayOnSubId = childToken.SelectToken("on_id").ToString();
-                                        var playerAwayOnSubName = childToken.SelectToken("on_name").ToString();
-                                        var playerAwayOffSubId = childToken.SelectToken("off_id").ToString();
-                                        var playerAwayOffSubName = childToken.SelectToken("off_name").ToString();
-                                        var subMinute = childToken.SelectToken("minute").ToString();
+                                        var playerAwayOnSubId = tkn.SelectToken("on_id").ToString();
+                                        var playerAwayOnSubName = tkn.SelectToken("on_name").ToString();
+                                        var playerAwayOffSubId = tkn.SelectToken("off_id").ToString();
+                                        var playerAwayOffSubName = tkn.SelectToken("off_name").ToString();
+                                        var subMinute = tkn.SelectToken("minute").ToString();
 
                                         int playerOnAPIId = 0;
                                         int playerOffAPIId = 0;
@@ -1239,7 +1239,7 @@ namespace CMS.Infrastructure.Entities
 
                                         result = Int32.TryParse(playerAwayOnSubId, out playerOnAPIId);
 
-                                        sub.APIPlayerOffId = playerOnAPIId;
+                                        sub.APIPlayerOnId = playerOnAPIId;
 
                                         result = Int32.TryParse(playerAwayOffSubId, out playerOffAPIId);
 
@@ -1281,8 +1281,8 @@ namespace CMS.Infrastructure.Entities
                                         }
                                         else
                                         {
-                                            sub.PlayerOffId = awaySubPlayerOn.Id;
-                                            sub.PlayerOff = awaySubPlayerOn.Name;
+                                            sub.PlayerOffId = awaySubPlayerOff.Id;
+                                            sub.PlayerOff = awaySubPlayerOff.Name;
                                         }
 
                                         //Save substitution
@@ -1351,8 +1351,8 @@ namespace CMS.Infrastructure.Entities
             jsonObject.Add("Updated", DateTime.Now);
 
             dynamic feed = jsonObject;
-            feed.Events = new JArray() as dynamic;
-            feed.Lineups = new JArray() as dynamic;
+
+            feed.Matches = new JArray() as dynamic;
 
             var todaysMatches = GetTodayMatches();
 
@@ -1361,10 +1361,31 @@ namespace CMS.Infrastructure.Entities
 
             foreach (var match in todaysMatches)
             {
+                var matchEvent = new JObject();
+                feed.Matches.Add(matchEvent);
+
+                //var HomeDetails = new JObject();
+                //feed.Matches.Add(HomeDetails);
+
+                //var AwayDetails = new JObject();
+                //feed.Matches.Add(AwayDetails);
+
+                //var HomeLineups = new JArray() as dynamic;
+                //feed.Matches.HomeDetails.Add(new JProperty(HomeLineups));
+
+                //var AwayLineups = new JArray() as dynamic;
+                //feed.Matches.AwayDetails.Add(new JProperty(AwayLineups));
+
                 var matchDetails = GetMatchByAPIId(match.APIId);
                 var latestEvent = GetLatestEvents(matchDetails.Id);
 
-                if(latestEvent != null)
+                //var homeTeam = GetTeamByAPIId(matchDetails.HomeTeamAPIId);
+                //var awayTeam = GetTeamByAPIId(matchDetails.AwayTeamAPIId);
+
+                //feed.HomeDetails.Add("HomeTeam", homeTeam.Name);
+                //feed.AwayDetails.Add("AwayTeam", awayTeam.Name);
+
+                if (latestEvent != null)
                 {
                     dynamic feedEvent = new JObject();
 
@@ -1380,16 +1401,124 @@ namespace CMS.Infrastructure.Entities
                     feedEvent.AwayComment = awayTeamComment;
                     feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
-                    feed.Events.Add(feedEvent);
+                    feed.Matches.Event.Add(feedEvent);
                 }
 
                 //Lineups 
-                dynamic lineUp = new JObject();
+                //var homeLineup = GetLineup(match.APIId, true);
+                //var awayLineup = GetLineup(match.APIId, false);
+                //var homeSubs = GetSubstitutions(match.Id, true);
+                //var awaySubs = GetSubstitutions(match.Id, false);
 
-                lineUp.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
-                lineUp.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
+                //#region Home Team
+
+                //foreach(var homePlayer in homeLineup)
+                //{
+                //    dynamic homePlyr = new JObject();
+
+                //    var player = GetPlayerById(homePlayer.PlayerId);
+                //    homePlyr.Number = player.SquadNumber + ".";
+
+                //    string[] name = player.Name.Split(' ');
+
+                //    if (name.Count() > 0)
+                //        homePlyr.Surname = name[name.Count() - 1];
+                //    else
+                //        homePlyr.Surname = player.Name;
+
+                //    //TODO
+                //    homePlyr.YellowCards = 0;
+                //    homePlyr.RedCards = 0;
+                //    homePlyr.Captain = false;
+                //    //
+
+                //    homePlyr.IsSub = homePlayer.IsSub;
+                         
+                //    var playerSubbed = homeSubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
+                //    var playerSubOn = homeSubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
+
+                //    if (playerSubbed != null)
+                //    {
+                //        homePlyr.Substituted = true;
+                //        homePlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                //    }
+                //    else
+                //    {
+                //        homePlyr.Substituted = false;
+                //        homePlyr.SubTime = "";
+                //    }
+
+                //    if (playerSubOn != null)
+                //    {
+                //        homePlyr.Substituted = false;
+                //        homePlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                //    }
+                //    else
+                //    {
+                //        homePlyr.Substituted = false;
+                //        homePlyr.SubTime = "";
+                //    }
+
+                //    feed.Matches.HomeDetails.HomeLineups.Add(homePlyr);
+                //}
+
+                //#endregion
+
+                //#region Away Team
+
+                //foreach (var awayPlayer in awayLineup)
+                //{
+                //    dynamic awayPlyr = new JObject();
+
+                //    var player = GetPlayerById(awayPlayer.PlayerId);
+                //    awayPlyr.Number = player.SquadNumber + ".";
+
+                //    string[] name = player.Name.Split(' ');
+
+                //    if (name.Count() > 0)
+                //        awayPlyr.Surname = name[name.Count() - 1];
+                //    else
+                //        awayPlyr.Surname = player.Name;
+
+                //    //TODO
+                //    awayPlyr.YellowCards = 0;
+                //    awayPlyr.RedCards = 0;
+                //    awayPlyr.Captain = false;
+                //    //
+
+                //    awayPlyr.IsSub = awayPlayer.IsSub;
+
+                //    var playerSubbed = awaySubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
+                //    var playerSubOn = awaySubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
+
+                //    if (playerSubbed != null)
+                //    {
+                //        awayPlyr.Substituted = true;
+                //        awayPlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                //    }
+                //    else
+                //    {
+                //        awayPlyr.Substituted = false;
+                //        awayPlyr.SubTime = "";
+                //    }
+
+                //    if (playerSubOn != null)
+                //    {
+                //        awayPlyr.Substituted = false;
+                //        awayPlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                //    }
+                //    else
+                //    {
+                //        awayPlyr.Substituted = false;
+                //        awayPlyr.SubTime = "";
+                //    }
+
+                //    feed.Matches.AwayDetails.AwayLineups.Add(awayPlyr);
+                //}
+
+                //#endregion
             }
-            
+
             return feed.ToString();
         }
 
@@ -1731,6 +1860,13 @@ namespace CMS.Infrastructure.Entities
             {
                 if (updatedRecord != null)
                 {
+                    var checkIfExists = context.Substitutions.Where(x => x.APIPlayerOffId == updatedRecord.APIPlayerOffId 
+                        && x.APIPlayerOnId == updatedRecord.APIPlayerOnId
+                        && x.MatchId == updatedRecord.MatchId).FirstOrDefault();
+
+                    if (checkIfExists != null)
+                        return Res.Resources.RecordExists;
+
                     if (updatedRecord.Id == System.Guid.Empty)
                     {
                         //Create record
@@ -1938,6 +2074,18 @@ namespace CMS.Infrastructure.Entities
             using (EFDbContext context = new EFDbContext())
             {
                 player = context.Players.Where(x => (x.APIPlayerId == id)).FirstOrDefault();
+            }
+
+            return player;
+        }
+
+        private static Player GetPlayerById(Guid id)
+        {
+            Player player = new Player();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                player = context.Players.Where(x => (x.Id == id)).FirstOrDefault();
             }
 
             return player;

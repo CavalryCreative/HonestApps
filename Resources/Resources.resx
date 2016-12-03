@@ -123,6 +123,9 @@
   <data name="RecordAdded" xml:space="preserve">
     <value>Record added</value>
   </data>
+  <data name="RecordExists" xml:space="preserve">
+    <value>Record exists</value>
+  </data>
   <data name="RecordFound" xml:space="preserve">
     <value>Record found</value>
   </data>
