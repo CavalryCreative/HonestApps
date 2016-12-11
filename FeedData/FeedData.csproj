@@ -114,6 +114,9 @@
     <Compile Include="Goal.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="LeagueStanding.cs">
+      <DependentUpon>DbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Lineup.cs">
       <DependentUpon>DbModel.tt</DependentUpon>
     </Compile>

@@ -33,6 +33,8 @@ namespace CMS.Infrastructure.Entities
         public Guid AwayTeamId { get; set; }
         public int HomeTeamAPIId { get; set; }
         public int AwayTeamAPIId { get; set; }
+        public string HalfTimeScore { get; set; }
+        public string FullTimeScore { get; set; }
         public bool IsToday { get; set; }
         public bool IsLive { get; set; }
        

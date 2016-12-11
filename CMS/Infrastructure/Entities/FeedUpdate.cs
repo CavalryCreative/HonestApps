@@ -2257,6 +2257,18 @@ namespace CMS.Infrastructure.Entities
             return latestEvents;
         }
 
+        private static IList<LeagueStanding> GetLeagueStandings()
+        {
+            IList<LeagueStanding> leagueStandings = new List<LeagueStanding>();
+
+            using (EFDbContext context = new EFDbContext())
+            {
+                leagueStandings = context.LeagueStanding.OrderBy(x => x.Position).ToList();
+            }
+
+            return leagueStandings;
+        }
+
         private static IList<MatchesToday> GetTodayMatches()
         {
             IList<MatchesToday> matchesToday = new List<MatchesToday>();

@@ -89,6 +89,30 @@
           <Property Name="DateUpdated" Type="datetime" />
           <Property Name="APIId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="LeagueStandings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="APIId" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="500" />
+          <Property Name="Position" Type="tinyint" Nullable="false" />
+          <Property Name="GamesPlayed" Type="tinyint" Nullable="false" />
+          <Property Name="GamesWon" Type="tinyint" Nullable="false" />
+          <Property Name="GamesDrawn" Type="tinyint" Nullable="false" />
+          <Property Name="GamesLost" Type="tinyint" Nullable="false" />
+          <Property Name="GoalsScored" Type="tinyint" Nullable="false" />
+          <Property Name="GoalsConceded" Type="tinyint" Nullable="false" />
+          <Property Name="GoalDifference" Type="int" Nullable="false" />
+          <Property Name="Points" Type="tinyint" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="500" />
+          <Property Name="CreatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateAdded" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="Deleted" Type="bit" />
+          <Property Name="UpdatedByUserId" Type="uniqueidentifier" />
+          <Property Name="DateUpdated" Type="datetime" />
+        </EntityType>
         <EntityType Name="Lineups">
           <Key>
             <PropertyRef Name="Id" />
@@ -134,6 +158,8 @@
           <Property Name="DateUpdated" Type="datetime" />
           <Property Name="Team_Id" Type="uniqueidentifier" />
           <Property Name="Team_Id1" Type="uniqueidentifier" />
+          <Property Name="HalfTimeScore" Type="varchar" MaxLength="10" />
+          <Property Name="FullTimeScore" Type="varchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="MatchesTodays">
           <Key>
@@ -548,6 +574,7 @@
           <EntitySet Name="Comments" EntityType="Self.Comments" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Events" EntityType="Self.Events" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Goals" EntityType="Self.Goals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeagueStandings" EntityType="Self.LeagueStandings" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Lineups" EntityType="Self.Lineups" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Matches" EntityType="Self.Matches" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MatchesTodays" EntityType="Self.MatchesTodays" Schema="dbo" store:Type="Tables" />
@@ -773,6 +800,8 @@
           <NavigationProperty Name="Stats" Relationship="Self.FK_dbo_Stats_dbo_Matches_MatchId" FromRole="Matches" ToRole="Stats" />
           <NavigationProperty Name="Substitutions" Relationship="Self.FK_dbo_Substitutions_dbo_Matches_MatchId" FromRole="Matches" ToRole="Substitutions" />
           <NavigationProperty Name="Summaries" Relationship="Self.FK_dbo_Summaries_dbo_Matches_MatchId" FromRole="Matches" ToRole="Summaries" />
+          <Property Name="HalfTimeScore" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="FullTimeScore" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="MatchesToday">
           <Key>
@@ -1243,7 +1272,32 @@
             <End Role="Players" EntitySet="Players" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
+          <EntitySet Name="LeagueStandings" EntityType="HonestAppsModel.LeagueStanding" />
         </EntityContainer>
+        <EntityType Name="LeagueStanding">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="APIId" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Position" Type="Byte" Nullable="false" />
+          <Property Name="GamesPlayed" Type="Byte" Nullable="false" />
+          <Property Name="GamesWon" Type="Byte" Nullable="false" />
+          <Property Name="GamesDrawn" Type="Byte" Nullable="false" />
+          <Property Name="GamesLost" Type="Byte" Nullable="false" />
+          <Property Name="GoalsScored" Type="Byte" Nullable="false" />
+          <Property Name="GoalsConceded" Type="Byte" Nullable="false" />
+          <Property Name="GoalDifference" Type="Int32" Nullable="false" />
+          <Property Name="Points" Type="Byte" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedByUserId" Type="Guid" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Deleted" Type="Boolean" />
+          <Property Name="UpdatedByUserId" Type="Guid" />
+          <Property Name="DateUpdated" Type="DateTime" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1362,6 +1416,8 @@
           <EntitySetMapping Name="Matches">
             <EntityTypeMapping TypeName="HonestAppsModel.Match">
               <MappingFragment StoreEntitySet="Matches">
+                <ScalarProperty Name="FullTimeScore" ColumnName="FullTimeScore" />
+                <ScalarProperty Name="HalfTimeScore" ColumnName="HalfTimeScore" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="APIId" ColumnName="APIId" />
                 <ScalarProperty Name="Stadium" ColumnName="Stadium" />
@@ -1592,6 +1648,31 @@
               <ScalarProperty Name="Id" ColumnName="Team_Id" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="LeagueStandings">
+            <EntityTypeMapping TypeName="HonestAppsModel.LeagueStanding">
+              <MappingFragment StoreEntitySet="LeagueStandings">
+                <ScalarProperty Name="DateUpdated" ColumnName="DateUpdated" />
+                <ScalarProperty Name="UpdatedByUserId" ColumnName="UpdatedByUserId" />
+                <ScalarProperty Name="Deleted" ColumnName="Deleted" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="CreatedByUserId" ColumnName="CreatedByUserId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Points" ColumnName="Points" />
+                <ScalarProperty Name="GoalDifference" ColumnName="GoalDifference" />
+                <ScalarProperty Name="GoalsConceded" ColumnName="GoalsConceded" />
+                <ScalarProperty Name="GoalsScored" ColumnName="GoalsScored" />
+                <ScalarProperty Name="GamesLost" ColumnName="GamesLost" />
+                <ScalarProperty Name="GamesDrawn" ColumnName="GamesDrawn" />
+                <ScalarProperty Name="GamesWon" ColumnName="GamesWon" />
+                <ScalarProperty Name="GamesPlayed" ColumnName="GamesPlayed" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="APIId" ColumnName="APIId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

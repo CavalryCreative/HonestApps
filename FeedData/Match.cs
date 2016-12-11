@@ -47,6 +47,8 @@ namespace FeedData
         public Nullable<System.DateTime> DateUpdated { get; set; }
         public Nullable<System.Guid> Team_Id { get; set; }
         public Nullable<System.Guid> Team_Id1 { get; set; }
+        public string HalfTimeScore { get; set; }
+        public string FullTimeScore { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Event> Events { get; set; }

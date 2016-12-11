@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CMS.Infrastructure.Entities
@@ -19,7 +16,7 @@ namespace CMS.Infrastructure.Entities
         public byte GamesLost { get; set; }
         public byte GoalsScored { get; set; }
         public byte GoalsConceded { get; set; }
-        public byte GoalDifference { get; set; }
+        public int GoalDifference { get; set; }
         public byte Points { get; set; }
         public string Description { get; set; }
     }

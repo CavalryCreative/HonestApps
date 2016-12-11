@@ -292,6 +292,18 @@
     <Compile Include="EntitiesMigrations\201612091851514_AddLeagueStandings.Designer.cs">
       <DependentUpon>201612091851514_AddLeagueStandings.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201612111936478_UpdateMatch.cs" />
+    <Compile Include="EntitiesMigrations\201612111936478_UpdateMatch.Designer.cs">
+      <DependentUpon>201612111936478_UpdateMatch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201612112122085_UpdateLeagueStandings.cs" />
+    <Compile Include="EntitiesMigrations\201612112122085_UpdateLeagueStandings.Designer.cs">
+      <DependentUpon>201612112122085_UpdateLeagueStandings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EntitiesMigrations\201612112133053_UpdateLeagueStandings2.cs" />
+    <Compile Include="EntitiesMigrations\201612112133053_UpdateLeagueStandings2.Designer.cs">
+      <DependentUpon>201612112133053_UpdateLeagueStandings2.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -488,6 +500,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201612091851514_AddLeagueStandings.resx">
       <DependentUpon>201612091851514_AddLeagueStandings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201612111936478_UpdateMatch.resx">
+      <DependentUpon>201612111936478_UpdateMatch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201612112122085_UpdateLeagueStandings.resx">
+      <DependentUpon>201612112122085_UpdateLeagueStandings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201612112133053_UpdateLeagueStandings2.resx">
+      <DependentUpon>201612112133053_UpdateLeagueStandings2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

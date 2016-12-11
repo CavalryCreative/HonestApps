@@ -49,7 +49,9 @@ namespace FeedData
 
             IDictionary<int, string> matchesToday = new Dictionary<int, string>();
 
-            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(14));
+            int currentYear = DateTime.Now.Year;
+            DateTime startDate = new DateTime(currentYear, 8, 1);
+            matchesToday = GetFixtures(DateTime.Now, DateTime.Now.AddDays(304));
 
             foreach (var kvp in matchesToday)
             {
@@ -59,6 +61,9 @@ namespace FeedData
 
                 SaveMatchToday(match);
             }
+
+            DeleteLeagueStandings();
+            GetLeagueStandings();
 
             //GetFixtures(DateTime.Now, DateTime.Now.AddDays(7));
         }
@@ -236,7 +241,9 @@ namespace FeedData
                                 match.Active = DateTime.Now <= match.EndDate ? true : false;
                                 match.IsToday = DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString() ? true : false;                                                             
                                 match.Time = item["time"].ToString();
-                                match.IsLive = false;                                
+                                match.IsLive = false;
+                                match.HalfTimeScore = item["ht_score"].ToString();
+                                match.FullTimeScore = item["ft_score"].ToString();
 
                                 var homeTeam = GetTeamByAPIId((int)item["localteam_id"]);
                                 var awayTeam = GetTeamByAPIId((int)item["visitorteam_id"]);
@@ -335,6 +342,81 @@ namespace FeedData
             return matchesToday;
         }
 
+        private static string GetLeagueStandings()
+        {
+            string uri = string.Empty;
+            string retMsg = string.Empty;
+
+            try
+            {
+                uri = "http://api.football-api.com/2.0/standings/1204?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85";
+
+                var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+                webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
+                var webResponse = (HttpWebResponse)webRequest.GetResponse();
+
+                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
+                {
+                    if (webResponse.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        return Resources.Resources.RecordNull;
+                    }
+
+                    //Test
+                    //string body = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\FeedData\fixtures.txt");
+
+                    var reader = new StreamReader(webResponse.GetResponseStream());
+                    string s = reader.ReadToEnd();
+
+                    JArray a = JArray.Parse(s);
+
+                    foreach (var item in a)
+                    {
+                        try
+                        {
+                            LeagueStanding leagueStanding = new LeagueStanding();
+                              
+                            leagueStanding.Active = true;
+                            leagueStanding.Name = item["team_name"].ToString();
+                            leagueStanding.Position = Convert.ToByte(item["position"]);
+                            leagueStanding.GamesPlayed = Convert.ToByte(item["overall_gp"]);
+                            leagueStanding.GamesWon = Convert.ToByte(item["overall_w"]);
+                            leagueStanding.GamesDrawn = Convert.ToByte(item["overall_d"]);
+                            leagueStanding.GamesLost = Convert.ToByte(item["overall_l"]);
+                            leagueStanding.GoalsScored = Convert.ToByte(item["overall_gs"]);
+                            leagueStanding.GoalsConceded = Convert.ToByte(item["overall_ga"]);
+                            leagueStanding.GoalDifference = Convert.ToInt32(item["gd"]);
+                            leagueStanding.Points = Convert.ToByte(item["points"]);
+                            leagueStanding.Description = item["description"].ToString();
+
+                            string Id;
+                            string actionMessage;
+
+                            retMsg = SaveLeagueStandings(leagueStanding);
+
+                            ReturnId(retMsg, out actionMessage, out Id);
+
+                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                            {
+                                    leagueStanding.Id = new Guid(Id);
+                            }
+                         }
+                         catch (Exception ex)
+                         {
+                            SaveException(ex, string.Format("SaveLeagueStandings - FeedData"));
+                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine(string.Format("Inner Exception: {0}, Message: {1}, Stack Trace: {2}", ex.InnerException.ToString(), ex.Message, ex.StackTrace));
+                SaveException(ex, string.Format("SaveLeagueStandings - FeedData - {0}", uri));
+            }
+
+            return retMsg;
+        }
+
         #region Save
 
         private static string SaveMatch(Match updatedRecord)
@@ -380,6 +462,8 @@ namespace FeedData
                 recordToUpdate.Referee = updatedRecord.Referee;
                 recordToUpdate.Stadium = updatedRecord.Stadium;
                 recordToUpdate.Time = updatedRecord.Time;
+                recordToUpdate.HalfTimeScore = updatedRecord.HalfTimeScore;
+                recordToUpdate.FullTimeScore = updatedRecord.FullTimeScore;
 
                 context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                 Id = updatedRecord.Id;
@@ -397,6 +481,64 @@ namespace FeedData
             }
         }
 
+        private static string DeleteLeagueStandings()
+        {
+            HonestAppsEntities context = new HonestAppsEntities();
+
+            var allRecords = context.LeagueStandings;
+
+            if (allRecords != null)
+            {
+                foreach (var record in allRecords)
+                {
+                    context.LeagueStandings.Remove(record);
+                }
+            }
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}", Res.Resources.RecordUpdated);
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
+
+        private static string SaveLeagueStandings(LeagueStanding updatedRecord)
+        {
+            Guid Id = Guid.Empty;
+
+            HonestAppsEntities context = new HonestAppsEntities();
+
+            if (updatedRecord == null)
+            {
+                return Res.Resources.NotFound;
+            }
+
+                //Create record
+                updatedRecord.Id = Guid.NewGuid();
+                updatedRecord.Active = true;
+                updatedRecord.Deleted = false;
+                updatedRecord.DateAdded = DateTime.Now;
+                updatedRecord.DateUpdated = DateTime.Now;
+
+                context.LeagueStandings.Add(updatedRecord);
+                Id = updatedRecord.Id;
+
+            try
+            {
+                context.SaveChanges();
+
+                return string.Format("{0}:{1}", Res.Resources.RecordAdded, Id.ToString());
+            }
+            catch (Exception e)
+            {
+                return string.Format("Error: {0}", e.InnerException.ToString());
+            }
+        }
         private static string SaveMatchSummary(Summary updatedRecord)
         {
             Guid Id = Guid.Empty;

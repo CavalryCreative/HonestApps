@@ -37,6 +37,7 @@
         <AssociationConnector Association="HonestAppsModel.FK_dbo_PlayerStats_dbo_Players_PlayerId" ManuallyRouted="false" />
         <AssociationConnector Association="HonestAppsModel.FK_dbo_Rivals_dbo_Teams_TeamId" ManuallyRouted="false" />
         <AssociationConnector Association="HonestAppsModel.TeamPlayers" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="HonestAppsModel.LeagueStanding" Width="1.5" PointX="5.375" PointY="4.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

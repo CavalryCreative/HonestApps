@@ -81,7 +81,9 @@ namespace CMS.Infrastructure.Concrete
                 Property(p => p.Attendance).HasMaxLength(10).IsUnicode(false);
                 Property(p => p.Time).HasMaxLength(20).IsUnicode(false);
                 Property(p => p.Referee).HasMaxLength(100).IsUnicode(false);
-            }
+            Property(p => p.HalfTimeScore).HasMaxLength(10).IsUnicode(false);
+            Property(p => p.FullTimeScore).HasMaxLength(10).IsUnicode(false);
+        }
         }
 
         public class EventMap : EntityTypeConfiguration<Event>
