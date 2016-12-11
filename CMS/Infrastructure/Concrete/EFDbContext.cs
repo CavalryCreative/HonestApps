@@ -30,6 +30,7 @@ namespace CMS.Infrastructure.Concrete
             public DbSet<SiteException> SiteException { get; set; }
             public DbSet<BroadcastFeed> BroadcastFeed { get; set; }
             public DbSet<Comment> Comment { get; set; }
+            public DbSet<LeagueStanding> LeagueStanding { get; set; }
 
             protected override void OnModelCreating(DbModelBuilder modelBuilder)
             {
@@ -44,8 +45,9 @@ namespace CMS.Infrastructure.Concrete
                 modelBuilder.Configurations.Add(new SiteExceptionMap());
                 modelBuilder.Configurations.Add(new BroadcastFeedMap());
                 modelBuilder.Configurations.Add(new CommentMap());
-            modelBuilder.Configurations.Add(new LineupMap());
-        }
+                modelBuilder.Configurations.Add(new LineupMap());
+                modelBuilder.Configurations.Add(new LeagueStandingMap());
+            }
         }
 
         public class TeamMap : EntityTypeConfiguration<Team>
@@ -170,4 +172,13 @@ namespace CMS.Infrastructure.Concrete
                 Property(p => p.Text).HasMaxLength(500).IsUnicode(false);
             }
         }
+
+    public class LeagueStandingMap : EntityTypeConfiguration<LeagueStanding>
+    {
+        public LeagueStandingMap()
+        {
+            Property(p => p.Name).HasMaxLength(500).IsUnicode(false);
+            Property(p => p.Description).HasMaxLength(500).IsUnicode(false);
+        }
+    }
 }

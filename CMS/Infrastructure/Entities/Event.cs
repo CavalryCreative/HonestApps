@@ -22,5 +22,21 @@ namespace CMS.Infrastructure.Entities
         public int APIId { get; set; }
         public byte HomeTeamMatchRating { get; set; }
         public byte AwayTeamMatchRating { get; set; }
+
+        //Properties used in feed
+        [NotMapped]
+        public string EventComment { get; set; }
+        [NotMapped]
+        public string HomeComment { get; set; }
+        [NotMapped]
+        public int HomeTeamAPIId { get; set; }
+        [NotMapped]
+        public string AwayComment { get; set; }
+        [NotMapped]
+        public int AwayTeamAPIId { get; set; }
+        [NotMapped]
+        public int MatchAPIId { get; set; }
+        [NotMapped]
+        public int EventAPIId { get; set; }
     }
 }

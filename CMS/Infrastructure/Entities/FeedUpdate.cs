@@ -126,8 +126,8 @@ namespace CMS.Infrastructure.Entities
 
             try
             {
-                //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683
-                string uri = "http://api.football-api.com/2.0/commentaries/" + matchId.ToString()  + "?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683";  // <-- this returns formatted json
+                //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85
+                string uri = "http://api.football-api.com/2.0/commentaries/" + matchId.ToString()  + "?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85";  // <-- this returns formatted json
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -1353,6 +1353,10 @@ namespace CMS.Infrastructure.Entities
             dynamic feed = jsonObject;
 
             feed.Matches = new JArray() as dynamic;
+            feed.Matches.HomeLineUp = new JArray() as dynamic;
+            feed.Matches.AwayLineUp = new JArray() as dynamic;
+            feed.Standings = new JArray() as dynamic;
+            feed.Fixtures = new JArray() as dynamic;
 
             var todaysMatches = GetTodayMatches();
 
@@ -1363,6 +1367,15 @@ namespace CMS.Infrastructure.Entities
             {
                 var matchEvent = new JObject();
                 feed.Matches.Add(matchEvent);
+
+                var matchDetails = GetMatchByAPIId(match.APIId);
+                var latestEvent = GetLatestEvents(matchDetails.Id);
+
+                var homeTeam = GetTeamByAPIId(matchDetails.HomeTeamAPIId);
+                var awayTeam = GetTeamByAPIId(matchDetails.AwayTeamAPIId);
+
+                feed.HomeDetails.Add("HomeTeam", homeTeam.Name);
+                feed.AwayDetails.Add("AwayTeam", awayTeam.Name);
 
                 //var HomeDetails = new JObject();
                 //feed.Matches.Add(HomeDetails);
@@ -1375,15 +1388,6 @@ namespace CMS.Infrastructure.Entities
 
                 //var AwayLineups = new JArray() as dynamic;
                 //feed.Matches.AwayDetails.Add(new JProperty(AwayLineups));
-
-                var matchDetails = GetMatchByAPIId(match.APIId);
-                var latestEvent = GetLatestEvents(matchDetails.Id);
-
-                //var homeTeam = GetTeamByAPIId(matchDetails.HomeTeamAPIId);
-                //var awayTeam = GetTeamByAPIId(matchDetails.AwayTeamAPIId);
-
-                //feed.HomeDetails.Add("HomeTeam", homeTeam.Name);
-                //feed.AwayDetails.Add("AwayTeam", awayTeam.Name);
 
                 if (latestEvent != null)
                 {
@@ -1405,118 +1409,118 @@ namespace CMS.Infrastructure.Entities
                 }
 
                 //Lineups 
-                //var homeLineup = GetLineup(match.APIId, true);
-                //var awayLineup = GetLineup(match.APIId, false);
-                //var homeSubs = GetSubstitutions(match.Id, true);
-                //var awaySubs = GetSubstitutions(match.Id, false);
+                var homeLineup = GetLineup(match.APIId, true);
+                var awayLineup = GetLineup(match.APIId, false);
+                var homeSubs = GetSubstitutions(match.Id, true);
+                var awaySubs = GetSubstitutions(match.Id, false);
 
-                //#region Home Team
+                #region Home Team
 
-                //foreach(var homePlayer in homeLineup)
-                //{
-                //    dynamic homePlyr = new JObject();
+                foreach (var homePlayer in homeLineup)
+                {
+                    dynamic homePlyr = new JObject();
 
-                //    var player = GetPlayerById(homePlayer.PlayerId);
-                //    homePlyr.Number = player.SquadNumber + ".";
+                    var player = GetPlayerById(homePlayer.PlayerId);
+                    homePlyr.Number = player.SquadNumber + ".";
 
-                //    string[] name = player.Name.Split(' ');
+                    string[] name = player.Name.Split(' ');
 
-                //    if (name.Count() > 0)
-                //        homePlyr.Surname = name[name.Count() - 1];
-                //    else
-                //        homePlyr.Surname = player.Name;
+                    if (name.Count() > 0)
+                        homePlyr.Surname = name[name.Count() - 1];
+                    else
+                        homePlyr.Surname = player.Name;
 
-                //    //TODO
-                //    homePlyr.YellowCards = 0;
-                //    homePlyr.RedCards = 0;
-                //    homePlyr.Captain = false;
-                //    //
+                    //TODO
+                    homePlyr.YellowCards = 0;
+                    homePlyr.RedCards = 0;
+                    homePlyr.Captain = false;
+                    //
 
-                //    homePlyr.IsSub = homePlayer.IsSub;
-                         
-                //    var playerSubbed = homeSubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
-                //    var playerSubOn = homeSubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
+                    homePlyr.IsSub = homePlayer.IsSub;
 
-                //    if (playerSubbed != null)
-                //    {
-                //        homePlyr.Substituted = true;
-                //        homePlyr.SubTime = "(" + playerSubbed.Minute + ")";
-                //    }
-                //    else
-                //    {
-                //        homePlyr.Substituted = false;
-                //        homePlyr.SubTime = "";
-                //    }
+                    var playerSubbed = homeSubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
+                    var playerSubOn = homeSubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
 
-                //    if (playerSubOn != null)
-                //    {
-                //        homePlyr.Substituted = false;
-                //        homePlyr.SubTime = "(" + playerSubbed.Minute + ")";
-                //    }
-                //    else
-                //    {
-                //        homePlyr.Substituted = false;
-                //        homePlyr.SubTime = "";
-                //    }
+                    if (playerSubbed != null)
+                    {
+                        homePlyr.Substituted = true;
+                        homePlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                    }
+                    else
+                    {
+                        homePlyr.Substituted = false;
+                        homePlyr.SubTime = "";
+                    }
 
-                //    feed.Matches.HomeDetails.HomeLineups.Add(homePlyr);
-                //}
+                    if (playerSubOn != null)
+                    {
+                        homePlyr.Substituted = false;
+                        homePlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                    }
+                    else
+                    {
+                        homePlyr.Substituted = false;
+                        homePlyr.SubTime = "";
+                    }
 
-                //#endregion
+                    feed.Matches.HomeLineUp.Add(homePlyr);
+                }
 
-                //#region Away Team
+                #endregion
 
-                //foreach (var awayPlayer in awayLineup)
-                //{
-                //    dynamic awayPlyr = new JObject();
+                #region Away Team
 
-                //    var player = GetPlayerById(awayPlayer.PlayerId);
-                //    awayPlyr.Number = player.SquadNumber + ".";
+                foreach (var awayPlayer in awayLineup)
+                {
+                    dynamic awayPlyr = new JObject();
 
-                //    string[] name = player.Name.Split(' ');
+                    var player = GetPlayerById(awayPlayer.PlayerId);
+                    awayPlyr.Number = player.SquadNumber + ".";
 
-                //    if (name.Count() > 0)
-                //        awayPlyr.Surname = name[name.Count() - 1];
-                //    else
-                //        awayPlyr.Surname = player.Name;
+                    string[] name = player.Name.Split(' ');
 
-                //    //TODO
-                //    awayPlyr.YellowCards = 0;
-                //    awayPlyr.RedCards = 0;
-                //    awayPlyr.Captain = false;
-                //    //
+                    if (name.Count() > 0)
+                        awayPlyr.Surname = name[name.Count() - 1];
+                    else
+                        awayPlyr.Surname = player.Name;
 
-                //    awayPlyr.IsSub = awayPlayer.IsSub;
+                    //TODO
+                    awayPlyr.YellowCards = 0;
+                    awayPlyr.RedCards = 0;
+                    awayPlyr.Captain = false;
+                    //
 
-                //    var playerSubbed = awaySubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
-                //    var playerSubOn = awaySubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
+                    awayPlyr.IsSub = awayPlayer.IsSub;
 
-                //    if (playerSubbed != null)
-                //    {
-                //        awayPlyr.Substituted = true;
-                //        awayPlyr.SubTime = "(" + playerSubbed.Minute + ")";
-                //    }
-                //    else
-                //    {
-                //        awayPlyr.Substituted = false;
-                //        awayPlyr.SubTime = "";
-                //    }
+                    var playerSubbed = awaySubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
+                    var playerSubOn = awaySubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
 
-                //    if (playerSubOn != null)
-                //    {
-                //        awayPlyr.Substituted = false;
-                //        awayPlyr.SubTime = "(" + playerSubbed.Minute + ")";
-                //    }
-                //    else
-                //    {
-                //        awayPlyr.Substituted = false;
-                //        awayPlyr.SubTime = "";
-                //    }
+                    if (playerSubbed != null)
+                    {
+                        awayPlyr.Substituted = true;
+                        awayPlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                    }
+                    else
+                    {
+                        awayPlyr.Substituted = false;
+                        awayPlyr.SubTime = "";
+                    }
 
-                //    feed.Matches.AwayDetails.AwayLineups.Add(awayPlyr);
-                //}
+                    if (playerSubOn != null)
+                    {
+                        awayPlyr.Substituted = false;
+                        awayPlyr.SubTime = "(" + playerSubbed.Minute + ")";
+                    }
+                    else
+                    {
+                        awayPlyr.Substituted = false;
+                        awayPlyr.SubTime = "";
+                    }
 
-                //#endregion
+                    feed.Matches.AwayLineup.Add(awayPlyr);
+                }
+
+                #endregion
             }
 
             return feed.ToString();

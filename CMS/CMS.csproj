@@ -288,6 +288,10 @@
     <Compile Include="EntitiesMigrations\201610021635142_LineupAddPosition2.Designer.cs">
       <DependentUpon>201610021635142_LineupAddPosition2.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201612091851514_AddLeagueStandings.cs" />
+    <Compile Include="EntitiesMigrations\201612091851514_AddLeagueStandings.Designer.cs">
+      <DependentUpon>201612091851514_AddLeagueStandings.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -327,8 +331,13 @@
     <Compile Include="Infrastructure\Entities\Event.cs" />
     <Compile Include="Infrastructure\Entities\Feed.cs" />
     <Compile Include="FeedHub.cs" />
+    <Compile Include="Infrastructure\Entities\FeedEvent.cs" />
+    <Compile Include="Infrastructure\Entities\FeedFixture.cs" />
+    <Compile Include="Infrastructure\Entities\FeedLineup.cs" />
+    <Compile Include="Infrastructure\Entities\FeedMatch.cs" />
     <Compile Include="Infrastructure\Entities\FeedUpdate.cs" />
     <Compile Include="Infrastructure\Entities\Goal.cs" />
+    <Compile Include="Infrastructure\Entities\LeagueStanding.cs" />
     <Compile Include="Infrastructure\Entities\Lineup.cs" />
     <Compile Include="Infrastructure\Entities\Match.cs" />
     <Compile Include="Infrastructure\Entities\MatchesToday.cs" />
@@ -346,14 +355,6 @@
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
     <Compile Include="Infrastructure\NinjectResolver.cs" />
     <Compile Include="Infrastructure\NinjectScope.cs" />
-    <Compile Include="Migrations\201509292022112_InitialCreate.cs" />
-    <Compile Include="Migrations\201509292022112_InitialCreate.Designer.cs">
-      <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201510111758212_AddInitial.cs" />
-    <Compile Include="Migrations\201510111758212_AddInitial.Designer.cs">
-      <DependentUpon>201510111758212_AddInitial.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -485,11 +486,8 @@
     <EmbeddedResource Include="EntitiesMigrations\201610021635142_LineupAddPosition2.resx">
       <DependentUpon>201610021635142_LineupAddPosition2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201509292022112_InitialCreate.resx">
-      <DependentUpon>201509292022112_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201510111758212_AddInitial.resx">
-      <DependentUpon>201510111758212_AddInitial.cs</DependentUpon>
+    <EmbeddedResource Include="EntitiesMigrations\201612091851514_AddLeagueStandings.resx">
+      <DependentUpon>201612091851514_AddLeagueStandings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

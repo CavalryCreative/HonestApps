@@ -69,7 +69,7 @@ namespace FeedData
 
             foreach (var team in teams)
             {
-                string uri = string.Format("http://api.football-api.com/2.0/team/{0}?Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683", team.APIId.ToString());
+                string uri = string.Format("http://api.football-api.com/2.0/team/{0}?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85", team.APIId.ToString());
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";
@@ -178,7 +178,7 @@ namespace FeedData
             try
             {
                 //string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
-                uri = string.Format("http://api.football-api.com/2.0/matches?comp_id=1204&from_date={0}&to_date={1}&Authorization=565ec012251f932ea4000001393b4115a8bf4bf551672b0543e35683", formatStart, formatEnd);
+                uri = string.Format("http://api.football-api.com/2.0/matches?comp_id=1204&from_date={0}&to_date={1}&Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85", formatStart, formatEnd);
                 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
