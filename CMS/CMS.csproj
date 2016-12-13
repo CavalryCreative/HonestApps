@@ -347,6 +347,7 @@
     <Compile Include="Infrastructure\Entities\FeedFixture.cs" />
     <Compile Include="Infrastructure\Entities\FeedLineup.cs" />
     <Compile Include="Infrastructure\Entities\FeedMatch.cs" />
+    <Compile Include="Infrastructure\Entities\FeedStanding.cs" />
     <Compile Include="Infrastructure\Entities\FeedUpdate.cs" />
     <Compile Include="Infrastructure\Entities\Goal.cs" />
     <Compile Include="Infrastructure\Entities\LeagueStanding.cs" />

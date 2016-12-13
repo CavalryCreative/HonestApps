@@ -12,7 +12,7 @@ namespace CMS.Infrastructure.Entities
     {
         public string Updated { get; set; }
         public IList<FeedMatch> Matches { get; set; }
-        public IList<LeagueStanding> Standings { get; set; }
+        public IList<FeedStanding> Standings { get; set; }
         public IList<FeedFixture> Fixtures { get; set; }
     }
 }
