@@ -13,5 +13,6 @@ namespace CMS.Infrastructure.Entities
         public string AwayTeam { get; set; }
         public string MatchDate { get; set; }
         public string KickOff { get; set; }
+        public string FullTimeScore { get; set; }
     }
 }

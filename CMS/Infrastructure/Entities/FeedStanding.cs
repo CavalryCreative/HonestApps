@@ -7,6 +7,7 @@ namespace CMS.Infrastructure.Entities
     public class FeedStanding
     {
         public string Name { get; set; }
+        public int TeamAPI { get; set; }
         public byte Position { get; set; }
         public byte GamesPlayed { get; set; }
         public byte GamesWon { get; set; }

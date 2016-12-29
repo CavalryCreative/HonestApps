@@ -219,7 +219,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\FeedController.cs" />
+    <Compile Include="Controllers\FixturesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LeagueStandingsController.cs" />
     <Compile Include="EntitiesMigrations\201602032130207_Initial.cs" />
     <Compile Include="EntitiesMigrations\201602032130207_Initial.Designer.cs">
       <DependentUpon>201602032130207_Initial.cs</DependentUpon>
@@ -309,6 +311,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HangfireBootstrapper.cs" />
+    <Compile Include="Infrastructure\Abstract\ILeagueStanding.cs" />
     <Compile Include="Infrastructure\Abstract\ILineup.cs" />
     <Compile Include="Infrastructure\Abstract\IEvent.cs" />
     <Compile Include="Infrastructure\Abstract\IGoal.cs" />
@@ -324,6 +327,7 @@
     <Compile Include="Infrastructure\Abstract\IUpdateHistory.cs" />
     <Compile Include="Infrastructure\Abstract\IYellowCard.cs" />
     <Compile Include="Infrastructure\Concrete\EFDbContext.cs" />
+    <Compile Include="Infrastructure\Concrete\EFLeagueStanding.cs" />
     <Compile Include="Infrastructure\Concrete\EFLineup.cs" />
     <Compile Include="Infrastructure\Concrete\EFEvent.cs" />
     <Compile Include="Infrastructure\Concrete\EFGoal.cs" />
