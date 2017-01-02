@@ -14,7 +14,7 @@ namespace CMS.Controllers
     public class LeagueStandingsController : ApiController
     {
         // GET api/<controller>
-        public string Get()
+        public Feed Get()
         {
             Feed feed = new Feed();
             IList<LeagueStanding> leagueStandings = new List<LeagueStanding>();
@@ -35,13 +35,16 @@ namespace CMS.Controllers
                 leagueStanding.GoalDifference = team.GoalDifference;
                 leagueStanding.Points = team.Points;
                 leagueStanding.Description = team.Description;
+                leagueStanding.TeamAPI = team.APIId;
 
                 feedStandings.Add(leagueStanding);
             }
 
             feed.Standings = feedStandings;
 
-            return JsonConvert.SerializeObject(feed);
+            return feed;
+
+           // return JsonConvert.SerializeObject(feed);
         }
     }
 }

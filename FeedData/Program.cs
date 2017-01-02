@@ -389,6 +389,13 @@ namespace FeedData
                             leagueStanding.Points = Convert.ToByte(item["points"]);
                             leagueStanding.Description = item["description"].ToString();
 
+                            var team = GetTeamByName(leagueStanding.Name);
+
+                            if (team != null)
+                            {
+                                leagueStanding.APIId = team.APIId;
+                            }
+
                             string Id;
                             string actionMessage;
 
@@ -783,6 +790,13 @@ namespace FeedData
             HonestAppsEntities context = new HonestAppsEntities();
 
             return context.Teams.Where(x => (x.APIId == id)).FirstOrDefault();
+        }
+
+        private static Team GetTeamByName(string name)
+        {
+            HonestAppsEntities context = new HonestAppsEntities();
+
+            return context.Teams.Where(x => (x.Name.Trim().ToLower() == name.Trim().ToLower())).FirstOrDefault();
         }
 
         private static IList<Team> GetAllTeams()
