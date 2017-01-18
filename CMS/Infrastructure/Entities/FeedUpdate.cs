@@ -1434,7 +1434,7 @@ namespace CMS.Infrastructure.Entities
                             if (playerSubOn != null)
                             {
                                 feedLineup.Substituted = false;
-                                feedLineup.SubTime = "(" + playerSubbed.Minute + ")";
+                                feedLineup.SubTime = "(" + playerSubOn.Minute + ")";
                             }
                             else
                             {
@@ -1493,7 +1493,7 @@ namespace CMS.Infrastructure.Entities
                             if (playerSubOn != null)
                             {
                                 feedLineup.Substituted = false;
-                                feedLineup.SubTime = "(" + playerSubbed.Minute + ")";
+                                feedLineup.SubTime = "(" + playerSubOn.Minute + ")";
                             }
                             else
                             {
