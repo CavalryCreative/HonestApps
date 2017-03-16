@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Jeff</title>
+</head>
+<body>
+    <script src="/Scripts/jquery-1.10.2.js"></script>
+    <script src="/Scripts/jquery.signalR-2.2.0.js"></script>
+    <script src="/signalr/hubs" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var broadcaster = $.connection.feedHub;
+
+            broadcaster.client.showMessage = function (text) {
+                $('#messages').append('<li>' + text + '</li>');
+            };
+
+            $.connection.hub.start().done(function () {
+                $("#broadcast").click(function () {
+                    broadcaster.server.broadcastMessage($('#msg').val());
+                });
+            });
+        });
+    </script>
+
+    <div>
+        <input type="text" id="msg" />
+        <input type="button" id="broadcast" value="Broadcast" />
+
+        <ul id="messages"></ul>
+    </div>
+</body>
+</html>
