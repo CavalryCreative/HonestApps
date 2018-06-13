@@ -66,10 +66,12 @@ namespace CMS.Infrastructure.Entities
 
         public void BroadcastFeed(object sender)
         {
-            GetAllCommentaries();
-            BroadcastFeed();
+            TestSportMonksFeed();
 
-            //SaveBroadcastFeed("", GetIPAddress());
+            //GetAllCommentaries();
+            //BroadcastFeed();
+
+            SaveBroadcastFeed("", GetIPAddress());
         }
         
         public void BroadcastFeed()
@@ -113,8 +115,8 @@ namespace CMS.Infrastructure.Entities
             try
             {
                 //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85
-                string uri = "http://api.football-api.com/2.0/commentaries/";
-                    //+ matchId.ToString() + "?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85";  // <-- this returns formatted json
+                string uri = "https://soccer.sportmonks.com/api/v2.0/fixtures/between/{from}/{to}/commentaries/";
+                //+ matchId.ToString() + "?api_token=ihC2k9rci5QzzPnldgoHJef90HXAiZ6hITYkNW6pFFVHYt1kfkHvhHqdwfX1";  // <-- this returns formatted json
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -126,7 +128,7 @@ namespace CMS.Infrastructure.Entities
                     string s = reader.ReadToEnd();
 
                     byte[] bytes = Encoding.ASCII.GetBytes(s);
-                    var filename = "Commentary" + Guid.NewGuid().ToString();
+                    var filename = "Commentary-" + Guid.NewGuid().ToString() + ".txt";
                     HttpPostedFileBase objFile = (HttpPostedFileBase)new MemoryPostedFile(bytes, filename);
                     
                     General.UploadToS3(objFile, "honestapps");
