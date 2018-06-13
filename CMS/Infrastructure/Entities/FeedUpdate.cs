@@ -12,6 +12,8 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web;
+using System.Text;
 
 //using System.Data.Entity;
 //using System.Data.Entity.Core.Objects;
@@ -104,6 +106,54 @@ namespace CMS.Infrastructure.Entities
             //{
             //    match.IsLive = false;
             //}
+        }
+
+        private static void TestSportMonksFeed()
+        {
+            try
+            {
+                //http://api.football-api.com/2.0/commentaries/2058958?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85
+                string uri = "http://api.football-api.com/2.0/commentaries/";
+                    //+ matchId.ToString() + "?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85";  // <-- this returns formatted json
+
+                var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+                webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
+                var webResponse = (HttpWebResponse)webRequest.GetResponse();
+
+                if ((webResponse.StatusCode == HttpStatusCode.OK)) //&& (webResponse.ContentLength > 0))
+                {
+                    var reader = new StreamReader(webResponse.GetResponseStream());
+                    string s = reader.ReadToEnd();
+
+                    byte[] bytes = Encoding.ASCII.GetBytes(s);
+                    var filename = "Commentary" + Guid.NewGuid().ToString();
+                    HttpPostedFileBase objFile = (HttpPostedFileBase)new MemoryPostedFile(bytes, filename);
+                    
+                    General.UploadToS3(objFile, "honestapps");
+                }
+            }
+            catch (Exception ex)
+            {
+                SaveException(ex, string.Format("TestSportMonksFeed: {0}", ex.Message.ToString()));
+            };
+        }
+
+        public class MemoryPostedFile : HttpPostedFileBase
+        {
+            private readonly byte[] fileBytes;
+
+            public MemoryPostedFile(byte[] fileBytes, string fileName = null)
+            {
+                this.fileBytes = fileBytes;
+                this.FileName = fileName;
+                this.InputStream = new MemoryStream(fileBytes);
+            }
+
+            public override int ContentLength => fileBytes.Length;
+
+            public override string FileName { get; }
+
+            public override Stream InputStream { get; }
         }
 
         private static string GetCommentaries(int matchId)

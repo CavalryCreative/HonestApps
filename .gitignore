@@ -156,3 +156,9 @@ $RECYCLE.BIN/
 .DS_Store
 *.mdf
 *.ldf
+.vs/HonestApps/DesignTimeBuild/.dtbcache
+.vs/config/applicationhost.config
+*.lock
+*.ide
+*.ide-shm
+*.ide-wal
