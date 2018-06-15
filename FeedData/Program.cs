@@ -23,6 +23,7 @@ namespace FeedData
 
     class Program
     {
+        public static string CompId { get; set; }
         static void Main(string[] args)
         {
             //GlobalConfiguration.Configuration.UseSqlServerStorage("HonestAppsEntities");
@@ -37,6 +38,7 @@ namespace FeedData
             //    Console.WriteLine("Hangfire Server started. Press any key to exit...");
             //    Console.ReadKey();
             //}
+            CompId = "1056";//1056 World Cup, 1204 Premier League
 
             UpdatePlayers();
             GetFixtures();
@@ -162,7 +164,7 @@ namespace FeedData
             string[] startArr = startDateStr.Split('/');
             string[] endArr = endDateStr.Split('/');
 
-            CultureInfo culture = new CultureInfo("en-US");
+            CultureInfo culture = new CultureInfo("en-GB");//TODO - change for live
 
             string formatStart = string.Empty;
             string formatEnd = string.Empty;
@@ -183,7 +185,7 @@ namespace FeedData
             try
             {
                 //string uri = string.Format("http://football-api.com/api/?Action=fixtures&APIKey=5d003dc1-7e24-ad8d-a2c3610dd99b&comp_id=1204&from_date={0}&to_date={1}", formatStart, formatEnd);  // <-- this returns formatted json
-                uri = string.Format("http://api.football-api.com/2.0/matches?comp_id=1204&from_date={0}&to_date={1}&Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85", formatStart, formatEnd);
+                uri = string.Format("http://api.football-api.com/2.0/matches?comp_id={0}&from_date={1}&to_date={2}&Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85", CompId, formatStart, formatEnd);
                 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -291,6 +293,28 @@ namespace FeedData
                                 SaveUpdateHistory(history);
 
                                 matchAPIId = match.APIId;
+
+                                if (DateTime.Now.ToShortDateString() == match.Date.Value.ToShortDateString())
+                                {
+                                    matchesToday.Add(match.APIId, match.Time);
+
+                                    match.IsToday = true;
+
+                                    if (pingRequestSent == false)
+                                    {
+                                        try
+                                        {
+                                            WebClient http = new WebClient();
+                                            string Result = http.DownloadString("http://honest-apps.elasticbeanstalk.com/");
+
+                                            pingRequestSent = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string Message = ex.Message;
+                                        }
+                                    }
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -349,7 +373,7 @@ namespace FeedData
 
             try
             {
-                uri = "http://api.football-api.com/2.0/standings/1204?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85";
+                uri = string.Format("http://api.football-api.com/2.0/standings/{0}?Authorization=565ec012251f932ea4000001ce56c3d1cd08499276e255f4b481bd85", CompId);
 
                 var webRequest = (HttpWebRequest)WebRequest.Create(uri);
                 webRequest.Method = "GET";  // <-- GET is the default method/verb, but it's here for clarity
@@ -546,6 +570,7 @@ namespace FeedData
                 return string.Format("Error: {0}", e.InnerException.ToString());
             }
         }
+
         private static string SaveMatchSummary(Summary updatedRecord)
         {
             Guid Id = Guid.Empty;
@@ -803,7 +828,7 @@ namespace FeedData
         {
             HonestAppsEntities context = new HonestAppsEntities();
 
-            return context.Teams.ToList();
+            return context.Teams.Where(x => x.Active == true).ToList();
         }
 
         private static Match GetMatchByAPIId(int id)
