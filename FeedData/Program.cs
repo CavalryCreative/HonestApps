@@ -164,7 +164,7 @@ namespace FeedData
             string[] startArr = startDateStr.Split('/');
             string[] endArr = endDateStr.Split('/');
 
-            CultureInfo culture = new CultureInfo("en-GB");//TODO - change for live
+            CultureInfo culture = new CultureInfo("en-US");
 
             string formatStart = string.Empty;
             string formatEnd = string.Empty;

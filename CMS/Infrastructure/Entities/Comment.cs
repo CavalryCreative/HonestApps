@@ -74,6 +74,7 @@ namespace CMS.Infrastructure.Entities
         Goalkeeper = 1,
         Defender = 2,
         Midfielder = 3,
-        Forward = 4
+        Forward = 4,
+        Sub = 5
     }
 }
