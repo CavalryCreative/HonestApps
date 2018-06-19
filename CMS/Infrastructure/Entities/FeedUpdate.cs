@@ -1044,7 +1044,7 @@ namespace CMS.Infrastructure.Entities
                             string isgoal = evtIsGoal;
                             string comment = evtComment;
 
-                            commEvent.Important = important == "True" ? true : false;
+                            commEvent.Important = important == "1" ? true : false;
 
                             if (isgoal == "1")
                             {
@@ -1109,12 +1109,17 @@ namespace CMS.Infrastructure.Entities
                             commEvent.AwayTeamMatchRating = awayRating;
 
                             SaveEvent(commEvent);
+                            }
+                            catch (Exception ex)
+                            {
+                                SaveException(ex, string.Format("SaveEvent, MatchId: {0}", match.Id.ToString()));
+                            }
 
-                                #endregion //Events
+                            #endregion //Events
 
-                                #region Home Substitutions
+                            #region Home Substitutions
 
-                                jPath = "substitutions.localteam";
+                            jPath = "substitutions.localteam";
 
                                 var y = token.SelectTokens(jPath);
 
@@ -1314,13 +1319,7 @@ namespace CMS.Infrastructure.Entities
 
                                 #region Red Cards
                                 //TODO
-                                #endregion
-                            }
-                            catch (Exception ex)
-                        {
-                                    //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
-                                    SaveException(ex, string.Format("SaveEvent, MatchId: ", match.Id.ToString()));
-                        }
+                                #endregion                            
                     }
                             //}//
                         //}
@@ -2037,8 +2036,8 @@ namespace CMS.Infrastructure.Entities
                     record.InnerException = record.InnerException != null ? exception.InnerException.ToString() : string.Empty;
                     record.Message = string.Format("Additional Info:{0}, Exception: {1} ", additionalInfo, exception.Message);
                     record.Source = exception.Source;
-                    record.StackTrace = record.StackTrace != null ? string.Format("Stack Trace: {0}", exception.StackTrace.ToString()) : string.Empty;
-                    record.TargetSite = record.TargetSite != null ? exception.TargetSite.ToString() : string.Empty;
+                    record.StackTrace = !string.IsNullOrWhiteSpace(exception.StackTrace) ? string.Format("Stack Trace: {0}", exception.StackTrace.ToString()) : string.Empty;
+                    record.TargetSite = exception.TargetSite != null ? exception.TargetSite.ToString() : string.Empty;
                     record.DateAdded = DateTime.Now;
 
                     context.SiteException.Add(record);
@@ -3791,6 +3790,9 @@ namespace CMS.Infrastructure.Entities
                         break;                
                     case EventType.Goal:
                         //Goal!  Costa Rica 0, Serbia 1. Aleksandar Kolarov  - Serbia -  from a free kick with a shot with left foot to the top right corner. Assisted by Jim Baxter.
+                        //Goal!  Tunisia 0, England 1. Harry Kane  - England -  shot with right foot from few metres to the centre of the goal after corner. (Not showing)
+                        //Goal!  Tunisia 1, England 1. Ferjani Sassi  - Tunisia -  converts the penalty with a shot with right foot to the left corner. (showing)
+                        //Goal!  Tunisia 1, England 2. Harry Kane  - England -  header inside of six yard box - left side to the left corner. Assist -  Harry Maguire after corner. (not showing)
                         comment = comment.Replace("Goal!", "");
                         arr = comment.Split('.');
                         score = arr[0].Trim();
@@ -3842,8 +3844,8 @@ namespace CMS.Infrastructure.Entities
                 }
             }
             catch (Exception ex)
-            {
-                SaveException(ex, string.Format("GetPlayerAndTeamFromComment, Comment: {0}", comment));
+            {              
+                SaveException(ex, string.Format("GetPlayerAndTeamFromComment, Comment: {0}, EventType:{1}", comment, eventType.ToString()));
             }
         }
 
