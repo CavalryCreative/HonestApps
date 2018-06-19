@@ -66,6 +66,7 @@ namespace CMS.Infrastructure.Entities
         Handball = 25,
         General = 26,
         SecondHalfEnds = 27,
+        OwnGoal = 28
     }
 
     public enum Position

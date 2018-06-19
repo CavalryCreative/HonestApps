@@ -125,7 +125,7 @@ namespace CMS
             try
             {
                 WebClient http = new WebClient();
-                string Result = http.DownloadString("http://honest-apps.elasticbeanstalk.com/");
+                string Result = http.DownloadString("http://honest-apps.eu-west-1.elasticbeanstalk.com/");
             }
             catch (Exception ex)
             {

@@ -1055,11 +1055,20 @@ namespace CMS.Infrastructure.Entities
                                 string teamName = string.Empty;
                                 string score = string.Empty;
 
-                                GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
+                                    Goal goal = new Goal();
 
-                                Goal goal = new Goal();
+                                    if (comment.StartsWith("Goal!"))
+                                    {
+                                        GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
+                                        goal.OwnGoal = false;
+                                    }
+                                    else if (comment.StartsWith("Own Goal"))
+                                    {
+                                        GetPlayerAndTeamFromComment(EventType.OwnGoal, comment, out playerName, out teamName, out score);
 
-                                goal.OwnGoal = false; //TODO - find a way of checking if own goal
+                                        goal.OwnGoal = true;
+                                    }
+                              
                                 goal.Penalty = false; //TODO - find a way of checking if penalty     
                                 goal.Minute = min;
                                 goal.APIId = APIId;
@@ -1080,11 +1089,25 @@ namespace CMS.Infrastructure.Entities
 
                                 if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower())
                                 {
-                                    goal.IsHomeTeam = true;
+                                    if (goal.OwnGoal)
+                                    {
+                                        goal.IsHomeTeam = false;
+                                    }
+                                    else
+                                    {
+                                        goal.IsHomeTeam = true;
+                                    }                              
                                 }
                                 else
                                 {
-                                    goal.IsHomeTeam = false;
+                                    if (goal.OwnGoal)
+                                    {
+                                        goal.IsHomeTeam = true;
+                                    }
+                                    else
+                                    {
+                                        goal.IsHomeTeam = false;
+                                    }
                                 }
 
                                 retMsg = SaveGoal(goal);
@@ -2859,9 +2882,9 @@ namespace CMS.Infrastructure.Entities
                        out awayTeamComment);
                }
            }
-            else if (feedComment.StartsWith("Attempt saved."))//Player attacker/GK
+            else if (feedComment.StartsWith("Attempt saved"))//Player attacker/GK
             {
-                feedComment = feedComment.Replace("Attempt saved.", "").Trim();
+                feedComment = feedComment.Replace("Attempt saved", "").Trim();
 
                 GeneratePlayerComment(
                        matchId,
@@ -2874,7 +2897,7 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.Contains("receive yellow card."))//Player
+           else if (feedComment.Contains("receive yellow card"))//Player
             {
                 GeneratePlayerComment(
                        matchId,
@@ -2887,7 +2910,7 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.Contains("receive red card."))//Player
+           else if (feedComment.Contains("receive red card"))//Player
             {
                 GeneratePlayerComment(
                        matchId,
@@ -3009,7 +3032,22 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Lineups are announced"))//Team
+            else if (feedComment.StartsWith("Own Goal"))//Player or Match or team
+            {
+                feedComment = feedComment.Replace("Own Goal by ", "").Trim();
+
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        false,
+                        CommentType.Player,
+                        EventType.Goal,
+                        out homeTeamComment,
+                        out awayTeamComment);
+            }
+            else if (feedComment.StartsWith("Lineups are announced"))//Team
             {
                 GenerateTeamComment(
                     matchId,
@@ -3746,16 +3784,13 @@ namespace CMS.Infrastructure.Entities
                     case EventType.AttemptMissesJustABitTooHigh:                  
                     case EventType.AttemptMissed:                    
                     case EventType.AttemptSaved:
-                    case EventType.FreeKick:
-                    case EventType.YellowCard:
-                    case EventType.RedCard:
+                    case EventType.FreeKick:                    
                     case EventType.HitsTheBar:
-                    case EventType.HitsThePost:
-                    case EventType.Handball:
+                    case EventType.HitsThePost:                   
                         //Shot blocked. Juan Quintero  - Colombia -  shot with left foot from outside the box is blocked. Assist -  Juan Cuadrado.
                         //Radamel Falcao  - Colombia -  won a free kick on the left wing.
                         //Yuto Nagatomo  - Japan -  won a free kick on the left wing.
-
+                        
                         arr = comment.Split('-');
                         player = arr[0].Trim();
 
@@ -3764,9 +3799,25 @@ namespace CMS.Infrastructure.Entities
 
                         break;
 
+                    case EventType.Handball:
+                        //Hand ball by Idrissa Gueye - Senegal
+                        arr = comment.Split('-');
+                        player = arr[0].Trim();
+                        team = arr[1].Trim();
+
+                        break;
+
+                    case EventType.YellowCard:
+                    case EventType.RedCard:
+                        //Carlos S\u00c3\u00a1nchez - Colombia - receive red card.
+                        arr = comment.Split('-');
+                        player = arr[0].Trim();
+                        team = arr[1].Trim();
+
+                        break;                   
+
                     case EventType.Foul:
                         //Fouled by Maya Yoshida  - Japan
-                        comment = comment.Replace("Fouled by", "");
 
                         arr = comment.Split('-');
                         player = arr[0].Trim();
@@ -3787,13 +3838,15 @@ namespace CMS.Infrastructure.Entities
                     case EventType.General:
                         //Don't need to return anything
 
-                        break;                
+                        break;  
+                        
                     case EventType.Goal:
                         //Goal!  Costa Rica 0, Serbia 1. Aleksandar Kolarov  - Serbia -  from a free kick with a shot with left foot to the top right corner. Assisted by Jim Baxter.
                         //Goal!  Tunisia 0, England 1. Harry Kane  - England -  shot with right foot from few metres to the centre of the goal after corner. (Not showing)
                         //Goal!  Tunisia 1, England 1. Ferjani Sassi  - Tunisia -  converts the penalty with a shot with right foot to the left corner. (showing)
                         //Goal!  Tunisia 1, England 2. Harry Kane  - England -  header inside of six yard box - left side to the left corner. Assist -  Harry Maguire after corner. (not showing)
-                        comment = comment.Replace("Goal!", "");
+                        //Poland 0, Senegal 2. M'Baye Niang  - Senegal -  shot with right foot from the centre of the box to the centre of the goal.
+
                         arr = comment.Split('.');
                         score = arr[0].Trim();
 
@@ -3805,6 +3858,19 @@ namespace CMS.Infrastructure.Entities
                         team = arr2[1].Trim();
 
                         break;
+
+                    case EventType.OwnGoal:
+                        //Own Goal by Thiago Cionek, Poland.  Poland 0, Senegal 1.
+                        arr = comment.Split('.');
+                       
+                        score = arr[1].Trim();
+
+                        arr2 = arr[0].Split(',');
+                        player = arr2[0].Trim();
+                        team = arr2[1].Trim();
+
+                        break;
+
                     case EventType.FirstHalfEnds:
                     case EventType.SecondHalfBegins:
                     case EventType.MatchEnds:
