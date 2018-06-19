@@ -108,12 +108,14 @@ namespace CMS
 
             efSiteException.Save(siteException);
 
-            var todayMatches = FeedUpdate.GetLiveMatches();
+            //var todayMatches = FeedUpdate.GetLiveMatches();
 
-            if (todayMatches.Count > 0)
-            {
-                PingServer();
-            }
+            //if (todayMatches.Count > 0)
+            //{
+            //    PingServer();
+            //}
+
+            PingServer();
 
             //HangfireBootstrapper.Instance.Stop();
         }
@@ -127,7 +129,16 @@ namespace CMS
             }
             catch (Exception ex)
             {
-                string Message = ex.Message;
+                EFSiteException efSiteException = new EFSiteException();
+                SiteException siteException = new SiteException();
+
+                siteException.HResult = ex.HResult.ToString();
+                siteException.InnerException = "Ping Server";
+                siteException.Message = string.Format("Message: {0}", ex.Message);
+                siteException.Source = ex.Source;
+                siteException.TargetSite = ex.TargetSite.ToString();
+
+                efSiteException.Save(siteException);
             }
         }
     }

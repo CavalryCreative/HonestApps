@@ -3752,19 +3752,28 @@ namespace CMS.Infrastructure.Entities
                     case EventType.RedCard:
                     case EventType.HitsTheBar:
                     case EventType.HitsThePost:
-                    case EventType.Foul:
                     case EventType.Handball:
-                        //Attempt blocked. Adam Lallana (Liverpool) left footed shot from the centre of the box is blocked. Assisted by Nathaniel Clyne.
-                        //Adam Lallana (Liverpool) wins a free kick in the attacking half.
-                        //Foul by Alberto Moreno (Liverpool).
+                        //Shot blocked. Juan Quintero  - Colombia -  shot with left foot from outside the box is blocked. Assist -  Juan Cuadrado.
+                        //Radamel Falcao  - Colombia -  won a free kick on the left wing.
+                        //Yuto Nagatomo  - Japan -  won a free kick on the left wing.
 
-                        arr = comment.Split('(');
+                        arr = comment.Split('-');
                         player = arr[0].Trim();
 
                         arr2 = arr[1].Split(')');
                         team = arr2[0].Trim();
 
-                        break;               
+                        break;
+
+                    case EventType.Foul:
+                        //Fouled by Maya Yoshida  - Japan
+                        comment = comment.Replace("Fouled by", "");
+
+                        arr = comment.Split('-');
+                        player = arr[0].Trim();
+                        team = arr[1].Trim();
+
+                        break;
                     case EventType.Corner:
                         //Corner,  Crystal Palace. Conceded by Brendan Galloway.
 

@@ -163,3 +163,4 @@ $RECYCLE.BIN/
 *.ide-shm
 *.ide-wal
 .vs/config/applicationhost.config
+.vs/config/applicationhost.config
