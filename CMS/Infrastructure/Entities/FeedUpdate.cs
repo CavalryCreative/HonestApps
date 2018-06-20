@@ -190,67 +190,70 @@ namespace CMS.Infrastructure.Entities
 
                             try
                             {
-                                foreach (var childToken in y.Children())
+                                if(y.Children().Count() > 0)
                                 {
-                                    var jeff = childToken.Children();
-
-                                    Player homePlayer = new Player();
-
-                                    var playerHomeId = childToken.SelectToken("id").ToString();
-                                    var playerHomeName = childToken.SelectToken("name").ToString();
-                                    var playerHomeNumber = childToken.SelectToken("number").ToString();
-                                    var playerHomePos = childToken.SelectToken("pos").ToString();
-
-                                    result = Int32.TryParse(playerHomeId, out playerAPIId);
-
-                                    //Check if player exists                           
-                                    if (result)
-                                        homePlayer = GetPlayerByAPIId(playerAPIId);
-
-                                    if (homePlayer == null)
-                                        homePlayer = GetPlayerByName(playerHomeName);
-
-                                    //Add to Players if not already added
-                                    if (homePlayer == null)
+                                    foreach (var childToken in y.Children())
                                     {
-                                        homePlayer = new Player();
+                                        var jeff = childToken.Children();
 
-                                        result = Byte.TryParse(playerHomeNumber, out squadNumberByte);
+                                        Player homePlayer = new Player();
 
+                                        var playerHomeId = childToken.SelectToken("id").ToString();
+                                        var playerHomeName = childToken.SelectToken("name").ToString();
+                                        var playerHomeNumber = childToken.SelectToken("number").ToString();
+                                        var playerHomePos = childToken.SelectToken("pos").ToString();
+
+                                        result = Int32.TryParse(playerHomeId, out playerAPIId);
+
+                                        //Check if player exists                           
                                         if (result)
-                                            homePlayer.SquadNumber = squadNumberByte;
-                                        else
-                                            homePlayer.SquadNumber = 0;
+                                            homePlayer = GetPlayerByAPIId(playerAPIId);
 
-                                        homePlayer.Name = playerHomeName;
-                                        homePlayer.Position = playerHomePos;
-                                        homePlayer.Id = System.Guid.Empty;
-                                        homePlayer.APIPlayerId = playerAPIId;
+                                        if (homePlayer == null)
+                                            homePlayer = GetPlayerByName(playerHomeName);
 
-                                        retMsg = SavePlayer(homePlayer, homeTeam.Id);
-
-                                        ReturnId(retMsg, out actionMessage, out Id);
-
-                                        if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                        //Add to Players if not already added
+                                        if (homePlayer == null)
                                         {
-                                            homePlayer.Id = new Guid(Id);
+                                            homePlayer = new Player();
+
+                                            result = Byte.TryParse(playerHomeNumber, out squadNumberByte);
+
+                                            if (result)
+                                                homePlayer.SquadNumber = squadNumberByte;
+                                            else
+                                                homePlayer.SquadNumber = 0;
+
+                                            homePlayer.Name = playerHomeName;
+                                            homePlayer.Position = playerHomePos;
+                                            homePlayer.Id = System.Guid.Empty;
+                                            homePlayer.APIPlayerId = playerAPIId;
+
+                                            retMsg = SavePlayer(homePlayer, homeTeam.Id);
+
+                                            ReturnId(retMsg, out actionMessage, out Id);
+
+                                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                            {
+                                                homePlayer.Id = new Guid(Id);
+                                            }
+                                        }
+
+                                        if (homePlayer != null)
+                                        {
+                                            //add to Lineups
+                                            Lineup lineup = new Lineup();
+
+                                            lineup.IsHomePlayer = true;
+                                            lineup.IsSub = false;
+                                            lineup.MatchAPIId = matchId;
+                                            lineup.PlayerId = homePlayer.Id;
+                                            lineup.Position = playerHomePos;
+
+                                            SavePlayerToMatchLineup(lineup);
                                         }
                                     }
-
-                                    if (homePlayer != null)
-                                    {
-                                        //add to Lineups
-                                        Lineup lineup = new Lineup();
-
-                                        lineup.IsHomePlayer = true;
-                                        lineup.IsSub = false;
-                                        lineup.MatchAPIId = matchId;
-                                        lineup.PlayerId = homePlayer.Id;
-                                        lineup.Position = playerHomePos;
-
-                                        SavePlayerToMatchLineup(lineup);
-                                    }
-                                }
+                                }                               
                             }
                             catch (Exception ex)
                             {
@@ -270,67 +273,70 @@ namespace CMS.Infrastructure.Entities
 
                             try
                             {
-                                foreach (var childToken in y.Children())
+                                if (y.Children().Count() > 0)
                                 {
-                                    var jeff = childToken.Children();
-
-                                    //Check if player exists
-                                    Player homeSubPlayer = new Player();
-
-                                    var playerHomeSubId = childToken.SelectToken("id").ToString();
-                                    var playerHomeSubName = childToken.SelectToken("name").ToString();
-                                    var playerHomeSubNumber = childToken.SelectToken("number").ToString();
-                                    var playerHomeSubPos = childToken.SelectToken("pos").ToString();
-
-                                    result = Int32.TryParse(playerHomeSubId, out playerAPIId);
-
-                                    if (result)
-                                        homeSubPlayer = GetPlayerByAPIId(playerAPIId);
-
-                                    if (homeSubPlayer == null)
-                                        homeSubPlayer = GetPlayerByName(playerHomeSubName);
-
-                                    //Add to Players if not already added
-                                    if (homeSubPlayer == null)
+                                    foreach (var childToken in y.Children())
                                     {
-                                        homeSubPlayer = new Player();
+                                        var jeff = childToken.Children();
 
-                                        result = Byte.TryParse(playerHomeSubNumber, out squadNumberByte);
+                                        //Check if player exists
+                                        Player homeSubPlayer = new Player();
+
+                                        var playerHomeSubId = childToken.SelectToken("id").ToString();
+                                        var playerHomeSubName = childToken.SelectToken("name").ToString();
+                                        var playerHomeSubNumber = childToken.SelectToken("number").ToString();
+                                        var playerHomeSubPos = childToken.SelectToken("pos").ToString();
+
+                                        result = Int32.TryParse(playerHomeSubId, out playerAPIId);
 
                                         if (result)
-                                            homeSubPlayer.SquadNumber = squadNumberByte;
-                                        else
-                                            homeSubPlayer.SquadNumber = 0;
+                                            homeSubPlayer = GetPlayerByAPIId(playerAPIId);
 
-                                        homeSubPlayer.Name = playerHomeSubName;
-                                        homeSubPlayer.Position = playerHomeSubPos;
-                                        homeSubPlayer.Id = System.Guid.Empty;
-                                        homeSubPlayer.APIPlayerId = playerAPIId;
+                                        if (homeSubPlayer == null)
+                                            homeSubPlayer = GetPlayerByName(playerHomeSubName);
 
-                                        retMsg = SavePlayer(homeSubPlayer, homeTeam.Id);
-
-                                        ReturnId(retMsg, out actionMessage, out Id);
-
-                                        if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                        //Add to Players if not already added
+                                        if (homeSubPlayer == null)
                                         {
-                                            homeSubPlayer.Id = new Guid(Id);
+                                            homeSubPlayer = new Player();
+
+                                            result = Byte.TryParse(playerHomeSubNumber, out squadNumberByte);
+
+                                            if (result)
+                                                homeSubPlayer.SquadNumber = squadNumberByte;
+                                            else
+                                                homeSubPlayer.SquadNumber = 0;
+
+                                            homeSubPlayer.Name = playerHomeSubName;
+                                            homeSubPlayer.Position = playerHomeSubPos;
+                                            homeSubPlayer.Id = System.Guid.Empty;
+                                            homeSubPlayer.APIPlayerId = playerAPIId;
+
+                                            retMsg = SavePlayer(homeSubPlayer, homeTeam.Id);
+
+                                            ReturnId(retMsg, out actionMessage, out Id);
+
+                                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                            {
+                                                homeSubPlayer.Id = new Guid(Id);
+                                            }
+                                        }
+
+                                        if (homeSubPlayer != null)
+                                        {
+                                            //add to Lineups
+                                            Lineup lineup = new Lineup();
+
+                                            lineup.IsHomePlayer = true;
+                                            lineup.IsSub = true;
+                                            lineup.MatchAPIId = matchId;
+                                            lineup.PlayerId = homeSubPlayer.Id;
+                                            lineup.Position = playerHomeSubPos;
+
+                                            SavePlayerToMatchLineup(lineup);
                                         }
                                     }
-
-                                    if (homeSubPlayer != null)
-                                    {
-                                        //add to Lineups
-                                        Lineup lineup = new Lineup();
-
-                                        lineup.IsHomePlayer = true;
-                                        lineup.IsSub = true;
-                                        lineup.MatchAPIId = matchId;
-                                        lineup.PlayerId = homeSubPlayer.Id;
-                                        lineup.Position = playerHomeSubPos;
-
-                                        SavePlayerToMatchLineup(lineup);
-                                    }
-                                }
+                                }                          
                             }
                             catch (Exception ex)
                             {
@@ -351,67 +357,70 @@ namespace CMS.Infrastructure.Entities
 
                             try
                             {
-                                foreach (var childToken in y.Children())
+                                if (y.Children().Count() > 0)
                                 {
-                                    var jeff = childToken.Children();
-
-                                    var playerAwayId = childToken.SelectToken("id").ToString();
-                                    var playerAwayName = childToken.SelectToken("name").ToString();
-                                    var playerAwayNumber = childToken.SelectToken("number").ToString();
-                                    var playerAwayPos = childToken.SelectToken("pos").ToString();
-
-                                    result = Int32.TryParse(playerAwayId, out playerAPIId);
-
-                                    //Check if player exists
-                                    Player awayPlayer = new Player();
-
-                                    if (result)
-                                        awayPlayer = GetPlayerByAPIId(playerAPIId);
-
-                                    if (awayPlayer == null)
-                                        awayPlayer = GetPlayerByName(playerAwayName);
-
-                                    //Add to Players if not already added
-                                    if (awayPlayer == null)
+                                    foreach (var childToken in y.Children())
                                     {
-                                        awayPlayer = new Player();
+                                        var jeff = childToken.Children();
 
-                                        result = Byte.TryParse(playerAwayNumber, out squadNumberByte);
+                                        var playerAwayId = childToken.SelectToken("id").ToString();
+                                        var playerAwayName = childToken.SelectToken("name").ToString();
+                                        var playerAwayNumber = childToken.SelectToken("number").ToString();
+                                        var playerAwayPos = childToken.SelectToken("pos").ToString();
+
+                                        result = Int32.TryParse(playerAwayId, out playerAPIId);
+
+                                        //Check if player exists
+                                        Player awayPlayer = new Player();
 
                                         if (result)
-                                            awayPlayer.SquadNumber = squadNumberByte;
-                                        else
-                                            awayPlayer.SquadNumber = 0;
+                                            awayPlayer = GetPlayerByAPIId(playerAPIId);
 
-                                        awayPlayer.Name = playerAwayName;
-                                        awayPlayer.Position = playerAwayPos;
-                                        awayPlayer.Id = System.Guid.Empty;
-                                        awayPlayer.APIPlayerId = playerAPIId;
+                                        if (awayPlayer == null)
+                                            awayPlayer = GetPlayerByName(playerAwayName);
 
-                                        retMsg = SavePlayer(awayPlayer, awayTeam.Id);
-
-                                        ReturnId(retMsg, out actionMessage, out Id);
-
-                                        if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                        //Add to Players if not already added
+                                        if (awayPlayer == null)
                                         {
-                                            awayPlayer.Id = new Guid(Id);
+                                            awayPlayer = new Player();
+
+                                            result = Byte.TryParse(playerAwayNumber, out squadNumberByte);
+
+                                            if (result)
+                                                awayPlayer.SquadNumber = squadNumberByte;
+                                            else
+                                                awayPlayer.SquadNumber = 0;
+
+                                            awayPlayer.Name = playerAwayName;
+                                            awayPlayer.Position = playerAwayPos;
+                                            awayPlayer.Id = System.Guid.Empty;
+                                            awayPlayer.APIPlayerId = playerAPIId;
+
+                                            retMsg = SavePlayer(awayPlayer, awayTeam.Id);
+
+                                            ReturnId(retMsg, out actionMessage, out Id);
+
+                                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                            {
+                                                awayPlayer.Id = new Guid(Id);
+                                            }
+                                        }
+
+                                        if (awayPlayer != null)
+                                        {
+                                            //add to Lineups
+                                            Lineup lineup = new Lineup();
+
+                                            lineup.IsHomePlayer = false;
+                                            lineup.IsSub = false;
+                                            lineup.MatchAPIId = matchId;
+                                            lineup.PlayerId = awayPlayer.Id;
+                                            lineup.Position = playerAwayPos;
+
+                                            SavePlayerToMatchLineup(lineup);
                                         }
                                     }
-
-                                    if (awayPlayer != null)
-                                    {
-                                        //add to Lineups
-                                        Lineup lineup = new Lineup();
-
-                                        lineup.IsHomePlayer = false;
-                                        lineup.IsSub = false;
-                                        lineup.MatchAPIId = matchId;
-                                        lineup.PlayerId = awayPlayer.Id;
-                                        lineup.Position = playerAwayPos;
-
-                                        SavePlayerToMatchLineup(lineup);
-                                    }
-                                }
+                                }                                
                             }
                             catch (Exception ex)
                             {
@@ -430,85 +439,87 @@ namespace CMS.Infrastructure.Entities
 
                             try
                             {
-                                foreach (var childToken in y.Children())
+                                if (y.Children().Count() > 0)
                                 {
-                                    var jeff = childToken.Children();
-
-                                    var playerAwaySubId = childToken.SelectToken("id").ToString();
-                                    var playerAwaySubName = childToken.SelectToken("name").ToString();
-                                    var playerAwaySubNumber = childToken.SelectToken("number").ToString();
-                                    var playerAwaySubPos = childToken.SelectToken("pos").ToString();
-
-                                    result = Int32.TryParse(playerAwaySubId, out playerAPIId);
-
-                                    //Check if player exists
-                                    Player awaySubPlayer = new Player();
-
-                                    if (result)
-                                        awaySubPlayer = GetPlayerByAPIId(playerAPIId);
-
-                                    if (awaySubPlayer == null)
-                                        awaySubPlayer = GetPlayerByName(playerAwaySubName);
-
-                                    //Add to Players if not already added
-                                    if (awaySubPlayer == null)
+                                    foreach (var childToken in y.Children())
                                     {
-                                        awaySubPlayer = new Player();
+                                        var jeff = childToken.Children();
 
-                                        result = Byte.TryParse(playerAwaySubNumber, out squadNumberByte);
+                                        var playerAwaySubId = childToken.SelectToken("id").ToString();
+                                        var playerAwaySubName = childToken.SelectToken("name").ToString();
+                                        var playerAwaySubNumber = childToken.SelectToken("number").ToString();
+                                        var playerAwaySubPos = childToken.SelectToken("pos").ToString();
+
+                                        result = Int32.TryParse(playerAwaySubId, out playerAPIId);
+
+                                        //Check if player exists
+                                        Player awaySubPlayer = new Player();
 
                                         if (result)
-                                            awaySubPlayer.SquadNumber = squadNumberByte;
-                                        else
-                                            awaySubPlayer.SquadNumber = 0;
+                                            awaySubPlayer = GetPlayerByAPIId(playerAPIId);
 
-                                        awaySubPlayer.Name = playerAwaySubName;
-                                        awaySubPlayer.Position = playerAwaySubPos;
-                                        awaySubPlayer.Id = System.Guid.Empty;
-                                        awaySubPlayer.APIPlayerId = playerAPIId;
+                                        if (awaySubPlayer == null)
+                                            awaySubPlayer = GetPlayerByName(playerAwaySubName);
 
-                                        retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
-
-                                        ReturnId(retMsg, out actionMessage, out Id);
-
-                                        if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                        //Add to Players if not already added
+                                        if (awaySubPlayer == null)
                                         {
-                                            awaySubPlayer.Id = new Guid(Id);
+                                            awaySubPlayer = new Player();
+
+                                            result = Byte.TryParse(playerAwaySubNumber, out squadNumberByte);
+
+                                            if (result)
+                                                awaySubPlayer.SquadNumber = squadNumberByte;
+                                            else
+                                                awaySubPlayer.SquadNumber = 0;
+
+                                            awaySubPlayer.Name = playerAwaySubName;
+                                            awaySubPlayer.Position = playerAwaySubPos;
+                                            awaySubPlayer.Id = System.Guid.Empty;
+                                            awaySubPlayer.APIPlayerId = playerAPIId;
+
+                                            retMsg = SavePlayer(awaySubPlayer, awayTeam.Id);
+
+                                            ReturnId(retMsg, out actionMessage, out Id);
+
+                                            if ((actionMessage == Res.Resources.RecordAdded) || (actionMessage == Res.Resources.RecordUpdated))
+                                            {
+                                                awaySubPlayer.Id = new Guid(Id);
+                                            }
+                                        }
+
+                                        if (awaySubPlayer != null)
+                                        {
+                                            //add to Lineups
+                                            Lineup lineup = new Lineup();
+
+                                            lineup.IsHomePlayer = false;
+                                            lineup.IsSub = true;
+                                            lineup.MatchAPIId = matchId;
+                                            lineup.PlayerId = awaySubPlayer.Id;
+                                            lineup.Position = playerAwaySubPos;
+
+                                            SavePlayerToMatchLineup(lineup);
                                         }
                                     }
 
-                                    if (awaySubPlayer != null)
-                                    {
-                                        //add to Lineups
-                                        Lineup lineup = new Lineup();
+                                    UpdateHistory history = new UpdateHistory();
 
-                                        lineup.IsHomePlayer = false;
-                                        lineup.IsSub = true;
-                                        lineup.MatchAPIId = matchId;
-                                        lineup.PlayerId = awaySubPlayer.Id;
-                                        lineup.Position = playerAwaySubPos;
+                                    history.Active = true;
+                                    history.Deleted = false;
+                                    history.MatchDetails = true;
+                                    history.MatchAPIId = matchId;
+                                    history.Lineups = true;
 
-                                        SavePlayerToMatchLineup(lineup);                                      
-                                    }
-                                }
-
-                                UpdateHistory history = new UpdateHistory();
-
-                                history.Active = true;
-                                history.Deleted = false;
-                                history.MatchDetails = true;
-                                history.MatchAPIId = matchId;
-                                history.Lineups = true;
-
-                                SaveUpdateHistory(history);
+                                    SaveUpdateHistory(history);
+                                }                                                        
                             }
                             catch (Exception ex)
                             {
                                 //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
                                 SaveException(ex, string.Format("SavePlayer - Away Sub, Match Id: {0} ", matchId.ToString()));
                             }
-                            //System.Diagnostics.Debug.WriteLine("Away players subs complete");
-
+                           
                             #endregion
                         }
 
