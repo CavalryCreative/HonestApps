@@ -1059,70 +1059,77 @@ namespace CMS.Infrastructure.Entities
 
                             if (isgoal == "1")
                             {
-                                commEvent.Goal = true;
-
-                                //Get player and team from comment
-                                string playerName = string.Empty;
-                                string teamName = string.Empty;
-                                string score = string.Empty;
-
-                                    Goal goal = new Goal();
-
-                                    if (comment.StartsWith("Goal!"))
+                                    try
                                     {
-                                        GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
-                                        goal.OwnGoal = false;
+                                        commEvent.Goal = true;
+
+                                        //Get player and team from comment
+                                        string playerName = string.Empty;
+                                        string teamName = string.Empty;
+                                        string score = string.Empty;
+
+                                        Goal goal = new Goal();
+
+                                        if (comment.StartsWith("Goal!"))
+                                        {
+                                            GetPlayerAndTeamFromComment(EventType.Goal, comment, out playerName, out teamName, out score);
+                                            goal.OwnGoal = false;
+                                        }
+                                        else if (comment.StartsWith("Own Goal"))
+                                        {
+                                            GetPlayerAndTeamFromComment(EventType.OwnGoal, comment, out playerName, out teamName, out score);
+
+                                            goal.OwnGoal = true;
+                                        }
+
+                                        goal.Penalty = false; //TODO - find a way of checking if penalty     
+                                        goal.Minute = min;
+                                        goal.APIId = APIId;
+                                        goal.SummaryId = summary.Id;
+
+                                        var player = GetPlayerByNameAndTeam(playerName, teamName);
+
+                                        if (player != null)
+                                        {
+                                            goal.PlayerName = player.Name;
+                                            goal.APIPlayerId = player.APIPlayerId;
+                                        }
+                                        else
+                                        {
+                                            goal.PlayerName = player.Name;
+                                            goal.APIPlayerId = 0;
+                                        }
+
+                                        if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower())
+                                        {
+                                            if (goal.OwnGoal)
+                                            {
+                                                goal.IsHomeTeam = false;
+                                            }
+                                            else
+                                            {
+                                                goal.IsHomeTeam = true;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (goal.OwnGoal)
+                                            {
+                                                goal.IsHomeTeam = true;
+                                            }
+                                            else
+                                            {
+                                                goal.IsHomeTeam = false;
+                                            }
+                                        }
+
+                                        retMsg = SaveGoal(goal);
                                     }
-                                    else if (comment.StartsWith("Own Goal"))
+                                    catch (Exception ex)
                                     {
-                                        GetPlayerAndTeamFromComment(EventType.OwnGoal, comment, out playerName, out teamName, out score);
-
-                                        goal.OwnGoal = true;
+                                        SaveException(ex, string.Format("SaveGoal, MatchId: {0}", match.Id.ToString()));
                                     }
-                              
-                                goal.Penalty = false; //TODO - find a way of checking if penalty     
-                                goal.Minute = min;
-                                goal.APIId = APIId;
-                                goal.SummaryId = summary.Id;
-
-                                var player = GetPlayerByNameAndTeam(playerName, teamName);
-
-                                if (player != null)
-                                {
-                                    goal.PlayerName = player.Name;
-                                    goal.APIPlayerId = player.APIPlayerId;
                                 }
-                                else
-                                {
-                                    goal.PlayerName = player.Name;
-                                    goal.APIPlayerId = 0;
-                                }
-
-                                if (teamName.Trim().ToLower() == homeTeam.Name.Trim().ToLower())
-                                {
-                                    if (goal.OwnGoal)
-                                    {
-                                        goal.IsHomeTeam = false;
-                                    }
-                                    else
-                                    {
-                                        goal.IsHomeTeam = true;
-                                    }                              
-                                }
-                                else
-                                {
-                                    if (goal.OwnGoal)
-                                    {
-                                        goal.IsHomeTeam = true;
-                                    }
-                                    else
-                                    {
-                                        goal.IsHomeTeam = false;
-                                    }
-                                }
-
-                                retMsg = SaveGoal(goal);
-                            }
                             else
                             {
                                 commEvent.Goal = false;
@@ -3856,7 +3863,8 @@ namespace CMS.Infrastructure.Entities
                         //Goal!  Tunisia 0, England 1. Harry Kane  - England -  shot with right foot from few metres to the centre of the goal after corner. (Not showing)
                         //Goal!  Tunisia 1, England 1. Ferjani Sassi  - Tunisia -  converts the penalty with a shot with right foot to the left corner. (showing)
                         //Goal!  Tunisia 1, England 2. Harry Kane  - England -  header inside of six yard box - left side to the left corner. Assist -  Harry Maguire after corner. (not showing)
-                        //Poland 0, Senegal 2. M'Baye Niang  - Senegal -  shot with right foot from the centre of the box to the centre of the goal.
+                        //Poland 0, Senegal 2. M'Baye Niang  - Senegal -  shot with right foot from the centre of the box to the centre of the goal. (errored)
+                        //Goal!  Uruguay 1, Saudi Arabia 0. Luis Su\u00c3\u00a1rez  - Uruguay -  shot with left foot from few metres to the right corner. Assist -  Carlos S\u00c3\u00a1nchez with a cross after corner. (errored)
 
                         arr = comment.Split('.');
                         score = arr[0].Trim();
