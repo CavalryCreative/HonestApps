@@ -190,7 +190,7 @@ namespace CMS.Infrastructure.Entities
 
                             try
                             {
-                                if(y.Children().Count() > 0)
+                                if (y.Children().Count() > 0)
                                 {
                                     foreach (var childToken in y.Children())
                                     {
@@ -343,9 +343,6 @@ namespace CMS.Infrastructure.Entities
                                 //System.Diagnostics.Debug.WriteLine(string.Format("Inner Exception: {0}, Message: {1}", ex.InnerException, ex.Message));
                                 SaveException(ex, string.Format("SavePlayer - Home Sub, Match Id: {0}", matchId.ToString()));
                             }
-
-
-                            //System.Diagnostics.Debug.WriteLine("Home players subs complete");
 
                             #endregion
 
@@ -1096,7 +1093,7 @@ namespace CMS.Infrastructure.Entities
                                         }
                                         else
                                         {
-                                            goal.PlayerName = player.Name;
+                                            goal.PlayerName = playerName;
                                             goal.APIPlayerId = 0;
                                         }
 
