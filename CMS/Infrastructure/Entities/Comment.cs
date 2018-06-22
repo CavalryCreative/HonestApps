@@ -44,6 +44,7 @@ namespace CMS.Infrastructure.Entities
         AttemptMissedHighAndWide = 3,
         AttemptMissesToRightOrLeft = 4,
         AttemptMissesJustABitTooHigh = 5,
+        AttemptMissesClose = 30,
         AttemptMissed = 6,
         AttemptSaved = 7,
         FreeKick = 8,     
@@ -61,12 +62,16 @@ namespace CMS.Infrastructure.Entities
         Offside = 20,
         HitsTheBar = 21,
         HitsThePost = 22,
+        Penalty = 33,
+        PenaltyConceded = 31,
+        PenaltyMissed = 32,
         SecondHalfBegins = 23,
         Substitution = 24,
         Handball = 25,
         General = 26,
         SecondHalfEnds = 27,
-        OwnGoal = 28
+        OwnGoal = 28,
+        DangerousPlay = 29
     }
 
     public enum Position

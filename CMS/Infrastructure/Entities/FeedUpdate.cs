@@ -2811,10 +2811,16 @@ namespace CMS.Infrastructure.Entities
         {
             homeTeamComment = string.Empty;
             awayTeamComment = string.Empty;
+
+            //TODO - Corner, get Conceded by Player name
+            //Dangerous play
+            //Missed chance
+            //Offside
+            //Penalty conceded, missed etc.
            
-           if (feedComment.StartsWith("Attempt blocked."))//Player
+           if (feedComment.StartsWith("Shot blocked."))//Player
            {
-               feedComment = feedComment.Replace("Attempt blocked.", "").Trim();
+               feedComment = feedComment.Replace("Shot blocked.", "").Trim();
   
                GeneratePlayerComment(
                    matchId, 
@@ -2827,9 +2833,25 @@ namespace CMS.Infrastructure.Entities
                    out homeTeamComment, 
                    out awayTeamComment);
            }
-           else if (feedComment.StartsWith("Attempt missed."))//Player
+           else if (feedComment.StartsWith("Missed chance."))//Player
            {
-                feedComment = feedComment.Replace("Attempt missed.", "").Trim();
+                //Missed chance. Aaron Mooy  - Australia -  shot with right foot from outside the box is very close to the goal.
+                //Missed chance. Abdallah El Said  - Egypt -  shot with right foot from outside the box is high and wide to the right.
+                //Missed chance. Alberto RodrÃ­guez  - Peru -  shot with the head from the centre of the box is close, but missed to the left. Assist -  Miguel Trauco with a cross .
+                //Missed chance. Alberto RodrÃ­guez  - Peru -  shot with the head from the centre of the box missed. Assist -  Yoshimar YotÃºn with a cross after corner.
+                //Missed chance. Aleksandar Kolarov  - Serbia -  shot with left foot from outside the box missed. Assist -  Aleksandar Mitrovic.
+                //Missed chance. Aleksandar Mitrovic  - Serbia -  shot with the head from the centre of the box missed to the left. Assist -  Adem Ljajic with a cross after corner.
+                //Missed chance. Aleksandr Golovin  - Russia -  shot with right foot from outside the box is close, but missed to the left.
+                //Missed chance. Ali Gabr  - Egypt -  shot with the head from the centre of the box is high and wide to the right. Assist -  Mohamed Elneny .
+                //Missed chance. AndrÃ© Carrillo  - Peru -  shot with right foot from outside the box goes high. Assist -  Jefferson FarfÃ¡n.
+                //Missed chance. Andrej Kramaric  - Croatia -  shot with the head from the centre of the box is very close to the goal. Assist -  Ivan Rakitic.
+                //Missed chance. Ante Rebic  - Croatia -  shot with the head from the right side of the six yard box missed to the left. Assist -  Luka Modric with a cross after corner.
+                //Missed chance. Aziz Behich  - Australia -  shot with right foot from outside the box is close, but misses the top right corner. Assist -  Robbie Kruse.
+                //Missed chance. Eden Hazard  - BÃ©lgica -  shot with left foot from a diffucult position on the left is close, but missed to the left.
+                //Missed chance. Paulinho  - Brazil -  shot with left foot from few metres is close, but missed.
+                //Missed chance. Yoshimar YotÃºn  - Peru -  shot with left foot from more than 35 yards is high and wide to the right. Assist -  Pedro Aquino.
+
+                feedComment = feedComment.Replace("Missed chance.", "").Trim();
 
                if (feedComment.Contains("is too high"))
                {
@@ -2897,9 +2919,11 @@ namespace CMS.Infrastructure.Entities
                        out awayTeamComment);
                }
            }
-            else if (feedComment.StartsWith("Attempt saved"))//Player attacker/GK
+            else if (feedComment.StartsWith("New attacking attempt"))//Player attacker/GK
             {
-                feedComment = feedComment.Replace("Attempt saved", "").Trim();
+                //New attacking attempt. Ã?ver Banega  - Argentina -  shot with right foot from outside the box is saved by goalkeeper in the centre of the goal. Assist -  NicolÃ¡s Tagliafico.
+
+                feedComment = feedComment.Replace("New attacking attempt.", "").Trim();
 
                 GeneratePlayerComment(
                        matchId,
@@ -2938,9 +2962,24 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Corner,"))//Player or Match
+           else if (feedComment.StartsWith("Dangerous play by"))
             {
-               feedComment = feedComment.Replace("Corner, ", "").Trim();
+                feedComment = feedComment.Replace("Dangerous play by", "").Trim();
+
+                GeneratePlayerComment(
+                      matchId,
+                      homeTeamAPIId,
+                      awayTeamAPIId,
+                      feedComment,
+                      false,
+                      CommentType.Player,
+                      EventType.DangerousPlay,
+                      out homeTeamComment,
+                      out awayTeamComment);
+            }
+           else if (feedComment.StartsWith("Corner"))//Player or Match
+            {
+               feedComment = feedComment.Replace("Corner -", "").Trim();
  
                GeneratePlayerComment(
                        matchId,
@@ -2955,7 +2994,9 @@ namespace CMS.Infrastructure.Entities
             }
             else if (feedComment.StartsWith("Delay in match"))//Match
             {
-               GenerateMatchComment(
+                feedComment = feedComment.Replace("Delay in match", "").Trim();
+
+                GenerateMatchComment(
                    matchId, 
                    homeTeamAPIId, 
                    awayTeamAPIId, 
@@ -2977,7 +3018,7 @@ namespace CMS.Infrastructure.Entities
                    out homeTeamComment,
                    out awayTeamComment);
             }
-           else if (feedComment.StartsWith("First Half begins"))//Team
+           else if (feedComment.StartsWith("First Half starts"))//Team
             {
                GenerateTeamComment(
                    matchId,
@@ -2989,9 +3030,9 @@ namespace CMS.Infrastructure.Entities
                    out homeTeamComment,
                    out awayTeamComment);
             }
-           else if (feedComment.StartsWith("First Half ends"))//Team
+           else if (feedComment.StartsWith("First Half ended"))//Team
             {
-                feedComment = feedComment.Replace("First Half ends,", "").Trim();
+                feedComment = feedComment.Replace("First Half ended -", "").Trim();
 
                 GenerateTeamComment(
                    matchId,
@@ -3003,9 +3044,9 @@ namespace CMS.Infrastructure.Entities
                    out homeTeamComment,
                    out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Second Half ends"))//Team
+           else if (feedComment.StartsWith("Second Half ended"))//Team
            {
-               feedComment = feedComment.Replace("Second Half ends,", "").Trim();
+               feedComment = feedComment.Replace("Second Half ended,", "").Trim();
 
                GenerateTeamComment(
                   matchId,
@@ -3076,7 +3117,9 @@ namespace CMS.Infrastructure.Entities
             }
            else if (feedComment.StartsWith("Offside"))//Player
             {
-                feedComment = feedComment.Replace("Offside, ", "").Trim();
+                //Offside - Argentina. NicolÃ¡s Tagliafico with a pass, however Sergio AgÃ¼ero is in offside.
+
+                feedComment = feedComment.Replace("Offside - ", "").Trim();
  
                GeneratePlayerComment(
                        matchId,
@@ -3129,9 +3172,10 @@ namespace CMS.Infrastructure.Entities
                     out homeTeamComment,
                     out awayTeamComment);
             }
-           else if (feedComment.StartsWith("Match ends,"))//Match
+           else if (feedComment.StartsWith("That's all."))//Match
            {
-               feedComment = feedComment.Replace("Match ends,", "").Trim();
+                //Thats all. Game finished -  Sweden 1, Korea Republic 0.
+                feedComment = feedComment.Replace("Thats all. Game finished -", "").Trim();
 
                GenerateMatchComment(
                     matchId,
@@ -3173,9 +3217,13 @@ namespace CMS.Infrastructure.Entities
                        out homeTeamComment,
                        out awayTeamComment);
             }
-           else if (feedComment.Contains("wins a free kick"))//Player
+           else if (feedComment.Contains("won a free kick"))//Player
            {
-               GeneratePlayerComment(
+                //Michael Murillo  - PanamÃ¡ -  won a free kick on the right wing.
+                //Michael Murillo  - PanamÃ¡ -  won a free kick in defence.
+                //Marwan Mohsen  - Egypt -  won a free kick in attack.
+
+                GeneratePlayerComment(
                         matchId,
                         homeTeamAPIId,
                         awayTeamAPIId,
@@ -3186,7 +3234,52 @@ namespace CMS.Infrastructure.Entities
                         out homeTeamComment,
                         out awayTeamComment);
            }
-           else//Match/Team - Match
+            else if (feedComment.Contains("draws a foul in the penalty area"))//Player
+            {
+                //Penalty Peru. Christian Cueva draws a foul in the penalty area.
+
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        true,
+                        CommentType.Player,
+                        EventType.Penalty,
+                        out homeTeamComment,
+                        out awayTeamComment);
+            }
+            else if (feedComment.StartsWith("Penalty conceded"))//Player
+            {
+                //Penalty conceded by Giancarlo GonzÃ¡lez  - Costa Rica -  after a foul in the penalty area.
+
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        true,
+                        CommentType.Player,
+                        EventType.PenaltyConceded,
+                        out homeTeamComment,
+                        out awayTeamComment);
+            }
+            else if (feedComment.StartsWith("Penalty missed"))//Player
+            {
+                //Penalty missed! Bad penalty by Christian Cueva  - Peru -  shot with right foot goes high. Christian Cueva should be disappointed.
+
+                GeneratePlayerComment(
+                        matchId,
+                        homeTeamAPIId,
+                        awayTeamAPIId,
+                        feedComment,
+                        true,
+                        CommentType.Player,
+                        EventType.PenaltyMissed,
+                        out homeTeamComment,
+                        out awayTeamComment);
+            }
+            else//Match/Team - Match
            {
                GenerateMatchComment(
                     matchId,
