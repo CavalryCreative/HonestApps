@@ -2817,6 +2817,7 @@ namespace CMS.Infrastructure.Entities
             //Missed chance
             //Offside
             //Penalty conceded, missed etc.
+            //Video review
            
            if (feedComment.StartsWith("Shot blocked."))//Player
            {
