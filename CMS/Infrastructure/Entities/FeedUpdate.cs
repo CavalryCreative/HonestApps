@@ -892,6 +892,13 @@ namespace CMS.Infrastructure.Entities
 
                                 if (player != null)
                                 {
+                                    var currentPlayerStats = GetPlayerStatsByIdAndMatch(player.Id, match.Id);
+
+                                    if (currentPlayerStats != null)
+                                    {
+                                        playerStat.Rating = currentPlayerStats.Rating;
+                                    }
+
                                     playerStat.Assists = string.IsNullOrWhiteSpace(statToken.SelectToken("assists").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("assists").ToString());
                                     playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_committed").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_committed").ToString());
                                     playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_drawn").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_drawn"));
@@ -953,6 +960,13 @@ namespace CMS.Infrastructure.Entities
 
                             if (player != null)
                             {
+                                var currentPlayerStats = GetPlayerStatsByIdAndMatch(player.Id, match.Id);
+
+                                if(currentPlayerStats != null)
+                                {
+                                    playerStat.Rating = currentPlayerStats.Rating;
+                                }
+                                
                                 playerStat.Assists = string.IsNullOrWhiteSpace(statToken.SelectToken("assists").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("assists").ToString());
                                 playerStat.FoulsCommitted = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_committed").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_committed").ToString());
                                 playerStat.FoulsDrawn = string.IsNullOrWhiteSpace(statToken.SelectToken("fouls_drawn").ToString()) ? (byte)0 : Convert.ToByte(statToken.SelectToken("fouls_drawn"));
@@ -2965,6 +2979,7 @@ namespace CMS.Infrastructure.Entities
             }
            else if (feedComment.StartsWith("Dangerous play by"))
             {
+                //Dangerous play by David GuzmÃ¡n  - Costa Rica
                 feedComment = feedComment.Replace("Dangerous play by", "").Trim();
 
                 GeneratePlayerComment(
@@ -3934,12 +3949,22 @@ namespace CMS.Infrastructure.Entities
 
                         break;
                     case EventType.Corner:
-                        //Corner,  Crystal Palace. Conceded by Brendan Galloway.
+                        //Corner -  Uruguay. Conceded by Osama Hawsawi.
 
                         arr = comment.Split('.');
                         team = arr[0].Trim();
 
+                        player = arr[1];
+                        player = player.Replace(player, "Conceded by ");
+
                         break;
+                    case EventType.DangerousPlay:
+                        //Dangerous play by David GuzmÃ¡n  - Costa Rica
+
+                        arr = comment.Split('-');
+                        team = arr[0].Trim();
+
+                        break;                   
                     case EventType.Delay:
                     case EventType.DelayEnds:
                     case EventType.FirstHalfBegins:              
