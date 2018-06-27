@@ -604,8 +604,10 @@ namespace CMS.Infrastructure.Entities
                                 }
                             }
 
-                            //TODO - set team ratings and match ratings
                             SaveMatchStats(stat);
+
+                            if(stat.HomeTeamTotalShots != null)
+                                SetTeamRating(homeGoals, awayGoals, match.Id);
                         }
                         catch (Exception ex)
                         {
@@ -1513,186 +1515,178 @@ namespace CMS.Infrastructure.Entities
             }      
         }
 
-        private static byte SetTeamRating(Player player, byte goalsConceeded, Guid matchId)
+        private static void SetTeamRating(int homeGoals, int awayGoals, Guid matchId)
         {
-            byte playerRating = 3;
-            //Changed this so that rating always starts at a base point of 3
-            if (player != null)
+            decimal homeTeamRating = 3;
+            decimal awayTeamRating = 3;
+
+            var matchStats = GetMatchStatsByAPIId(matchId);
+
+            if (matchStats != null)
             {
-                var plstat = GetPlayerStatsByIdAndMatch(player.Id, matchId);
-
-                if (plstat != null)
+                if (matchStats.HomeTeamTotalShots != null)
                 {
-                    decimal calcRating = playerRating;
+                    #region Home Team
 
-                    switch (player.Position)
+                    decimal homeShotsFactor = 0;
+
+                    if (matchStats.HomeTeamTotalShots > 2)
                     {
-                        case "G":
-                            //saves +0.2
-                            //goals conceeded -0.4
-                            //fouls committed -0.2
-                            //yellow cards -0.3
-                            //red card -1
-                            //penalties saved +0.3
+                        var percentageOnTarget = (decimal)matchStats.HomeTeamOnGoalShots / (decimal)matchStats.HomeTeamTotalShots * (decimal)100;
 
-                            calcRating = calcRating +
-                                 (decimal)(goalsConceeded * -0.4) +
-                                (decimal)(plstat.Saves * 0.2) +
-                                (decimal)(plstat.FoulsCommitted * -0.2) +
-                                (decimal)(plstat.FoulsDrawn * 0.1) +
-                                (decimal)(plstat.YellowCards * -0.3) +
-                                (decimal)(plstat.RedCards * -1);
-                            //penalties saved
-
-                            break;
-                        case "D":
-                            //goals conceeded -0.4
-                            //fouls committed -0.2
-                            //fouls drawn +0.1
-                            //yellow cards  -0.3
-                            //red card -1
-                            //penalties scored +0.5
-                            //penalties missed -0.3
-                            //goals scored +0.5
-                            //assists +0.3
-
-                            calcRating = calcRating +
-                                 (decimal)(goalsConceeded * -0.4) +
-                                (decimal)(plstat.FoulsCommitted * -0.2) +
-                                (decimal)(plstat.FoulsDrawn * 0.1) +
-                                (decimal)(plstat.YellowCards * -0.3) +
-                                (decimal)(plstat.RedCards * -1) +
-                                (decimal)(plstat.PenaltiesScored * 0.5) +
-                                (decimal)(plstat.PenaltiesMissed * -0.3) +
-                                (decimal)(plstat.Goals * 0.5) +
-                                (decimal)(plstat.Assists * 0.3);
-
-                            break;
-                        case "M":
-                            //goals conceeded -0.2
-                            //fouls committed -0.2
-                            //fouls drawn +0.1
-                            //yellow cards  -0.3
-                            //red card -1
-                            //penalties scored +0.5
-                            //penalties missed -0.3
-                            //goals scored +0.5
-                            //assists +0.3
-                            //total shots +/-
-                            //shots on goal +/-
-                            //If total shots > 2
-                            //0-25% = -0.3, 25-50% = -0.1, 50-75% = +0.1, 75-100% = +0.3
-                            //offsides -0.1
-
-
-                            decimal shotsFactor = 0;
-
-                            if (plstat.TotalShots > 2)
-                            {
-                                var percentageOnTarget = (decimal)plstat.ShotsOnGoal / (decimal)plstat.TotalShots * (decimal)100;
-
-                                if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
-                                {
-                                    shotsFactor = -0.3M;
-                                }
-                                else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
-                                {
-                                    shotsFactor = -0.1M;
-                                }
-                                else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
-                                {
-                                    shotsFactor = 0.1M;
-                                }
-                                else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
-                                {
-                                    shotsFactor = 0.3M;
-                                }
-                            }
-
-                            calcRating = calcRating +
-                                 (decimal)(goalsConceeded * -0.2) +
-                                (decimal)(plstat.FoulsCommitted * -0.2) +
-                                (decimal)(plstat.FoulsDrawn * 0.1) +
-                                (decimal)(plstat.YellowCards * -0.3) +
-                                (decimal)(plstat.RedCards * -1) +
-                                (decimal)(plstat.PenaltiesScored * 0.5) +
-                                (decimal)(plstat.PenaltiesMissed * -0.3) +
-                                (decimal)(plstat.Goals * 0.5) +
-                                (decimal)(plstat.Assists * 0.3) +
-                                (decimal)(plstat.Offsides * -0.1) +
-                                shotsFactor;
-
-                            break;
-                        case "F":
-                            //goals conceeded -0.1
-                            //fouls committed -0.2
-                            //fouls drawn +0.1
-                            //yellow cards  -0.3
-                            //red card -1
-                            //penalties scored +0.5
-                            //penalties missed -0.3
-                            //assists +0.3
-                            //goals scored +0.5
-                            //total shots +/-
-                            //shots on goal +/-
-                            //If total shots > 2
-                            //0-25% = -0.5, 25-50% = -0.25, 50-75% = +0.25, 75-100% = +0.5
-                            //offsides -0.1
-
-                            shotsFactor = 0;
-
-                            if (plstat.TotalShots > 2)
-                            {
-                                var percentageOnTarget = (decimal)plstat.ShotsOnGoal / (decimal)plstat.TotalShots * (decimal)100;
-
-                                if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
-                                {
-                                    shotsFactor = -0.5M;
-                                }
-                                else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
-                                {
-                                    shotsFactor = -0.3M;
-                                }
-                                else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
-                                {
-                                    shotsFactor = 0.3M;
-                                }
-                                else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
-                                {
-                                    shotsFactor = 0.5M;
-                                }
-                            }
-
-                            calcRating = calcRating +
-                                (decimal)(goalsConceeded * -0.1) +
-                                (decimal)(plstat.FoulsCommitted * -0.2) +
-                                (decimal)(plstat.FoulsDrawn * 0.1) +
-                                (decimal)(plstat.YellowCards * -0.3) +
-                                (decimal)(plstat.RedCards * -1) +
-                                (decimal)(plstat.PenaltiesScored * 0.5) +
-                                (decimal)(plstat.PenaltiesMissed * -0.3) +
-                                (decimal)(plstat.Goals * 0.5) +
-                                (decimal)(plstat.Assists * 0.3) +
-                                (decimal)(plstat.Offsides * -0.1) +
-                                shotsFactor;
-
-                            break;
-
-                        default:
-                            break;
+                        if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
+                        {
+                            homeShotsFactor = -0.3M;
+                        }
+                        else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
+                        {
+                            homeShotsFactor = -0.1M;
+                        }
+                        else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
+                        {
+                            homeShotsFactor = 0.1M;
+                        }
+                        else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
+                        {
+                            homeShotsFactor = 0.3M;
+                        }
                     }
 
-                    //update playerstat object with updated rating
-                    if (calcRating <= 0)
-                        plstat.Rating = 1;
+                    decimal homePossFactor = 0;
+                    var homePossStr = matchStats.HomeTeamPossessionTime.Replace("%", string.Empty);
+
+                    var isValid = Decimal.TryParse(homePossStr, out decimal homePoss);
+
+                    if (isValid)
+                    {
+                        if (homePoss >= 0 && homePoss <= 25)
+                        {
+                            homePossFactor = -0.3M;
+                        }
+                        else if (homePoss > 25 && homePoss <= 50)
+                        {
+                            homePossFactor = -0.1M;
+                        }
+                        else if (homePoss > 50 && homePoss <= 75)
+                        {
+                            homePossFactor = 0.1M;
+                        }
+                        else if (homePoss > 75 && homePoss <= 100)
+                        {
+                            homePossFactor = 0.3M;
+                        }
+                    }
+
+                    homeTeamRating = homeTeamRating +
+                                     (decimal)(homeGoals * 0.2) +
+                                     (decimal)(awayGoals * -0.2) +
+                                    (decimal)(matchStats.HomeTeamFouls * -0.03) +
+                                    (decimal)(matchStats.HomeTeamCorners * 0.05) +
+                                    (decimal)(matchStats.HomeTeamOffsides * -0.1) +
+                                    (decimal)(matchStats.HomeTeamRedCards * -0.5) +
+                                    (decimal)(matchStats.HomeTeamYellowCards * -0.25) +
+                                    (decimal)(matchStats.HomeTeamSaves * 0.1) +
+                                    (decimal)(matchStats.HomeTeamTotalShots * 0.04) +
+                                    (decimal)(matchStats.HomeTeamOnGoalShots * 0.1) +
+                                    homeShotsFactor +
+                                    homePossFactor;
+
+                    //update matchstats object with updated rating
+                    if (homeTeamRating <= 0)
+                        matchStats.HomeTeamRating = 1;
                     else
-                        plstat.Rating = Convert.ToByte(calcRating);
+                        matchStats.HomeTeamRating = Convert.ToByte(homeTeamRating);
 
-                    SavePlayerStats(plstat);
-                }
+                    #endregion
+
+                    #region Away Team
+
+                    decimal awayShotsFactor = 0;
+
+                    if (matchStats.AwayTeamTotalShots > 2)
+                    {
+                        var percentageOnTarget = (decimal)matchStats.AwayTeamOnGoalShots / (decimal)matchStats.AwayTeamTotalShots * (decimal)100;
+
+                        if (percentageOnTarget >= 0 && percentageOnTarget <= 25)
+                        {
+                            awayShotsFactor = -0.3M;
+                        }
+                        else if (percentageOnTarget > 25 && percentageOnTarget <= 50)
+                        {
+                            awayShotsFactor = -0.1M;
+                        }
+                        else if (percentageOnTarget > 50 && percentageOnTarget <= 75)
+                        {
+                            awayShotsFactor = 0.1M;
+                        }
+                        else if (percentageOnTarget > 75 && percentageOnTarget <= 100)
+                        {
+                            awayShotsFactor = 0.3M;
+                        }
+                    }
+
+                    decimal awayPossFactor = 0;
+                    var awayPossStr = matchStats.AwayTeamPossessionTime.Replace("%", string.Empty);
+
+                    isValid = Decimal.TryParse(homePossStr, out decimal awayPoss);
+
+                    if (isValid)
+                    {
+                        if (awayPoss >= 0 && awayPoss <= 25)
+                        {
+                            awayPossFactor = -0.3M;
+                        }
+                        else if (awayPoss > 25 && awayPoss <= 50)
+                        {
+                            awayPossFactor = -0.1M;
+                        }
+                        else if (awayPoss > 50 && awayPoss <= 75)
+                        {
+                            awayPossFactor = 0.1M;
+                        }
+                        else if (awayPoss > 75 && awayPoss <= 100)
+                        {
+                            awayPossFactor = 0.3M;
+                        }
+                    }
+
+                    awayTeamRating = awayTeamRating +
+                                     (decimal)(homeGoals * -0.2) +
+                                     (decimal)(awayGoals * 0.2) +
+                                    (decimal)(matchStats.AwayTeamFouls * -0.03) +
+                                    (decimal)(matchStats.AwayTeamCorners * 0.05) +
+                                    (decimal)(matchStats.AwayTeamOffsides * -0.1) +
+                                    (decimal)(matchStats.AwayTeamRedCards * -0.5) +
+                                    (decimal)(matchStats.AwayTeamYellowCards * -0.25) +
+                                    (decimal)(matchStats.AwayTeamSaves * 0.1) +
+                                    (decimal)(matchStats.AwayTeamTotalShots * 0.04) +
+                                    (decimal)(matchStats.AwayTeamOnGoalShots * 0.1) +
+                                    awayShotsFactor +
+                                    awayPossFactor;
+
+                    //update matchstats object with updated rating
+                    if (awayTeamRating <= 0)
+                        matchStats.AwayTeamRating = 1;
+                    else
+                        matchStats.AwayTeamRating = Convert.ToByte(awayTeamRating);
+
+                    #endregion
+
+                    #region Match rating
+
+                    decimal calcMatchRating = ((decimal)homeTeamRating + (decimal)awayTeamRating) / 2M;
+                    //calcMatchRating = calcMatchRating + (((decimal)homeGoals + (decimal)awayGoals) * 0.2M);
+
+                    if (calcMatchRating <= 0)
+                        matchStats.MatchRating = 1;
+                    else
+                        matchStats.MatchRating = Convert.ToByte(calcMatchRating);
+
+                    #endregion
+
+                    SaveMatchStats(matchStats);
+                }                           
             }
-
-            return playerRating;
         }
 
         private static byte SetPlayerRating(Player player, byte goalsConceeded, Guid matchId)
@@ -3756,23 +3750,16 @@ namespace CMS.Infrastructure.Entities
             byte commType = (byte)commentType;
             byte evType = (byte)eventType;
             byte neutralPos = (byte)Perspective.Neutral;
-            byte matchRating = 0;
-            byte homeTeamRating = 0;
-            byte awayTeamRating = 0;
+            byte matchRating = 3;
+            byte homeTeamRating = 3;
+            byte awayTeamRating = 3;
 
             if (matchStats != null)
             {
                 homeTeamRating = matchStats.HomeTeamRating;
                 awayTeamRating = matchStats.AwayTeamRating;
+                matchRating = matchStats.MatchRating;
             }
-
-            decimal calcMatchRating = ((decimal)homeTeamRating + (decimal)awayTeamRating) / 2M;
-            calcMatchRating = calcMatchRating + (((decimal)homeGoals + (decimal)awayGoals) * 0.2M);
-
-            if (calcMatchRating <= 0)
-                matchRating = 1;
-            else
-                matchRating = Convert.ToByte(calcMatchRating);
 
             IList<string> comments = new List<string>();
             
@@ -3842,8 +3829,8 @@ namespace CMS.Infrastructure.Entities
             //awayTeamComment = "Match away team - Perspective: Neutral";
 
             //update matchstat object with updated rating
-            if (matchStats != null)
-                SaveMatchStats(matchStats);
+            //if (matchStats != null)
+            //    SaveMatchStats(matchStats);
         }
         
         private static void GetPlayerAndTeamFromComment(EventType eventType, string comment, out string player, out string team, out string score)
