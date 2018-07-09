@@ -69,15 +69,20 @@ namespace CMS.Infrastructure.Entities
             GetAllCommentaries();
             BroadcastFeed();
 
-            SaveBroadcastFeed("", GetIPAddress());
+            //SaveBroadcastFeed("", GetIPAddress());
         }
         
         public void BroadcastFeed()
         {
             string feed = string.Empty;
-            feed = GetFeed();
+            feed = GetFeed(null);
 
             Clients.All.showMessage(feed);
+        }
+
+        public string GetMatchFeed(int teamId)
+        {
+            return GetFeed(teamId);
         }
 
         #region Private Methods
@@ -1156,7 +1161,7 @@ namespace CMS.Infrastructure.Entities
             return retMsg;
         }
 
-        private static string GetFeed()
+        private static string GetFeed(int? teamId)
         {
             Feed feed = new Feed();
 
@@ -1179,148 +1184,151 @@ namespace CMS.Infrastructure.Entities
                 var homeTeam = GetTeamByAPIId(matchDetails.HomeTeamAPIId);
                 var awayTeam = GetTeamByAPIId(matchDetails.AwayTeamAPIId);
 
-                if(latestEvent != null)
+                if (homeTeam.APIId == teamId || awayTeam.APIId == teamId || teamId == null)
                 {
-                    GetComment(matchDetails.Id, matchDetails.HomeTeamAPIId, matchDetails.AwayTeamAPIId, latestEvent.Comment, out homeTeamComment, out awayTeamComment);
-
-                    feedEvent.EventComment = latestEvent.Comment;
-                    feedEvent.Score = latestEvent.Score;
-                    feedEvent.Minute = latestEvent.Minute;
-                    feedEvent.EventAPIId = latestEvent.APIId;
-                    feedEvent.MatchAPIId = matchDetails.APIId;
-                    feedEvent.HomeComment = homeTeamComment;
-                    feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
-                    feedEvent.AwayComment = awayTeamComment;
-                    feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
-
-                    feedMatch.HomeTeam = homeTeam.Name;
-                    feedMatch.AwayTeam = awayTeam.Name;
-                    feedMatch.LatestEvent = feedEvent;
-
-                    //Lineups 
-                    var homeLineup = GetLineup(match.APIId, true);
-                    var awayLineup = GetLineup(match.APIId, false);
-                    var homeSubs = GetSubstitutions(match.Id, true);
-                    var awaySubs = GetSubstitutions(match.Id, false);
-
-                    #region Home Team
-
-                    IList<FeedLineup> homeTeamLineup = new List<FeedLineup>();
-
-                    foreach (var homePlayer in homeLineup)
+                    if (latestEvent != null)
                     {
-                        FeedLineup feedLineup = new FeedLineup();
-                        var player = GetPlayerById(homePlayer.PlayerId);
+                        GetComment(matchDetails.Id, matchDetails.HomeTeamAPIId, matchDetails.AwayTeamAPIId, latestEvent.Comment, out homeTeamComment, out awayTeamComment);
 
-                        feedLineup.IsHomePlayer = true;
-                        feedLineup.IsSub = homePlayer.IsSub;
+                        feedEvent.EventComment = latestEvent.Comment;
+                        feedEvent.Score = latestEvent.Score;
+                        feedEvent.Minute = latestEvent.Minute;
+                        feedEvent.EventAPIId = latestEvent.APIId;
+                        feedEvent.MatchAPIId = matchDetails.APIId;
+                        feedEvent.HomeComment = homeTeamComment;
+                        feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
+                        feedEvent.AwayComment = awayTeamComment;
+                        feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
-                        if (player != null)
+                        feedMatch.HomeTeam = homeTeam.Name;
+                        feedMatch.AwayTeam = awayTeam.Name;
+                        feedMatch.LatestEvent = feedEvent;
+
+                        //Lineups 
+                        var homeLineup = GetLineup(match.APIId, true);
+                        var awayLineup = GetLineup(match.APIId, false);
+                        var homeSubs = GetSubstitutions(match.Id, true);
+                        var awaySubs = GetSubstitutions(match.Id, false);
+
+                        #region Home Team
+
+                        IList<FeedLineup> homeTeamLineup = new List<FeedLineup>();
+
+                        foreach (var homePlayer in homeLineup)
                         {
-                            feedLineup.Number = player.SquadNumber + ".";
-                            feedLineup.PlayerId = homePlayer.PlayerId;
-                            feedLineup.Position = homePlayer.Position;
+                            FeedLineup feedLineup = new FeedLineup();
+                            var player = GetPlayerById(homePlayer.PlayerId);
 
-                            string[] name = player.Name.Split(' ');
+                            feedLineup.IsHomePlayer = true;
+                            feedLineup.IsSub = homePlayer.IsSub;
 
-                            if (name.Count() > 0)
-                                feedLineup.PlayerSurname = name[name.Count() - 1];
-                            else
-                                feedLineup.PlayerSurname = player.Name;
-
-                            var playerSubbed = homeSubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
-                            var playerSubOn = homeSubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
-
-                            if (playerSubbed != null)
+                            if (player != null)
                             {
-                                feedLineup.Substituted = true;
-                                feedLineup.SubTime = "(" + playerSubbed.Minute + ")";
-                            }
-                            else
-                            {
-                                feedLineup.Substituted = false;
-                                feedLineup.SubTime = "";
+                                feedLineup.Number = player.SquadNumber + ".";
+                                feedLineup.PlayerId = homePlayer.PlayerId;
+                                feedLineup.Position = homePlayer.Position;
+
+                                string[] name = player.Name.Split(' ');
+
+                                if (name.Count() > 0)
+                                    feedLineup.PlayerSurname = name[name.Count() - 1];
+                                else
+                                    feedLineup.PlayerSurname = player.Name;
+
+                                var playerSubbed = homeSubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
+                                var playerSubOn = homeSubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
+
+                                if (playerSubbed != null)
+                                {
+                                    feedLineup.Substituted = true;
+                                    feedLineup.SubTime = "(" + playerSubbed.Minute + ")";
+                                }
+                                else
+                                {
+                                    feedLineup.Substituted = false;
+                                    feedLineup.SubTime = "";
+                                }
+
+                                if (playerSubOn != null)
+                                {
+                                    feedLineup.Substituted = false;
+                                    feedLineup.SubTime = "(" + playerSubOn.Minute + ")";
+                                }
+                                else
+                                {
+                                    feedLineup.Substituted = false;
+                                    feedLineup.SubTime = "";
+                                }
                             }
 
-                            if (playerSubOn != null)
-                            {
-                                feedLineup.Substituted = false;
-                                feedLineup.SubTime = "(" + playerSubOn.Minute + ")";
-                            }
-                            else
-                            {
-                                feedLineup.Substituted = false;
-                                feedLineup.SubTime = "";
-                            }
+                            homeTeamLineup.Add(feedLineup);
                         }
 
-                        homeTeamLineup.Add(feedLineup);
-                    }
+                        feedMatch.HomeLineUp = homeTeamLineup;
 
-                    feedMatch.HomeLineUp = homeTeamLineup;
+                        #endregion
 
-                    #endregion
+                        #region Away Team
 
-                    #region Away Team
+                        IList<FeedLineup> awayTeamLineup = new List<FeedLineup>();
 
-                    IList<FeedLineup> awayTeamLineup = new List<FeedLineup>();
-
-                    foreach (var awayPlayer in awayTeamLineup)
-                    {
-                        FeedLineup feedLineup = new FeedLineup();
-                        var player = GetPlayerById(awayPlayer.PlayerId);
-
-                        feedLineup.IsHomePlayer = false;
-                        feedLineup.IsSub = awayPlayer.IsSub;
-
-                        if (player != null)
+                        foreach (var awayPlayer in awayTeamLineup)
                         {
-                            feedLineup.Number = player.SquadNumber + ".";
+                            FeedLineup feedLineup = new FeedLineup();
+                            var player = GetPlayerById(awayPlayer.PlayerId);
 
-                            feedLineup.PlayerId = awayPlayer.PlayerId;
-                            feedLineup.Position = awayPlayer.Position;
+                            feedLineup.IsHomePlayer = false;
+                            feedLineup.IsSub = awayPlayer.IsSub;
 
-                            string[] name = player.Name.Split(' ');
-
-                            if (name.Count() > 0)
-                                feedLineup.PlayerSurname = name[name.Count() - 1];
-                            else
-                                feedLineup.PlayerSurname = player.Name;
-
-                            var playerSubbed = awaySubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
-                            var playerSubOn = awaySubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
-
-                            if (playerSubbed != null)
+                            if (player != null)
                             {
-                                feedLineup.Substituted = true;
-                                feedLineup.SubTime = "(" + playerSubbed.Minute + ")";
-                            }
-                            else
-                            {
-                                feedLineup.Substituted = false;
-                                feedLineup.SubTime = "";
+                                feedLineup.Number = player.SquadNumber + ".";
+
+                                feedLineup.PlayerId = awayPlayer.PlayerId;
+                                feedLineup.Position = awayPlayer.Position;
+
+                                string[] name = player.Name.Split(' ');
+
+                                if (name.Count() > 0)
+                                    feedLineup.PlayerSurname = name[name.Count() - 1];
+                                else
+                                    feedLineup.PlayerSurname = player.Name;
+
+                                var playerSubbed = awaySubs.Where(x => x.APIPlayerOffId == player.APIPlayerId).FirstOrDefault();
+                                var playerSubOn = awaySubs.Where(x => x.APIPlayerOnId == player.APIPlayerId).FirstOrDefault();
+
+                                if (playerSubbed != null)
+                                {
+                                    feedLineup.Substituted = true;
+                                    feedLineup.SubTime = "(" + playerSubbed.Minute + ")";
+                                }
+                                else
+                                {
+                                    feedLineup.Substituted = false;
+                                    feedLineup.SubTime = "";
+                                }
+
+                                if (playerSubOn != null)
+                                {
+                                    feedLineup.Substituted = false;
+                                    feedLineup.SubTime = "(" + playerSubOn.Minute + ")";
+                                }
+                                else
+                                {
+                                    feedLineup.Substituted = false;
+                                    feedLineup.SubTime = "";
+                                }
                             }
 
-                            if (playerSubOn != null)
-                            {
-                                feedLineup.Substituted = false;
-                                feedLineup.SubTime = "(" + playerSubOn.Minute + ")";
-                            }
-                            else
-                            {
-                                feedLineup.Substituted = false;
-                                feedLineup.SubTime = "";
-                            }
+                            awayTeamLineup.Add(feedLineup);
                         }
 
-                        awayTeamLineup.Add(feedLineup);
+                        feedMatch.AwayLineUp = awayTeamLineup;
+
+                        #endregion
                     }
-
-                    feedMatch.AwayLineUp = awayTeamLineup;
-
-                    #endregion
                 }
-
+               
                 feedMatches.Add(feedMatch);
             }
 
