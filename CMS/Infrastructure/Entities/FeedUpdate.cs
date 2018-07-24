@@ -75,12 +75,12 @@ namespace CMS.Infrastructure.Entities
         public void BroadcastFeed()
         {
             string feed = string.Empty;
-            feed = GetFeed(null);
+            feed = GetFeed(null).ToString();
 
             Clients.All.showMessage(feed);
         }
 
-        public string GetMatchFeed(int teamId)
+        public Feed GetMatchFeed(int teamId)
         {
             return GetFeed(teamId);
         }
@@ -1161,7 +1161,7 @@ namespace CMS.Infrastructure.Entities
             return retMsg;
         }
 
-        private static string GetFeed(int? teamId)
+        private static Feed GetFeed(int? teamId)
         {
             Feed feed = new Feed();
 
@@ -1384,7 +1384,7 @@ namespace CMS.Infrastructure.Entities
 
             #endregion
 
-            return JsonConvert.SerializeObject(feed);
+            return feed;
         }
 
         #region Save

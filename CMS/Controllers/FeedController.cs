@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using CMS.Infrastructure.Entities;
+using Newtonsoft.Json;
 using CMS.Infrastructure.Abstract;
 
 namespace CMS.Controllers
@@ -13,11 +14,23 @@ namespace CMS.Controllers
     {
         
         // GET: api/Feed/5
-        public string Get(int id)
+        public IHttpActionResult Get(int id)
         {
             FeedUpdate update = FeedUpdate.Instance;
 
-            return update.GetMatchFeed(id);
+            return Json(update.GetMatchFeed(id), DefaultJsonSettings);
+        }
+
+        private JsonSerializerSettings DefaultJsonSettings
+        {
+            get
+            {
+                return new JsonSerializerSettings()
+                {
+                    Formatting = Formatting.Indented,
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                };
+            }
         }
     }
 }

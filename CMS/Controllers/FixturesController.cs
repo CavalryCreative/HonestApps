@@ -14,7 +14,7 @@ namespace CMS.Controllers
     public class FixturesController : ApiController
     {
         // GET api/<controller>
-        public string Get()
+        public IHttpActionResult Get()
         {
             Feed feed = new Feed();
             IList<Match> fixtures = new List<Match>();
@@ -48,11 +48,11 @@ namespace CMS.Controllers
 
             feed.Fixtures = feedFixtures;
 
-            return JsonConvert.SerializeObject(feed);
+            return Json(feed);
         }
 
         // GET api/<controller>/5
-        public string Get(int id)
+        public IHttpActionResult Get(int id)
         {
             Feed feed = new Feed();
             IList<Match> fixtures = new List<Match>();
@@ -87,7 +87,7 @@ namespace CMS.Controllers
 
             feed.Fixtures = feedFixtures;
 
-            return JsonConvert.SerializeObject(feed);
+            return Json(feed);
         }
 
         private static Team GetTeamByAPIId(int id)
