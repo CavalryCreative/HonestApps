@@ -9,6 +9,8 @@ namespace CMS.Infrastructure.Entities
         public int APIId { get; set; }
         public int HomeTeamAPIId { get; set; }
         public int AwayTeamAPIId { get; set; }
+        public string TeamToPlay { get; set; }
+        public bool IsHome { get; set; }
         public string HomeTeam { get; set; }
         public string AwayTeam { get; set; }
         public string MatchDate { get; set; }

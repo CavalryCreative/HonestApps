@@ -74,12 +74,21 @@ namespace CMS.Controllers
                 var homeTeam = GetTeamByAPIId(fixture.HomeTeamAPIId);
                 var awayTeam = GetTeamByAPIId(fixture.AwayTeamAPIId);
 
+                if (id == fixture.HomeTeamAPIId)
+                {
+                    feedFixture.TeamToPlay = awayTeam.Name;
+                }
+                else
+                {
+                    feedFixture.TeamToPlay = homeTeam.Name;
+                }
+
                 feedFixture.APIId = fixture.APIId;
                 feedFixture.HomeTeamAPIId = homeTeam.APIId;
                 feedFixture.HomeTeam = homeTeam.Name;
                 feedFixture.AwayTeamAPIId = awayTeam.APIId;
                 feedFixture.AwayTeam = awayTeam.Name;
-                feedFixture.MatchDate = fixture.Date.Value.ToString("D");
+                feedFixture.MatchDate = fixture.Date.Value.ToString("MMMM dd");
                 feedFixture.FullTimeScore = fixture.FullTimeScore;
 
                 feedFixtures.Add(feedFixture);
