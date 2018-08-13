@@ -1177,9 +1177,11 @@ namespace CMS.Infrastructure.Entities
             {
                 FeedMatch feedMatch = new FeedMatch();
                 Event feedEvent = new Event();
+                Stat matchStats = new Stat();
 
                 var matchDetails = GetMatchByAPIId(match.APIId);
                 var latestEvent = GetLatestEvents(matchDetails.Id);
+                var latestStats = GetMatchStatsByAPIId(matchDetails.Id);
 
                 var homeTeam = GetTeamByAPIId(matchDetails.HomeTeamAPIId);
                 var awayTeam = GetTeamByAPIId(matchDetails.AwayTeamAPIId);
@@ -1203,6 +1205,20 @@ namespace CMS.Infrastructure.Entities
                         feedMatch.HomeTeam = homeTeam.Name;
                         feedMatch.AwayTeam = awayTeam.Name;
                         feedMatch.LatestEvent = feedEvent;
+
+                        //Match stats
+                        matchStats.AwayTeamPossessionTime = latestStats.AwayTeamPossessionTime.Replace("%", "");
+                        matchStats.HomeTeamPossessionTime = latestStats.HomeTeamPossessionTime.Replace("%", "");
+                        matchStats.AwayTeamTotalShots = latestStats.AwayTeamTotalShots;
+                        matchStats.HomeTeamTotalShots = latestStats.HomeTeamTotalShots;
+                        matchStats.AwayTeamOnGoalShots = latestStats.AwayTeamOnGoalShots;
+                        matchStats.HomeTeamOnGoalShots = latestStats.HomeTeamOnGoalShots;
+                        matchStats.AwayTeamCorners = latestStats.AwayTeamCorners;
+                        matchStats.HomeTeamCorners = latestStats.HomeTeamCorners;
+                        matchStats.AwayTeamFouls = latestStats.AwayTeamFouls;
+                        matchStats.HomeTeamFouls = latestStats.HomeTeamFouls;
+
+                        feedMatch.MatchStats = matchStats;
 
                         //Lineups 
                         var homeLineup = GetLineup(match.APIId, true);

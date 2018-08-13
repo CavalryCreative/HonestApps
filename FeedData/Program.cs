@@ -38,7 +38,7 @@ namespace FeedData
             //    Console.WriteLine("Hangfire Server started. Press any key to exit...");
             //    Console.ReadKey();
             //}
-            CompId = "1056";//1056 World Cup, 1204 Premier League
+            CompId = "1204";//1056 World Cup, 1204 Premier League
 
             UpdatePlayers();
             GetFixtures();
