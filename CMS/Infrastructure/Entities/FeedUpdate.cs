@@ -926,6 +926,21 @@ namespace CMS.Infrastructure.Entities
                             commEvent.AwayTeamMatchRating = awayRating;
 
                             SaveEvent(commEvent);
+
+                                //If end of match update full time score in match record
+                                if (evtComment.StartsWith("Second Half ended"))
+                                {
+                                    match.FullTimeScore = GetFullTimeScore(match.Id);
+
+                                    try
+                                    {
+                                        SaveMatch(match);
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        SaveException(ex, string.Format("SaveMatch - GetCommentaries, MatchId: {0}", match.Id.ToString()));
+                                    }                                
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -1477,6 +1492,7 @@ namespace CMS.Infrastructure.Entities
                     recordToUpdate.Referee = updatedRecord.Referee;
                     recordToUpdate.Stadium = updatedRecord.Stadium;
                     recordToUpdate.Time = updatedRecord.Time;
+                    recordToUpdate.FullTimeScore = updatedRecord.FullTimeScore;
 
                     context.Entry(recordToUpdate).State = System.Data.Entity.EntityState.Modified;
                     Id = updatedRecord.Id;
@@ -2634,6 +2650,28 @@ namespace CMS.Infrastructure.Entities
             }
 
             score = string.Format("{0} {1} - {2} {3}", homeTeam, homeGoals, awayGoals, awayTeam);
+
+            return score;
+        }
+
+        private static string GetFullTimeScore(Guid matchId)
+        {
+            string score = string.Empty;
+            var summary = GetSummaryByMatchId(matchId);
+
+            int homeGoals = 0;
+            int awayGoals = 0;
+
+            if (summary != null)
+            {
+                using (EFDbContext context = new EFDbContext())
+                {
+                    homeGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == true)).Count();
+                    awayGoals = context.Goals.Where(x => (x.SummaryId == summary.Id) && (x.IsHomeTeam == false)).Count();
+                }
+            }
+
+            score = string.Format("[{0}-{1}]", homeGoals, awayGoals);
 
             return score;
         }

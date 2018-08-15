@@ -15,7 +15,7 @@ namespace CMS.Controllers
 
             using (EFDbContext context = new EFDbContext())
             {
-                foreach (var team in context.Teams.Where(x => x.Active == true))
+                foreach (var team in context.Teams.Where(x => x.Active == true).OrderBy(x => x.Name))
                 {
                     teams.Add(team);
                 }

@@ -3,20 +3,25 @@ using System.Linq;
 using System.Web.Http;
 using CMS.Infrastructure.Entities;
 using CMS.Infrastructure.Concrete;
+using System;
 
 namespace CMS.Controllers
 {
     public class FixturesController : ApiController
     {
+        public DateTime StartDate { get; set; }
+
         // GET api/<controller>
         public IHttpActionResult Get()
         {
             Feed feed = new Feed();
             IList<Match> fixtures = new List<Match>();
 
+            StartDate = new DateTime(2018, 8, 1);
+
             using (EFDbContext context = new EFDbContext())
             {
-                foreach (var match in context.Matches)
+                foreach (var match in context.Matches.Where(x => x.Date > StartDate).OrderBy(x => x.Date))
                 {
                     fixtures.Add(match);
                 }
@@ -37,6 +42,7 @@ namespace CMS.Controllers
                 feedFixture.AwayTeamAPIId = awayTeam.APIId;
                 feedFixture.AwayTeam = awayTeam.Name;
                 feedFixture.MatchDate = fixture.Date.Value.ToString("D");
+                feedFixture.FullTimeScore = fixture.FullTimeScore;
 
                 feedFixtures.Add(feedFixture);
             }
@@ -52,9 +58,11 @@ namespace CMS.Controllers
             Feed feed = new Feed();
             IList<Match> fixtures = new List<Match>();
 
+            StartDate = new DateTime(2018, 8, 1);
+
             using (EFDbContext context = new EFDbContext())
             {
-                foreach (var match in context.Matches.Where(x => x.AwayTeamAPIId == id || x.HomeTeamAPIId == id).OrderBy(x => x.Date))
+                foreach (var match in context.Matches.Where(x => (x.AwayTeamAPIId == id || x.HomeTeamAPIId == id) && x.Date > StartDate).OrderBy(x => x.Date))
                 {
                     fixtures.Add(match);
                 }
