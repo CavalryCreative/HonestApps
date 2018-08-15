@@ -54,20 +54,10 @@ namespace CMS.Infrastructure.Concrete
         {
             public TeamMap()
             {
-                //HasMany(p => p.Matches).WithMany(c => c.Teams).Map(m =>
-                //{
-                //    m.MapLeftKey("MatchId");
-                //    m.MapRightKey("TeamId");
-                //});
-
-                //Property(p => p.URL).HasMaxLength(500).IsUnicode(false);
-                //Property(p => p.JobRef).HasMaxLength(50).IsUnicode(false);
-                //Property(p => p.Title).HasMaxLength(100).IsUnicode(false);
-                //Property(p => p.Description).IsUnicode(false);
-                //Property(p => p.Summary).HasMaxLength(5000).IsUnicode(false);
-                //Property(p => p.Keywords).HasMaxLength(5000).IsUnicode(false);
                 Property(p => p.Name).HasMaxLength(500).IsUnicode(false);
                 Property(p => p.Stadium).HasMaxLength(500).IsUnicode(false);
+                Property(p => p.PrimaryColour).HasMaxLength(50).IsUnicode(false);
+                Property(p => p.SecondaryColour).HasMaxLength(50).IsUnicode(false);
             }
         }
 
@@ -81,9 +71,9 @@ namespace CMS.Infrastructure.Concrete
                 Property(p => p.Attendance).HasMaxLength(10).IsUnicode(false);
                 Property(p => p.Time).HasMaxLength(20).IsUnicode(false);
                 Property(p => p.Referee).HasMaxLength(100).IsUnicode(false);
-            Property(p => p.HalfTimeScore).HasMaxLength(10).IsUnicode(false);
-            Property(p => p.FullTimeScore).HasMaxLength(10).IsUnicode(false);
-        }
+                Property(p => p.HalfTimeScore).HasMaxLength(10).IsUnicode(false);
+                Property(p => p.FullTimeScore).HasMaxLength(10).IsUnicode(false);
+            }
         }
 
         public class EventMap : EntityTypeConfiguration<Event>

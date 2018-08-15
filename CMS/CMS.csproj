@@ -226,6 +226,7 @@
     <Compile Include="Controllers\FixturesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LeagueStandingsController.cs" />
+    <Compile Include="Controllers\TeamsController.cs" />
     <Compile Include="EntitiesMigrations\201602032130207_Initial.cs" />
     <Compile Include="EntitiesMigrations\201602032130207_Initial.Designer.cs">
       <DependentUpon>201602032130207_Initial.cs</DependentUpon>
@@ -310,6 +311,10 @@
     <Compile Include="EntitiesMigrations\201612112133053_UpdateLeagueStandings2.Designer.cs">
       <DependentUpon>201612112133053_UpdateLeagueStandings2.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntitiesMigrations\201808141056381_UpdateTeam.cs" />
+    <Compile Include="EntitiesMigrations\201808141056381_UpdateTeam.Designer.cs">
+      <DependentUpon>201808141056381_UpdateTeam.cs</DependentUpon>
+    </Compile>
     <Compile Include="EntitiesMigrations\Configuration.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -356,6 +361,7 @@
     <Compile Include="Infrastructure\Entities\FeedLineup.cs" />
     <Compile Include="Infrastructure\Entities\FeedMatch.cs" />
     <Compile Include="Infrastructure\Entities\FeedStanding.cs" />
+    <Compile Include="Infrastructure\Entities\FeedTeam.cs" />
     <Compile Include="Infrastructure\Entities\FeedUpdate.cs" />
     <Compile Include="Infrastructure\Entities\Goal.cs" />
     <Compile Include="Infrastructure\Entities\LeagueStanding.cs" />
@@ -520,6 +526,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EntitiesMigrations\201612112133053_UpdateLeagueStandings2.resx">
       <DependentUpon>201612112133053_UpdateLeagueStandings2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EntitiesMigrations\201808141056381_UpdateTeam.resx">
+      <DependentUpon>201808141056381_UpdateTeam.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

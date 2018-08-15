@@ -17,6 +17,8 @@ namespace CMS.Infrastructure.Entities
         public int APIId { get; set; }
         public string Name { get; set; }
         public string Stadium { get; set; }
+        public string PrimaryColour { get; set; }
+        public string SecondaryColour { get; set; }
 
         public virtual ICollection<Match> HomeMatches { get; set; }
         public virtual ICollection<Match> AwayMatches { get; set; }

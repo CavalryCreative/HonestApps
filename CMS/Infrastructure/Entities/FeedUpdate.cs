@@ -29,7 +29,7 @@ namespace CMS.Infrastructure.Entities
             () => new FeedUpdate(GlobalHost.ConnectionManager.GetHubContext<FeedHub>().Clients));
        
         //private Timer matchTimer;
-        private Timer eventsTimer;
+        //private Timer eventsTimer;
         string IPAddress = string.Empty;
 
         private FeedUpdate(IHubConnectionContext<dynamic> clients)
@@ -39,7 +39,7 @@ namespace CMS.Infrastructure.Entities
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
       
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
+            //eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -59,7 +59,7 @@ namespace CMS.Infrastructure.Entities
         public void Stop(bool immediate)
         {
             //matchTimer.Dispose();
-            eventsTimer.Dispose();
+            //eventsTimer.Dispose();
 
             HostingEnvironment.UnregisterObject(this);
         }
@@ -1197,13 +1197,17 @@ namespace CMS.Infrastructure.Entities
                         feedEvent.Minute = latestEvent.Minute;
                         feedEvent.EventAPIId = latestEvent.APIId;
                         feedEvent.MatchAPIId = matchDetails.APIId;
-                        feedEvent.HomeComment = homeTeamComment;
+                        feedEvent.HomeComment = string.IsNullOrWhiteSpace(homeTeamComment) ? string.Empty : homeTeamComment.Remove(homeTeamComment.Length - 1, 1);
                         feedEvent.HomeTeamAPIId = matchDetails.HomeTeamAPIId;
-                        feedEvent.AwayComment = awayTeamComment;
+                        feedEvent.AwayComment = string.IsNullOrWhiteSpace(awayTeamComment) ? string.Empty : awayTeamComment.Remove(awayTeamComment.Length - 1, 1);
                         feedEvent.AwayTeamAPIId = matchDetails.AwayTeamAPIId;
 
                         feedMatch.HomeTeam = homeTeam.Name;
+                        feedMatch.HomeTeamPrimaryColour = homeTeam.PrimaryColour;
+                        feedMatch.HomeTeamSecondaryColour = homeTeam.SecondaryColour;
                         feedMatch.AwayTeam = awayTeam.Name;
+                        feedMatch.AwayTeamPrimaryColour = awayTeam.PrimaryColour;
+                        feedMatch.AwayTeamSecondaryColour = awayTeam.SecondaryColour;
                         feedMatch.LatestEvent = feedEvent;
 
                         //Match stats
@@ -1288,7 +1292,7 @@ namespace CMS.Infrastructure.Entities
 
                         IList<FeedLineup> awayTeamLineup = new List<FeedLineup>();
 
-                        foreach (var awayPlayer in awayTeamLineup)
+                        foreach (var awayPlayer in awayLineup)
                         {
                             FeedLineup feedLineup = new FeedLineup();
                             var player = GetPlayerById(awayPlayer.PlayerId);
@@ -1343,9 +1347,9 @@ namespace CMS.Infrastructure.Entities
 
                         #endregion
                     }
-                }
-               
-                feedMatches.Add(feedMatch);
+
+                    feedMatches.Add(feedMatch);
+                }              
             }
 
             feed.Matches = feedMatches;
@@ -1398,6 +1402,32 @@ namespace CMS.Infrastructure.Entities
 
             //feed.Fixtures = feedFixtures;
 
+            #endregion
+
+            #region Team
+
+            if(teamId.HasValue)
+            {
+                var selectedTeam = GetTeamByAPIId(teamId.Value);
+
+                if (selectedTeam != null)
+                {
+                    IList<FeedTeam> feedTeams = new List<FeedTeam>();
+
+                    FeedTeam feedTeam = new FeedTeam();
+
+                    feedTeam.APIId = selectedTeam.APIId;
+                    feedTeam.Name = selectedTeam.Name;
+                    feedTeam.PrimaryColour = selectedTeam.PrimaryColour;
+                    feedTeam.SecondaryColour = selectedTeam.SecondaryColour;
+                    feedTeam.Stadium = selectedTeam.Stadium;
+
+                    feedTeams.Add(feedTeam);
+
+                    feed.Teams = feedTeams;
+                }
+            }
+            
             #endregion
 
             return feed;

@@ -8,7 +8,11 @@ namespace CMS.Infrastructure.Entities
     public class FeedMatch
     {
         public string HomeTeam { get; set; }
+        public string HomeTeamPrimaryColour { get; set; }
+        public string HomeTeamSecondaryColour { get; set; }
         public string AwayTeam { get; set; }
+        public string AwayTeamPrimaryColour { get; set; }
+        public string AwayTeamSecondaryColour { get; set; }
         public Event LatestEvent { get; set; }
         public Stat MatchStats { get; set; }
         public IList<FeedLineup> HomeLineUp { get; set; }
