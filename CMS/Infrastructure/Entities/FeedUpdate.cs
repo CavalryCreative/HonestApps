@@ -69,7 +69,7 @@ namespace CMS.Infrastructure.Entities
             GetAllCommentaries();
             //BroadcastFeed();
 
-            SaveBroadcastFeed("", GetIPAddress());
+            //SaveBroadcastFeed("", GetIPAddress());
         }
         
         public void BroadcastFeed()
