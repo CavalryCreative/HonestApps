@@ -29,7 +29,7 @@ namespace CMS.Infrastructure.Entities
             () => new FeedUpdate(GlobalHost.ConnectionManager.GetHubContext<FeedHub>().Clients));
        
         //private Timer matchTimer;
-        //private Timer eventsTimer;
+        private Timer eventsTimer;
         string IPAddress = string.Empty;
 
         private FeedUpdate(IHubConnectionContext<dynamic> clients)
@@ -39,7 +39,7 @@ namespace CMS.Infrastructure.Entities
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
       
-            //eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -59,7 +59,7 @@ namespace CMS.Infrastructure.Entities
         public void Stop(bool immediate)
         {
             //matchTimer.Dispose();
-            //eventsTimer.Dispose();
+            eventsTimer.Dispose();
 
             HostingEnvironment.UnregisterObject(this);
         }
@@ -67,9 +67,9 @@ namespace CMS.Infrastructure.Entities
         public void BroadcastFeed(object sender)
         {
             GetAllCommentaries();
-            BroadcastFeed();
+            //BroadcastFeed();
 
-            //SaveBroadcastFeed("", GetIPAddress());
+            SaveBroadcastFeed("", GetIPAddress());
         }
         
         public void BroadcastFeed()
