@@ -2649,7 +2649,8 @@ namespace CMS.Infrastructure.Entities
                 }               
             }
 
-            score = string.Format("{0} {1} - {2} {3}", homeTeam, homeGoals, awayGoals, awayTeam);
+            //score = string.Format("{0} {1} - {2} {3}", homeTeam, homeGoals, awayGoals, awayTeam);
+            score = string.Format("{0}-{1}", homeGoals, awayGoals);
 
             return score;
         }
