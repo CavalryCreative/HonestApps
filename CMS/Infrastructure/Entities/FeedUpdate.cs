@@ -39,7 +39,7 @@ namespace CMS.Infrastructure.Entities
             Clients = clients;
             //matchTimer = new Timer(GetFixtures, null, TimeSpan.FromSeconds(1), TimeSpan.FromDays(1));
       
-            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(60));
+            eventsTimer = new Timer(BroadcastFeed, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(6000));
         }
 
         private IHubConnectionContext<dynamic> Clients
@@ -149,10 +149,10 @@ namespace CMS.Infrastructure.Entities
                     }
 
                     var reader = new StreamReader(webResponse.GetResponseStream());
-                    string s = reader.ReadToEnd();
+                    //string s = reader.ReadToEnd();
 
                     //Test
-                    //string s = System.IO.File.ReadAllText(@"C:\Users\Wayne\Documents\GitHub\HonestApps\CMS\MatchId2058953.txt");
+                    string s = System.IO.File.ReadAllText(@"E:\GitHub\Cavalry\HonestApps\CMS\TestFeed.txt");
 
                     JToken token = JObject.Parse(s);
 
@@ -3832,7 +3832,10 @@ namespace CMS.Infrastructure.Entities
                         //Goal!  Tunisia 1, England 2. Harry Kane  - England -  header inside of six yard box - left side to the left corner. Assist -  Harry Maguire after corner. (not showing)
                         //Poland 0, Senegal 2. M'Baye Niang  - Senegal -  shot with right foot from the centre of the box to the centre of the goal. (errored)
                         //Goal!  Uruguay 1, Saudi Arabia 0. Luis Su\u00c3\u00a1rez  - Uruguay -  shot with left foot from few metres to the right corner. Assist -  Carlos S\u00c3\u00a1nchez with a cross after corner. (errored)
-
+                        
+                        //Goal!  Cardiff City 2, Fulham 1. Bobby Reid  - Cardiff City -  shot with right foot from the right side of the box to the centre of the goal . (error)
+                        //Goal!  Everton 1, Crystal Palace 0. Dominic Calvert-Lewin  - Everton -  shot with the head from the centre of the box to the left corner. Assist -  Ademola Lookman with a cross.(showing as away goal)
+                        //Goal!  Everton 2, Crystal Palace 0. Cenk Tosun  - Everton -  shot with right foot from the right side of the box to the centre of the goal. Assist -  Michael Keane following a fast break.(correct)
                         arr = comment.Split('.');
                         score = arr[0].Trim();
 
